@@ -7,6 +7,7 @@ interface User {
     email: string;
     dob: string;      // Data de nascimento
     password: string;
+    skinHistory: string;
 }
 
 // Criamos a base de dados 'NevoDB'

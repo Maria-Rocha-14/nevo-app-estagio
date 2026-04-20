@@ -16,6 +16,7 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [dataNasc, setDataNasc] = useState('');
     const [password, setPassword] = useState('');
+    const [historicoPele, setHistoricoPele] = useState('');
     const [aceitouTermos, setAceitouTermos] = useState(false);
     const [erroUI, setErroUI] = useState('');
     const hasError = Boolean(erroUI);
@@ -24,7 +25,8 @@ export default function Register() {
         e.preventDefault();
         setErroUI('');
 
-        if (!nome || !email || !dataNasc || !password) {
+        // Validação de todos os campos obrigatórios
+        if (!nome || !email || !dataNasc || !password || !historicoPele) {
             setErroUI(t('errors.fill_all'));
             return;
         }
@@ -35,7 +37,13 @@ export default function Register() {
         }
 
         try {
-            await db.users.add({ name: nome, email, dob: dataNasc, password });
+            await db.users.add({
+                name: nome,
+                email,
+                dob: dataNasc,
+                password,
+                skinHistory: historicoPele
+            });
             navigate('/');
         } catch {
             setErroUI(t('errors.email_exists'));
@@ -66,7 +74,7 @@ export default function Register() {
                 <p className="login-subtitle">{t('login.subtitle')}</p>
             </div>
 
-            <form className="login-card" onSubmit={handleRegister} noValidate aria-describedby={hasError ? 'register-form-error' : undefined}>
+            <form className="login-card" onSubmit={handleRegister} noValidate>
                 <h2 className="login-title">{t('register.title')}</h2>
 
                 {erroUI && (
@@ -76,41 +84,60 @@ export default function Register() {
                 )}
 
                 <div className="login-input-group">
-                    <label htmlFor="register-name">{t('register.name')}</label>
+                    <label htmlFor="register-name">{t('register.name')} *</label>
                     <div className="input-wrapper">
-                        <User className="input-icon" size={20} aria-hidden="true" />
-                        <input id="register-name" type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder={t('register.name_placeholder')} className="login-input with-icon" autoComplete="name" required aria-invalid={hasError && !nome} aria-describedby={hasError ? 'register-form-error' : undefined} />
+                        <User className="input-icon" size={20} />
+                        <input id="register-name" type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder={t('register.name_placeholder')} className="login-input with-icon" required />
                     </div>
                 </div>
 
                 <div className="login-input-group">
-                    <label htmlFor="register-email">{t('register.email')}</label>
+                    <label htmlFor="register-email">{t('register.email')} *</label>
                     <div className="input-wrapper">
-                        <Mail className="input-icon" size={20} aria-hidden="true" />
-                        <input id="register-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className="login-input with-icon" autoComplete="email" required aria-invalid={hasError && !email} aria-describedby={hasError ? 'register-form-error' : undefined} />
+                        <Mail className="input-icon" size={20} />
+                        <input id="register-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className="login-input with-icon" required />
                     </div>
                 </div>
 
                 <div className="login-input-group">
-                    <label htmlFor="register-dob">{t('register.dob')}</label>
+                    <label htmlFor="register-dob">{t('register.dob')} *</label>
                     <div className="input-wrapper">
-                        <Calendar className="input-icon" size={20} aria-hidden="true" />
-                        <input id="register-dob" type="date" value={dataNasc} onChange={(e) => setDataNasc(e.target.value)} className="login-input with-icon" required aria-invalid={hasError && !dataNasc} aria-describedby={hasError ? 'register-form-error' : undefined} />
+                        <Calendar className="input-icon" size={20} />
+                        <input id="register-dob" type="date" value={dataNasc} onChange={(e) => setDataNasc(e.target.value)} className="login-input with-icon" required />
                     </div>
                 </div>
 
                 <div className="login-input-group">
-                    <label htmlFor="register-password">{t('register.password')}</label>
+                    <label htmlFor="register-password">{t('register.password')} *</label>
                     <div className="input-wrapper">
-                        <Lock className="input-icon" size={20} aria-hidden="true" />
-                        <input id="register-password" type={mostrarPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="........." className="login-input with-icon" autoComplete="new-password" required aria-invalid={hasError && !password} aria-describedby={hasError ? 'register-form-error' : undefined} />
-                        <button type="button" className="eye-button" onClick={() => setMostrarPassword(!mostrarPassword)} aria-label={mostrarPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'} aria-pressed={mostrarPassword}>
+                        <Lock className="input-icon" size={20} />
+                        <input id="register-password" type={mostrarPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="........." className="login-input with-icon" required />
+                        <button type="button" className="eye-button" onClick={() => setMostrarPassword(!mostrarPassword)}>
                             {mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
                     </div>
                 </div>
 
-                <div className="login-input-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px' }}>
+                {/* Pergunta de Histórico de Saúde */}
+                <div className="login-input-group skin-history-group">
+                    <label>{t('register.skin_history_question')} *</label>
+                    <div className="radio-options">
+                        <label className="radio-card">
+                            <input type="radio" name="skinHistory" value="sim" checked={historicoPele === 'sim'} onChange={(e) => setHistoricoPele(e.target.value)} />
+                            <span>{t('register.yes')}</span>
+                        </label>
+                        <label className="radio-card">
+                            <input type="radio" name="skinHistory" value="nao" checked={historicoPele === 'nao'} onChange={(e) => setHistoricoPele(e.target.value)} />
+                            <span>{t('register.no')}</span>
+                        </label>
+                        <label className="radio-card">
+                            <input type="radio" name="skinHistory" value="pnr" checked={historicoPele === 'pnr'} onChange={(e) => setHistoricoPele(e.target.value)} />
+                            <span>{t('register.pnr')}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="login-input-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
                     <input
                         type="checkbox"
                         id="privacy"
@@ -131,6 +158,7 @@ export default function Register() {
                         {t('register.consent_processing')}
                     </label>
                 </div>
+
                 <button type="submit" className="login-button">{t('register.button')}</button>
 
                 <div className="login-footer" style={{ marginTop: '20px' }}>

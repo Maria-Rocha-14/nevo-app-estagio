@@ -29,7 +29,11 @@
         "consent_processing": "and I consent to the local processing of my health data.",
         "button": "Create Account",
         "already_account": "Already have an account?",
-        "sign_in": "Sign In"
+        "sign_in": "Sign In",
+        "skin_history_question": "Have you ever had any skin conditions?",
+        "yes": "Yes",
+        "no": "No",
+        "pnr": "Prefer not to say"
     },
     "errors": {
         "user_not_found": "Account not found.",

@@ -29,7 +29,11 @@
         "consent_processing": "e consinto o processamento local dos meus dados de saúde.",
         "button": "Criar Conta",
         "already_account": "Já tem conta?",
-        "sign_in": "Entrar"
+        "sign_in": "Entrar",
+        "skin_history_question": "Já teve algum problema de pele?",
+        "yes": "Sim",
+        "no": "Não",
+        "pnr": "Prefiro não responder"
     },
     "errors": {
         "user_not_found": "Esta conta não existe.",
