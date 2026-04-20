@@ -1,0 +1,52 @@
+.feedback-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.feedback-text {
+  color: #1f2937;
+}
+
+.feedback-close {
+  border: none;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.feedback-close:focus-visible {
+  outline: 3px solid #0b5fff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.feedback-success {
+  background: #e8f9ee;
+  border-color: #9adcb0;
+}
+
+.feedback-error {
+  background: #fde8e8;
+  border-color: #f8b4b4;
+}
+
+.feedback-warning {
+  background: #fff6e5;
+  border-color: #f1cd8d;
+}
+
+.feedback-info {
+  background: #e8f1fe;
+  border-color: #a6c6fa;
+}

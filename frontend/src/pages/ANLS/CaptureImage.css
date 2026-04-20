@@ -1,0 +1,354 @@
+/* 🔹 Layout geral */
+.capture-container {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, #dff3ec 0%, rgba(223, 243, 236, 0) 46%), linear-gradient(180deg, #f4fbf8 0%, #eef7f3 100%);
+    padding: 28px 18px 110px;
+    max-width: 480px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* 🔹 Header */
+.capture-header {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.capture-header h1 {
+    margin: 0;
+    font-size: 1.95rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #1f2d2a;
+}
+
+/* 🔹 Cards principais */
+.scan-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.scan-option-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fdfefe 100%);
+    border: 1px solid #d5e6e0;
+    border-radius: 22px;
+    padding: 22px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 22px rgba(31, 45, 42, 0.08);
+}
+
+.scan-option-card:hover {
+    transform: translateY(-3px);
+    border-color: #a5d4c8;
+}
+
+.scan-option-card:active {
+    transform: scale(0.98);
+}
+
+/* 🔹 Ícones */
+.scan-option-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+}
+
+.camera-icon { background: #d9f3ea; }
+.upload-icon { background: #dcecff; }
+
+/* 🔹 Texto */
+.scan-option-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #1f2d2a;
+}
+
+.scan-option-card p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #556865;
+}
+
+/* 🔹 Caixa de dicas */
+.scan-tips-card {
+    background: linear-gradient(135deg, #ecf7ff 0%, #e2f0ff 100%);
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid #cce2ff;
+    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.12);
+}
+
+.scan-tips-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.scan-tips-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #23446f;
+}
+
+/* 🔹 PREVIEW */
+.preview-container {
+    text-align: center;
+}
+
+.preview-image {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #d7e5e1;
+    box-shadow: 0 12px 26px rgba(21, 37, 33, 0.1);
+    margin-bottom: 20px;
+}
+
+.demo-controls {
+    background: #ffffff;
+    border: 1px solid #d6e4df;
+    border-radius: 14px;
+    padding: 10px;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.demo-controls p {
+    margin: 0 0 8px;
+    color: #33504b;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.demo-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.demo-option {
+    border: 1px solid #cfdad6;
+    background: #fff;
+    color: #2f3f3c;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.demo-option.active {
+    background: #0f766e;
+    border-color: #0f766e;
+    color: #fff;
+}
+
+/* 🔹 Botões preview */
+.preview-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 14px;
+    background: linear-gradient(135deg, #12967e 0%, #0d7f6a 100%);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+}
+
+.cancel-btn {
+    flex: 1;
+    padding: 14px;
+    background: white;
+    border: 1px solid #cfdad6;
+    border-radius: 12px;
+    color: #2f3d3a;
+    font-weight: 700;
+}
+
+/* 🔹 Navbar */
+.bottom-navbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #8c9996;
+    font-size: 0.72rem;
+    gap: 4px;
+}
+
+.nav-btn.active {
+    color: #5fa79a;
+}
+
+.scan-option-card:focus-visible,
+.confirm-btn:focus-visible,
+.cancel-btn:focus-visible,
+.nav-btn:focus-visible,
+.demo-option:focus-visible {
+    outline: 3px solid #0b5fff;
+    outline-offset: 2px;
+}
+
+/* 🔹 CÂMARA LIVE PREVIEW */
+.camera-live-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.camera-view {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 12px 26px rgba(21, 37, 33, 0.1);
+}
+
+.camera-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.4) 100%);
+}
+
+.reticle {
+    width: 200px;
+    height: 200px;
+    border: 3px dashed rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.2);
+}
+
+.camera-hint {
+    color: white;
+    font-weight: 600;
+    margin-top: 24px;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.4);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+.camera-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.capture-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #12967e;
+    color: white;
+    border: 4px solid #dff3ec;
+    box-shadow: 0 8px 20px rgba(18, 150, 126, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.capture-btn:active {
+    transform: scale(0.9);
+}
+
+.cancel-camera-btn {
+    padding: 10px 24px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid #cfdad6;
+    color: #556865;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@media (max-width: 380px) {
+    .capture-container {
+        padding: 18px 14px 104px;
+    }
+
+    .capture-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .preview-actions {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 640px) {
+    .capture-container {
+        max-width: 640px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .scan-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bottom-navbar {
+        max-width: 640px;
+    }
+}
+
+@media (min-width: 900px) {
+    .capture-container {
+        max-width: 820px;
+    }
+
+    .bottom-navbar {
+        max-width: 820px;
+    }
+}

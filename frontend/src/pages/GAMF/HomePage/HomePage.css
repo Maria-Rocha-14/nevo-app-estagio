@@ -1,0 +1,569 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+:root {
+    --icon-teal: #5fa79a;
+    --btn-gradient: linear-gradient(135deg, #00c2cb 0%, #009cb7 100%);
+    --bg-app: #f1f8f6;
+    --text-dark: #1a1a1a;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+.home-container {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-app);
+    min-height: 100vh;
+    padding: 20px;
+    padding-bottom: 120px;
+
+    max-width: 450px;
+    margin: 0 auto;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.home-skeleton-block,
+.home-skeleton-card {
+    background: linear-gradient(90deg, #e6efec 0%, #f4f8f7 50%, #e6efec 100%);
+    background-size: 200% 100%;
+    animation: pulse-shimmer 1.2s ease-in-out infinite;
+    border-radius: 14px;
+}
+
+.home-skeleton-block {
+    height: 140px;
+    margin-bottom: 16px;
+}
+
+.home-skeleton-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.home-skeleton-card {
+    height: 90px;
+}
+
+@keyframes pulse-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+@media (max-width: 360px) {
+    .home-container {
+        padding: 16px;
+        padding-bottom: 108px;
+    }
+
+    .user-info h1 {
+        font-size: 22px;
+    }
+
+    .main-scan-btn {
+        font-size: 16px;
+        padding: 14px;
+    }
+}
+
+@media (min-width: 560px) {
+    .home-container {
+        max-width: 560px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .bottom-navbar {
+        max-width: 560px;
+    }
+}
+
+@media (min-width: 768px) {
+    .home-container {
+        max-width: 760px;
+        padding: 28px;
+        padding-bottom: 124px;
+    }
+
+    .bottom-navbar {
+        max-width: 760px;
+        padding: 16px 0;
+    }
+
+    .quick-stats {
+        gap: 16px;
+    }
+
+    .level-card,
+    .mission-card,
+    .achievements-card,
+    .medical-disclaimer {
+        padding: 22px;
+    }
+}
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    margin-bottom: 30px;
+}
+
+.user-info h1 {
+    font-size: 26px;
+    margin: 0;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.user-info p {
+    color: #636e72;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+.avatar-circle {
+    width: 60px;
+    height: 60px;
+    background-color: #dcfce7;
+    border: 1px solid #b9e9c7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.avatar-circle:focus-visible,
+.main-scan-btn:focus-visible,
+.complete-mission-btn:focus-visible,
+.achievement-action:focus-visible,
+.nav-btn:focus-visible {
+    outline: 3px solid #0b5fff;
+    outline-offset: 3px;
+}
+
+.level-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+}
+
+/* --- Fix do Cabeçalho do Card de Nível (O primeiro retângulo) --- */
+.level-card {
+    
+    /* Como queres, apenas contorno */
+    border: 2px solid #e0e0e0;
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+}
+
+.level-header {
+    display: flex;
+    align-items: center;
+    /* Alinha o troféu, texto e estrela verticalmente */
+    justify-content: flex-start;
+    /* Alinha tudo à esquerda por defeito */
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* O Retângulo Cinzento com o Troféu Branco */
+.trophy-icon-container {
+    background-color: #7e7c7c;
+    /* Cor de fundo cinza clarinha */
+    padding: 10px;
+    /* Espaço interno para criar o retângulo */
+    border-radius: 10px;
+    /* Cantos arredondados */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    /* Espaço entre o troféu e o texto */
+    flex-shrink: 0;
+    /* Impede que o retângulo esmague */
+}
+
+.trophy-icon-container svg {
+    color: white;
+    stroke: white;
+}
+
+.level-text {
+    flex-grow: 1;
+}
+
+.level-text span {
+    font-size: 11px;
+    color: #636e72;
+    font-weight: 600;
+}
+
+.level-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.sparkle-icon {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.level-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.progress-bar-bg {
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #000;
+    border-radius: 6px;
+}
+
+.quick-stats {
+    
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    border: 2px solid #e0e0e0;
+    background: white;
+    padding: 15px 5px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-box strong {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.stat-box span {
+    font-size: 11px;
+    color: #636e72;
+}
+
+.main-scan-btn {
+    width: 100%;
+    background: var(--btn-gradient);
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 15px rgba(0, 194, 203, 0.25);
+    cursor: pointer;
+}
+
+.mission-card {
+    background: #fff4e5;
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mission-icon-container {
+    background-color: #ff7e39;
+    min-width: 44px;
+    max-width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mission-content h3 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: 800;
+}
+
+.mission-content p {
+    font-size: 10px;
+    margin: 5px 0 8px 0;
+    color: #7f8c8d;
+}
+.complete-mission-btn {
+    background: #ff7e39;
+    /* Cor original (laranja) */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    /* Mais arredondado como na imagem */
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.complete-mission-btn.completed {
+    background-color: #00c853;
+    cursor: default;
+    box-shadow: none;
+    padding: 8px 20px;
+}
+
+.complete-mission-btn.completed span {
+    color: white;
+}
+
+.complete-mission-btn:active {
+    transform: scale(0.95);
+}
+
+.medical-disclaimer {
+    background-color: #d1e1f2;
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 10px;
+    border: 1px solid #b2c9e0;
+}
+
+.medical-disclaimer p {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: #1c4974;
+    margin: 0;
+    font-weight: 500;
+}
+
+.disclaimer-icon {
+    margin-top: 2px;
+}
+
+.achievements-card {
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.section-title h3 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 12px;
+    gap: 12px;
+    transition: background 0.2s;
+}
+
+.achievement-action {
+    width: 100%;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.achievement-action:hover {
+    background-color: #f9f4db;
+}
+
+.achievement-item.unlocked {
+    background-color: #fef9e7;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-info h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.achievement-info p {
+    margin: 0;
+    font-size: 9px;
+    color: #636e72;
+}
+
+
+
+.mission-icon-container {
+    background-color: #ff7e39;
+    min-width: 50px;
+    max-width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.achievement-info {
+    flex-grow: 1;
+}
+
+.achievement-info h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.achievement-info p {
+    margin: 0;
+    font-size: 11px;
+    color: #636e72;
+}
+
+/* Aviso Médico */
+.medical-disclaimer {
+    background-color: #d1e1f2;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.medical-disclaimer p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1c4974;
+    margin: 0;
+}
+
+.bottom-navbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    z-index: 1000;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #b2bec3;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.nav-btn.active {
+    color: var(--icon-teal);
+}
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    padding: 0 2px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #000;
+    border-radius: 6px;
+    min-width: 8px;
+}
+.achievement-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2d3436;
+    background-color: #f1f1f1;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-right: 10px;
+    min-width: 35px;
+    text-align: center;
+}
+.achievement-count {
+    font-size: 11px;            
+    font-weight: 600;
+    color: #2d3436;
+    
+    background-color: transparent; 
+    border: 1.5px solid #d1d1d1;   
+    
+    padding: 6px 1px;             
+    border-radius: 10px;           
+    
+    margin-right: 12px;            
+    min-width: 45px;               
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+

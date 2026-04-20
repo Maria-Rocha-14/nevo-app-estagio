@@ -1,0 +1,214 @@
+.assessment-container {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #dff3ec 0%, rgba(223, 243, 236, 0) 42%), linear-gradient(180deg, #f4fbf8 0%, #eef7f3 100%);
+  padding: 20px;
+}
+
+.assessment-header {
+  width: min(720px, 100%);
+  margin: 0 auto 12px;
+}
+
+.assessment-header h1 {
+  margin: 12px 0 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: #1f2d2a;
+}
+
+.assessment-card {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+  border: 1px solid #d1e4de;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 12px 26px rgba(16, 32, 28, 0.08);
+}
+
+.risk-indicator {
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+
+.risk-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-heading h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+.risk-indicator p {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.risk-low {
+  background: #e9f8ee;
+  border-color: #b5e1c0;
+}
+
+.risk-moderate {
+  background: #fff6e6;
+  border-color: #f0d39c;
+}
+
+.risk-high {
+  background: #fdeaea;
+  border-color: #f4b6b6;
+}
+
+.risk-meter {
+  margin-top: 14px;
+}
+
+.risk-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.risk-meter-track {
+  margin-top: 8px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e8edeb;
+  overflow: hidden;
+}
+
+.risk-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3ecf8e 0%, #f5a524 55%, #e5484d 100%);
+}
+
+.analysis-summary h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: #1f2d2a;
+}
+
+.submitted-image {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #dce9e5;
+  margin-bottom: 8px;
+}
+
+.simulated-tag {
+  font-size: 0.85rem;
+  background: #eef5ff;
+  border: 1px solid #bfd1ff;
+  color: #23408d;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.assessment-history-mini {
+  margin-top: 12px;
+  border: 1px solid #d7e5e1;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fcfa;
+}
+
+.assessment-history-mini h4 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: #2a4742;
+}
+
+.assessment-history-mini ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.assessment-history-mini li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.84rem;
+}
+
+.assessment-history-mini strong {
+  color: #0f766e;
+}
+
+.primary-action,
+.secondary-action,
+.ghost-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary-action {
+  width: 100%;
+  border: none;
+  background: linear-gradient(135deg, #12967e 0%, #0d7f6a 100%);
+  color: #fff;
+  padding: 12px 14px;
+  margin-top: 12px;
+}
+
+.secondary-action {
+  width: 100%;
+  border: 1px solid #c5d4cf;
+  background: #fff;
+  color: #1f2d2a;
+  padding: 11px 14px;
+  margin-top: 10px;
+}
+
+.ghost-action {
+  border: 1px solid #c5d4cf;
+  background: #fff;
+  color: #1f2d2a;
+  padding: 8px 12px;
+}
+
+.primary-action:hover {
+  filter: brightness(0.98);
+}
+
+.secondary-action:hover,
+.ghost-action:hover {
+  background: #f6faf8;
+}
+
+.primary-action:focus-visible,
+.secondary-action:focus-visible,
+.ghost-action:focus-visible {
+  outline: 3px solid #0b5fff;
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  .assessment-container {
+    padding: 28px;
+  }
+
+  .assessment-card {
+    padding: 22px;
+  }
+}

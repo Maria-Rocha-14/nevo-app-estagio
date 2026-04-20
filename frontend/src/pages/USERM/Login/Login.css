@@ -1,0 +1,347 @@
+.login-container {
+    background-color: #f0f7f4;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 40px;
+}
+
+.logo-title-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 5px;
+}
+
+.logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.login-brand-name {
+    color: #007b8f;
+    margin: 0;
+    font-size: 38px;
+}
+
+.login-subtitle {
+    color: #2f2f2f;
+    font-size: 13px;
+    margin: 0;
+}
+
+.login-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+.login-title {
+    font-size: 24px;
+    margin-bottom: 25px;
+    margin-top: 0;
+}
+
+.login-input-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-input-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #5c5c5c;
+}
+
+.login-input.with-icon {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    border-radius: 12px;
+    border: 1px solid #d4d4d4;
+    background-color: #f2f2f2;
+    box-sizing: border-box;
+    font-size: 15px;
+    outline: none;
+}
+
+.login-input.with-icon:focus {
+    border: 2px solid #007b8f;
+    background-color: #fff;
+}
+
+.eye-button {
+    position: absolute;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #4f4f4f;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.login-button {
+    width: 100%;
+    padding: 16px;
+    background-color: black;
+    color: white;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #111;
+}
+
+/* A magia das linhas horizontais no "ou" */
+.login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #aaa;
+    margin: 25px 0;
+    font-size: 14px;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.login-divider span {
+    padding: 0 15px;
+}
+
+.login-social-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    border: 1px solid #eaeaea;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.social-icon {
+    font-size: 18px;
+}
+
+.google-icon {
+    color: #DB4437;
+    /* Cor vermelha do Google */
+    font-weight: bold;
+}
+
+.apple-icon {
+    font-size: 20px;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.legal-text {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.legal-text strong {
+    color: #333;
+}
+
+.register-text {
+    font-size: 14px;
+    color: #1f1f1f;
+}
+
+.login-link {
+    color: #007b8f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.language-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+.language-toggle:hover {
+    background: #f0f7f4;
+    border-color: #007b8f;
+    color: #007b8f;
+}
+
+.language-toggle:focus-visible,
+.login-button:focus-visible,
+.login-social-button:focus-visible,
+.eye-button:focus-visible,
+.login-link:focus-visible,
+.login-input.with-icon:focus-visible,
+input[type="checkbox"]:focus-visible {
+    outline: 3px solid #0b5fff;
+    outline-offset: 2px;
+}
+
+.login-link:hover,
+.login-link:focus-visible {
+    text-decoration: underline;
+}
+
+.eye-button:focus-visible {
+    border-radius: 8px;
+}
+
+.login-social-button:hover {
+    background-color: #efefef;
+}
+
+@media (max-width: 380px) {
+    .login-container {
+        padding: 16px;
+    }
+
+    .login-header {
+        margin-top: 56px;
+    }
+
+    .logo-img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .login-brand-name {
+        font-size: 32px;
+    }
+
+    .login-card {
+        padding: 22px;
+        border-radius: 16px;
+    }
+}
+
+@media (min-width: 540px) {
+    .login-card {
+        max-width: 480px;
+    }
+}
+
+@media (min-width: 768px) {
+    .login-container {
+        padding: 32px;
+    }
+
+    .login-header {
+        margin-top: 20px;
+    }
+
+    .login-card {
+        max-width: 560px;
+        padding: 34px;
+    }
+}
+.error-message {
+    color: #d93025;
+    background-color: #fde8e8;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    text-align: center;
+    border: 1px solid #f8b4b4;
+    animation: fadeIn 0.3s ease-in-out;
+    /* Dá um efeito suave ao aparecer */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.link-text {
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.link-text:hover {
+    color: #4a8d82;
+}
+.link-clicavel {
+    color: inherit;
+    /* Mantém a cor do texto original (preto/cinza) */
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Quando passas o rato, fica com a cor do link "Registar" */
+.link-clicavel:hover {
+    color: #008099;
+    /* Esta parece ser a cor do teu link "Registar", ou usa var(--primary-color) */
+    opacity: 1;
+}

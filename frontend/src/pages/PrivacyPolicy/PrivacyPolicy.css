@@ -1,0 +1,76 @@
+.privacy-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #f9fbfb;
+    min-height: 100vh;
+}
+
+.privacy-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.privacy-header h1 {
+    font-size: 24px;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 5px;
+}
+
+.privacy-intro {
+    font-size: 18px;
+    color: #4a4a4a;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color);
+}
+
+.privacy-topic {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.topic-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.topic-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+.privacy-topic p {
+    font-size: 16px;
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.privacy-footer {
+    margin-top: 30px;
+    padding: 15px;
+    background: #fff3e0;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #e67e22;
+}
