@@ -6,7 +6,7 @@ import CaptureImage from './pages/ANLS/CaptureImage';
 import AssessmentResults from './pages/ANLS/AssessmentResults';
 import LearnPage from './pages/GAMF/Learn/LearnPage';
 import UnderConstruction from './pages/UnderConstruction';
-import PrivacyPolicy from './pages/PrivacyPolicy/privacyPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import Terms from './pages/Terms/Terms';
 
 function App() {
