@@ -19,7 +19,6 @@ export default function Register() {
     const [historicoPele, setHistoricoPele] = useState('');
     const [aceitouTermos, setAceitouTermos] = useState(false);
     const [erroUI, setErroUI] = useState('');
-    const hasError = Boolean(erroUI);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
