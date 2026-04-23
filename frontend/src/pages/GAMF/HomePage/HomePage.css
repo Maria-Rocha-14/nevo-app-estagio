@@ -72,42 +72,6 @@
     }
 }
 
-@media (min-width: 560px) {
-    .home-container {
-        max-width: 560px;
-        padding-left: 24px;
-        padding-right: 24px;
-    }
-
-    .bottom-navbar {
-        max-width: 560px;
-    }
-}
-
-@media (min-width: 768px) {
-    .home-container {
-        max-width: 760px;
-        padding: 28px;
-        padding-bottom: 124px;
-    }
-
-    .bottom-navbar {
-        max-width: 760px;
-        padding: 16px 0;
-    }
-
-    .quick-stats {
-        gap: 16px;
-    }
-
-    .level-card,
-    .mission-card,
-    .achievements-card,
-    .medical-disclaimer {
-        padding: 22px;
-    }
-}
-
 .home-header {
     display: flex;
     justify-content: space-between;

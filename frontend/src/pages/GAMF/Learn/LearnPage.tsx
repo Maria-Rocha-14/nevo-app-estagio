@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Brain, Camera, CheckCircle2, History, Home, ShieldCheck, Sparkles, SunMedium } from 'lucide-react';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { completeChallengeOnce, getSessionUser } from '../../../services/session';
+import { completeChallengeOnce, useSessionUser } from '../../../services/session';
 import './LearnPage.css';
 
 type ChallengeType = 'card' | 'quiz';
@@ -61,16 +61,15 @@ export default function LearnPage() {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
 
-  const [user, setUser] = useState(() => {
-    return getSessionUser();
-  });
+  const user = useSessionUser();
 
   useEffect(() => {
-    if (!user) {
+    if (user === null) {
       navigate('/');
     }
   }, [navigate, user]);
 
+  if (user === undefined) return <main className="learn-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>A carregar sessão...</div></main>;
   if (!user) {
     return null;
   }
@@ -88,16 +87,13 @@ export default function LearnPage() {
     (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
   );
 
-  const completeChallenge = (challenge: Challenge) => {
+  const completeChallenge = async (challenge: Challenge) => {
     if (completed.has(challenge.id)) {
       setFeedback({ tone: 'info', message: t('learn.already_completed') });
       return;
     }
 
-    const nextUser = completeChallengeOnce(challenge.id, challenge.points);
-    if (!nextUser) return;
-
-    setUser(nextUser);
+    await completeChallengeOnce(challenge.id, challenge.points);
     setFeedback({ tone: 'success', message: t('learn.points_awarded', { points: challenge.points }) });
   };
 

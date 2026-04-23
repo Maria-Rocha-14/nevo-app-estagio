@@ -1,9 +1,9 @@
 import { useMemo, type ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, CheckCircle2, ShieldAlert, Phone, ArrowLeft, Camera } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ShieldAlert, Phone, ArrowLeft, Camera, Image as ImageIcon } from 'lucide-react';
 import './AssessmentResults.css';
-import { getSessionUser } from '../../services/session';
+import { useSessionUser } from '../../services/session';
 
 type RiskLevel = 'low' | 'moderate' | 'high';
 
@@ -28,7 +28,7 @@ export default function AssessmentResults() {
   const { t } = useTranslation();
 
   const state = (location.state || {}) as AssessmentState;
-  const currentUser = getSessionUser();
+  const currentUser = useSessionUser();
   const recentAssessments = [...(currentUser?.assessmentHistory || [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   ).slice(0, 3);
@@ -63,7 +63,7 @@ export default function AssessmentResults() {
     };
   }, [riskLevel, t]);
 
-  if (!state.imageUrl) {
+  if (state.probability === undefined && !state.fileName) {
     return (
       <main className="assessment-container">
         <section className="assessment-card">
@@ -111,7 +111,13 @@ export default function AssessmentResults() {
 
         <div className="analysis-summary">
           <h3>{t('assessment.analysis_summary')}</h3>
-          <img src={state.imageUrl} alt={t('assessment.submitted_image_alt')} className="submitted-image" />
+          {state.imageUrl ? (
+            <img src={state.imageUrl} alt={t('assessment.submitted_image_alt')} className="submitted-image" />
+          ) : (
+            <div className="submitted-image-placeholder" aria-label="Imagem não disponível">
+              <ImageIcon size={34} aria-hidden="true" />
+            </div>
+          )}
           <p>
             {t('assessment.file_label')}: <strong>{state.fileName || t('assessment.unknown_file')}</strong>
           </p>

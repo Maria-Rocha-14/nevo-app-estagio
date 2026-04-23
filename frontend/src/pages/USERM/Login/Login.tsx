@@ -6,7 +6,7 @@ import './Login.css';
 import logoImg from '../../../assets/logo.png';
 import { db } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { setSessionUser } from '../../../services/session';
+import { setLoggedInUserId } from '../../../services/session';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -43,8 +43,10 @@ export default function Login() {
                 return;
             }
 
-            // 4. Se tudo estiver bem, guarda a sessão e navega para a Home
-            setSessionUser(user);
+            // 4. Se tudo estiver bem, guarda a sessão temporária (só ID) e navega para a Home
+            if (user.id) {
+                setLoggedInUserId(user.id);
+            }
             navigate('/homepage');
 
         } catch (error) {

@@ -41,7 +41,14 @@ export default function Register() {
                 email,
                 dob: dataNasc,
                 password,
-                skinHistory: historicoPele
+                skinHistory: historicoPele,
+                xp: 0,
+                points: 0,
+                weeksStreak: 0,
+                scansCount: 0,
+                completedChallenges: [],
+                challengeHistory: [],
+                assessmentHistory: []
             });
             navigate('/');
         } catch {

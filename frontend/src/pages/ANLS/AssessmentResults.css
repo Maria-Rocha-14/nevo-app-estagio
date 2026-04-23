@@ -1,12 +1,16 @@
 .assessment-container {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #dff3ec 0%, rgba(223, 243, 236, 0) 42%), linear-gradient(180deg, #f4fbf8 0%, #eef7f3 100%);
+  max-width: 450px;
+  margin: 0 auto;
+  background: #f1f8f6;
   padding: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .assessment-header {
-  width: min(720px, 100%);
+  width: 100%;
   margin: 0 auto 12px;
 }
 
@@ -19,7 +23,8 @@
 }
 
 .assessment-card {
-  width: min(720px, 100%);
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
   border: 1px solid #d1e4de;
@@ -105,6 +110,19 @@
   border-radius: 14px;
   border: 1px solid #dce9e5;
   margin-bottom: 8px;
+}
+
+.submitted-image-placeholder {
+  width: 100%;
+  min-height: 190px;
+  border-radius: 14px;
+  border: 1px solid #dce9e5;
+  margin-bottom: 8px;
+  background: #eef4f2;
+  color: #9aa8a4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .simulated-tag {
@@ -203,12 +221,8 @@
   outline-offset: 2px;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 360px) {
   .assessment-container {
-    padding: 28px;
-  }
-
-  .assessment-card {
-    padding: 22px;
+    padding: 16px;
   }
 }

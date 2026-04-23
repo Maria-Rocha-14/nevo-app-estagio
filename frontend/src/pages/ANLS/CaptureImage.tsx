@@ -157,7 +157,7 @@ export default function CaptureImage() {
         setFeedback({ tone: 'info', message: t('feedback.scan_selection_canceled') });
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (!selectedImage) {
             setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image') });
             return;
@@ -165,9 +165,10 @@ export default function CaptureImage() {
 
         const mockAssessment = getMockAssessment(selectedFileSize, demoScenario);
 
-        appendAssessmentHistory({
+        await appendAssessmentHistory({
             createdAt: new Date().toISOString(),
             fileName: selectedFileName,
+            imageUrl: selectedImage,
             probability: mockAssessment.probability,
             riskLevel: mockAssessment.riskLevel,
             simulated: true

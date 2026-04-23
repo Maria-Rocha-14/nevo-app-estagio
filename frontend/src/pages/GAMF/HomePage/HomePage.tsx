@@ -8,36 +8,23 @@ import {
 } from 'lucide-react';
 import './HomePage.css';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { awardDailyMissionXp, getSessionUser } from '../../../services/session';
+import { awardDailyMissionXp, useSessionUser } from '../../../services/session';
 
 type FeedbackState = {
     tone: 'success' | 'error' | 'warning' | 'info';
     message: string;
 };
 
-type SessionUser = {
-    id?: number;
-    name: string;
-    email: string;
-    dob: string;
-    password: string;
-    xp?: number;
-    points?: number;
-    weeksStreak?: number;
-    scansCount?: number;
-    lastMissionDate?: string;
-};
 
 export default function HomePage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const initialUser = getSessionUser() as SessionUser | null;
-    const isMissionAlreadyCompleted = initialUser?.lastMissionDate === new Date().toLocaleDateString();
+    const user = useSessionUser();
+    const isMissionAlreadyCompleted = user?.lastMissionDate === new Date().toLocaleDateString();
 
-    const [user, setUser] = useState<SessionUser | null>(initialUser);
-    const [xp, setXp] = useState(initialUser?.xp || 0);
-    const [missionCompleted, setMissionCompleted] = useState(isMissionAlreadyCompleted);
+    const xp = user?.xp || 0;
+    const missionCompleted = isMissionAlreadyCompleted;
     const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
     const [uvIndex, setUvIndex] = useState<number | null>(null);
@@ -83,7 +70,7 @@ export default function HomePage() {
         if (user) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             obterLocalizacaoEUV();
-        } else {
+        } else if (user === null) {
             navigate('/');
         }
     }, [navigate, obterLocalizacaoEUV, user]);
@@ -98,19 +85,14 @@ export default function HomePage() {
 
     const uvStatus = getUVStatus(uvIndex);
 
-    const handleCompleteMission = () => {
+    const handleCompleteMission = async () => {
         if (!user) return;
         if (missionCompleted) {
             setFeedback({ tone: 'info', message: t('feedback.home_mission_already_done') });
             return;
         }
 
-        const updatedUser = awardDailyMissionXp(25) as SessionUser | null;
-        if (!updatedUser) return;
-
-        setUser(updatedUser);
-        setXp(updatedUser.xp || 0);
-        setMissionCompleted(true);
+        await awardDailyMissionXp(25);
         setFeedback({ tone: 'success', message: t('feedback.home_mission_completed') });
     };
 
@@ -119,6 +101,7 @@ export default function HomePage() {
         return percentage > 100 ? 100 : percentage;
     };
 
+    if (user === undefined) return <main className="home-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>A carregar sessão...</div></main>;
     if (!user) return null;
 
     return (
