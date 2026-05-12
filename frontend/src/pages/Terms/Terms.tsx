@@ -17,7 +17,7 @@ export default function Terms() {
             </header>
 
             <section className="privacy-content">
-                <div className="privacy-intro" style={{ borderLeftColor: '#5fa79a' }}>
+                <div className="privacy-intro terms-intro">
                     <Scale size={48} color="#5fa79a" />
                     <p>{t('terms.intro')}</p>
                 </div>
@@ -47,7 +47,10 @@ export default function Terms() {
                 </div>
 
                 <div className="privacy-footer">
-                    <p><strong>{t('home.warning')}:</strong> {t('home.medical_warning_text')}</p>
+                    <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+                    <p>
+                        <strong>{t('home.warning')}:</strong> {t('home.medical_warning_text')}
+                    </p>
                 </div>
             </section>
         </div>

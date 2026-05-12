@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, ArrowLeft, UserCircle, Camera, ShieldAlert, Target } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, UserCircle, Camera, ShieldAlert, Target, AlertTriangle } from 'lucide-react';
 import './PrivacyPolicy.css';
 
 export default function PrivacyPolicy() {
@@ -43,7 +43,8 @@ export default function PrivacyPolicy() {
                         <ShieldAlert size={20} color="#5fa79a" />
                         <h3>{t('privacy.topics.admin_title')}</h3>
                     </div>
-                    <p>{t('privacy.topics.admin_desc')}</p>
+                    <p>{t('privacy.topics.admin_desc')} <strong>{t('privacy.topics.admin_desc2')}</strong> </p>
+                    
                 </div>
 
                 <div className="privacy-topic">
@@ -55,7 +56,10 @@ export default function PrivacyPolicy() {
                 </div>
 
                 <div className="privacy-footer">
-                    <p><strong>{t('home.warning')}:</strong> {t('home.medical_warning_text')}</p>
+                    <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+                    <p>
+                        <strong>{t('home.warning')}:</strong> {t('home.medical_warning_text')}
+                    </p>
                 </div>
             </section>
         </div>

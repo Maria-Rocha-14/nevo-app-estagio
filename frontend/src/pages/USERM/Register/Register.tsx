@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Calendar, Lock, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,8 @@ import '../Login/Login.css';
 import logoImg from '../../../assets/logo.png';
 import { db } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
+import { DEFAULT_AVATAR } from '../../../services/avatar';
+import { validatePassword } from '../../../services/session';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -19,12 +21,23 @@ export default function Register() {
     const [historicoPele, setHistoricoPele] = useState('');
     const [aceitouTermos, setAceitouTermos] = useState(false);
     const [erroUI, setErroUI] = useState('');
+    const [sucessoUI, setSucessoUI] = useState('');
+
+    useEffect(() => {
+        if (erroUI || sucessoUI) {
+            const timer = setTimeout(() => {
+                setErroUI('');
+                setSucessoUI('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [erroUI, sucessoUI]);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setErroUI('');
+        setSucessoUI('');
 
-        // Validação de todos os campos obrigatórios
         if (!nome || !email || !dataNasc || !password || !historicoPele) {
             setErroUI(t('errors.fill_all'));
             return;
@@ -35,24 +48,64 @@ export default function Register() {
             return;
         }
 
+        if (!validatePassword(password)) {
+            setErroUI(t('register.password_policy_error'));
+            return;
+        }
+
         try {
+            // 1. GUARDAR NO MONGODB (Servidor Externo)
+            const mappedHistory = historicoPele === 'sim' ? 'yes' : 'no';
+
+            const response = await fetch('http://127.0.0.1:5000/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: nome,
+                    email: email,
+                    dob: dataNasc,
+                    skinHistory: mappedHistory,
+                    // Dados iniciais para o Admin acompanhar
+                    xp: 0,
+                    points: 0,
+                    accountStatus: 'active'
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erro no servidor');
+            }
+
+            // 2. GUARDAR NO DEXIE (Base de Dados Local) - Mantido integralmente
             await db.users.add({
                 name: nome,
                 email,
                 dob: dataNasc,
                 password,
                 skinHistory: historicoPele,
+                createdAt: new Date().toISOString(),
+                accountStatus: 'active',
                 xp: 0,
                 points: 0,
                 weeksStreak: 0,
                 scansCount: 0,
+                earnedBadges: [],
+                avatar: DEFAULT_AVATAR,
                 completedChallenges: [],
                 challengeHistory: [],
                 assessmentHistory: []
             });
-            navigate('/');
-        } catch {
-            setErroUI(t('errors.email_exists'));
+
+            setSucessoUI('Conta criada com sucesso! A enviar email...');
+
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+
+        } catch (err: any) {
+            console.error("Erro no registo:", err);
+            setErroUI(err.message || t('errors.email_exists'));
         }
     };
 
@@ -84,9 +137,11 @@ export default function Register() {
                 <h2 className="login-title">{t('register.title')}</h2>
 
                 {erroUI && (
-                    <div id="register-form-error">
-                        <FeedbackMessage tone="error" message={erroUI} onClose={() => setErroUI('')} />
-                    </div>
+                    <FeedbackMessage tone="error" message={erroUI} onClose={() => setErroUI('')} />
+                )}
+
+                {sucessoUI && (
+                    <FeedbackMessage tone="success" message={sucessoUI} onClose={() => setSucessoUI('')} />
                 )}
 
                 <div className="login-input-group">
@@ -124,7 +179,6 @@ export default function Register() {
                     </div>
                 </div>
 
-                {/* Pergunta de Histórico de Saúde */}
                 <div className="login-input-group skin-history-group">
                     <label>{t('register.skin_history_question')} *</label>
                     <div className="radio-options">

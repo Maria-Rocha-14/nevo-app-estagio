@@ -1,0 +1,51 @@
+/* ADMIN/AdminUsers.css */
+
+/* Removemos as definições antigas que forçavam o fundo branco no admin-panel */
+.admin-quizzes-wrapper .admin-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Reutilizamos o estilo das linhas em cartões brancos */
+.admin-quizzes-wrapper .admin-custom-table td {
+    background: white !important;
+    border-top: 1px solid #eaf2f1;
+    border-bottom: 1px solid #eaf2f1;
+}
+
+/* Botão de Suspender/Reativar customizado para as ações */
+.admin-actions-cell .action-btn.delete {
+    color: #ef4444;
+    background: #fff5f5;
+}
+
+.admin-actions-cell .action-btn.delete:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.admin-actions-cell .action-btn.edit {
+    color: #5fa79a;
+    background: #f0f9f8;
+}
+
+.admin-actions-cell .action-btn.edit:hover {
+    background: #5fa79a;
+    color: white;
+}
+/* No teu ficheiro de CSS */
+
+.text-center {
+    text-align: center;
+}
+
+.admin-actions-cell {
+    display: flex;
+    justify-content: center;
+    /* Alterado de flex-end para center */
+    gap: 8px;
+    width: 100%;
+    /* Garante que ocupa o espaço da célula */
+}

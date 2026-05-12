@@ -1,10 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Lock, Save, ShieldCheck, User as UserIcon } from 'lucide-react';
+import {
+  ArrowLeft, ChevronRight, Eye, EyeOff, Languages, Lock,
+  Moon, Palette, Save, ShieldCheck, Sun, User as UserIcon,
+  LogOut, Trophy, Medal, Award
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import ChameleonAvatar from '../../../components/ChameleonAvatar';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { db } from '../../../db/db';
-import { useSessionUser } from '../../../services/session';
-import type { User } from '../../../db/db';
+import { db, type User, type AdminBadge } from '../../../db/db';
+import { getAvatar } from '../../../services/avatar';
+import { getStoredTheme, setStoredTheme, type AppTheme } from '../../../services/preferences';
+import { useSessionUser, validatePassword, logoutUser } from '../../../services/session';
 import './ProfilePage.css';
 
 type FeedbackState = {
@@ -13,9 +20,13 @@ type FeedbackState = {
 };
 
 export default function ProfilePage() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const sessionUser = useSessionUser();
+
+  // Estados do formulário e UI
   const [name, setName] = useState('');
+  const [theme, setTheme] = useState<AppTheme>(() => getStoredTheme());
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -23,26 +34,16 @@ export default function ProfilePage() {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Estado para os Badges
+  const [allBadges, setAllBadges] = useState<AdminBadge[]>([]);
+
   useEffect(() => {
     if (sessionUser) {
       setName(sessionUser.name);
     }
+    // Carregar todos os badges definidos pelo Admin
+    db.adminBadges.toArray().then(setAllBadges);
   }, [sessionUser]);
-
-  const updateStoredUser = async (updatedUser: User) => {
-    if (updatedUser.id) {
-      await db.users.update(updatedUser.id, {
-        name: updatedUser.name,
-        password: updatedUser.password
-      });
-      return;
-    }
-
-    await db.users.where({ email: updatedUser.email }).modify({
-      name: updatedUser.name,
-      password: updatedUser.password
-    });
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,60 +52,74 @@ export default function ProfilePage() {
     if (!sessionUser) return;
 
     const trimmedName = name.trim();
-
     if (!trimmedName) {
-      setFeedback({ tone: 'error', message: 'Introduz um nome para o perfil.' });
+      setFeedback({ tone: 'error', message: t('profile.error_name_required') });
       return;
     }
 
-    if (newPassword && newPassword.length < 6) {
-      setFeedback({ tone: 'error', message: 'A palavra-passe deve ter pelo menos 6 caracteres.' });
-      return;
+    if (newPassword) {
+      if (!validatePassword(newPassword)) {
+        setFeedback({ tone: 'error', message: t('profile.password_policy_error') });
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setFeedback({ tone: 'error', message: t('profile.password_mismatch') });
+        return;
+      }
     }
-
-    if (newPassword !== confirmPassword) {
-      setFeedback({ tone: 'error', message: 'As palavras-passe não coincidem.' });
-      return;
-    }
-
-    const updatedUser = {
-      ...sessionUser,
-      name: trimmedName,
-      password: newPassword || sessionUser.password
-    };
 
     try {
       setIsSaving(true);
-      await updateStoredUser(updatedUser);
+      if (sessionUser.id) {
+        await db.users.update(sessionUser.id, {
+          name: trimmedName,
+          password: newPassword || sessionUser.password
+        });
+      }
       setNewPassword('');
       setConfirmPassword('');
-      setFeedback({ tone: 'success', message: 'Perfil atualizado com sucesso.' });
+      setFeedback({ tone: 'success', message: t('profile.success_update') });
     } catch (error) {
       console.error('Profile update error:', error);
-      setFeedback({ tone: 'error', message: 'Não foi possível atualizar o perfil.' });
+      setFeedback({ tone: 'error', message: t('profile.error_update') });
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (sessionUser === undefined) return <main className="profile-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>A carregar sessão...</div></main>;
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/');
+  };
+
+  const handleLanguageChange = (language: 'pt' | 'en') => {
+    i18n.changeLanguage(language);
+  };
+
+  const handleThemeChange = (nextTheme: AppTheme) => {
+    setTheme(nextTheme);
+    setStoredTheme(nextTheme);
+  };
+
+  if (sessionUser === undefined) return <main className="profile-container" aria-busy="true"><div style={{ padding: '20px', textAlign: 'center' }}>{t('profile.loading')}</div></main>;
   if (!sessionUser) { navigate('/'); return null; }
 
   return (
     <main className="profile-container" aria-labelledby="profile-title">
       <header className="profile-header">
-        <button type="button" className="profile-icon-btn" onClick={() => navigate('/homepage')} aria-label="Voltar">
+        <button type="button" className="profile-icon-btn" onClick={() => navigate('/homepage')} aria-label={t('profile.back')}>
           <ArrowLeft size={22} aria-hidden="true" />
         </button>
         <div>
-          <p className="profile-kicker">Perfil</p>
-          <h1 id="profile-title">Personalização</h1>
+          <p className="profile-kicker">{t('profile.kicker')}</p>
+          <h1 id="profile-title">{t('profile.title')}</h1>
         </div>
       </header>
 
-      <section className="profile-summary" aria-label="Resumo do utilizador">
+      {/* Resumo do Utilizador */}
+      <section className="profile-summary">
         <div className="profile-avatar" aria-hidden="true">
-          <UserIcon size={34} />
+          <ChameleonAvatar avatar={getAvatar(sessionUser)} size="sm" />
         </div>
         <div className="profile-summary-text">
           <strong>{sessionUser.name}</strong>
@@ -112,106 +127,154 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {feedback && (
-        <FeedbackMessage
-          tone={feedback.tone}
-          message={feedback.message}
-          onClose={() => setFeedback(null)}
-        />
-      )}
+      {/* Atalho para Avatar */}
+      <button type="button" className="profile-avatar-link" onClick={() => navigate('/avatar')}>
+        <div className="profile-section-icon">
+          <Palette size={20} aria-hidden="true" />
+        </div>
+        <div>
+          <strong>{t('avatar.profile_title')}</strong>
+          <span>{t('avatar.profile_desc')}</span>
+        </div>
+        <ChevronRight size={18} aria-hidden="true" />
+      </button>
 
+      {/* SECÇÃO DE CONQUISTAS (BADGES) - Estilo lista conforme imagem */}
+      <section className="profile-card profile-badges-section">
+        <div className="profile-section-heading">
+          <div className="profile-section-icon profile-section-icon-gold">
+            <Award size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <h2>{t('home.recent_achievements')}</h2>
+          </div>
+        </div>
+
+        <div className="badges-grid-compact">
+          {allBadges.map(badge => {
+            const isEarned = sessionUser.earnedBadges?.includes(badge.id!);
+            return (
+              <div key={badge.id} className={`badge-circle-item ${isEarned ? 'earned' : 'locked'}`} title={badge.description}>
+                <div className="badge-icon-circle">
+                  {isEarned ? <Trophy size={24} /> : <Medal size={24} opacity={0.3} />}
+                </div>
+                <span className="badge-name-tiny">{badge.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Preferências */}
+      <section className="profile-card">
+        <div className="profile-section-heading">
+          <div className="profile-section-icon">
+            <Languages size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <h2>{t('profile.preferences_section')}</h2>
+            <p>{t('profile.preferences_subtitle')}</p>
+          </div>
+        </div>
+
+        <div className="profile-preference-row">
+          <span>{t('profile.language')}</span>
+          <div className="profile-segmented">
+            <button type="button" className={i18n.language.startsWith('pt') ? 'active' : ''} onClick={() => handleLanguageChange('pt')}>PT</button>
+            <button type="button" className={i18n.language.startsWith('en') ? 'active' : ''} onClick={() => handleLanguageChange('en')}>EN</button>
+          </div>
+        </div>
+
+        <div className="profile-preference-row">
+          <span>{t('profile.theme')}</span>
+          <div className="profile-segmented">
+            <button type="button" className={theme === 'light' ? 'active' : ''} onClick={() => handleThemeChange('light')}>
+              <Sun size={14} /> {t('profile.theme_light')}
+            </button>
+            <button type="button" className={theme === 'dark' ? 'active' : ''} onClick={() => handleThemeChange('dark')}>
+              <Moon size={14} /> {t('profile.theme_dark')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {feedback && <FeedbackMessage tone={feedback.tone} message={feedback.message} onClose={() => setFeedback(null)} />}
+
+      {/* Formulário de Dados */}
       <form className="profile-form" onSubmit={handleSubmit} noValidate>
-        <section className="profile-card" aria-labelledby="profile-data-title">
+        <section className="profile-card">
           <div className="profile-section-heading">
             <div className="profile-section-icon">
               <UserIcon size={20} aria-hidden="true" />
             </div>
             <div>
-              <h2 id="profile-data-title">Dados do perfil</h2>
-              <p>Atualiza apenas o nome visível na aplicação.</p>
+              <h2>{t('profile.data_section')}</h2>
+              <p>{t('profile.data_subtitle')}</p>
             </div>
           </div>
 
           <label className="profile-field" htmlFor="profile-name">
-            <span>Nome</span>
-            <input
-              id="profile-name"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              autoComplete="name"
-              required
-            />
-          </label>
-
-          <label className="profile-field" htmlFor="profile-email">
-            <span>Email</span>
-            <input id="profile-email" type="email" value={sessionUser.email} disabled />
+            <span>{t('profile.name')}</span>
+            <input id="profile-name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
           </label>
         </section>
 
-        <section className="profile-card" aria-labelledby="profile-password-title">
+        <section className="profile-card">
           <div className="profile-section-heading">
             <div className="profile-section-icon profile-section-icon-blue">
               <ShieldCheck size={20} aria-hidden="true" />
             </div>
             <div>
-              <h2 id="profile-password-title">Palavra-passe</h2>
-              <p>Deixa em branco se quiseres manter a atual.</p>
+              <h2>{t('profile.password')}</h2>
+              <p>{t('profile.password_subtitle')}</p>
             </div>
           </div>
 
           <label className="profile-field" htmlFor="profile-password">
-            <span>Nova palavra-passe</span>
+            <span>{t('profile.new_password')}</span>
             <div className="profile-password-wrapper">
               <Lock size={18} aria-hidden="true" />
               <input
                 id="profile-password"
                 type={showPassword ? 'text' : 'password'}
                 value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                autoComplete="new-password"
-                placeholder="Mínimo 6 caracteres"
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder={t('profile.password_placeholder')}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'}
-                aria-pressed={showPassword}
-              >
+              <button type="button" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </label>
 
           <label className="profile-field" htmlFor="profile-confirm-password">
-            <span>Confirmar palavra-passe</span>
+            <span>{t('profile.confirm_password')}</span>
             <div className="profile-password-wrapper">
               <Lock size={18} aria-hidden="true" />
               <input
                 id="profile-confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                autoComplete="new-password"
-                placeholder="Repetir palavra-passe"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={t('profile.confirm_password')}
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((current) => !current)}
-                aria-label={showConfirmPassword ? 'Ocultar confirmação' : 'Mostrar confirmação'}
-                aria-pressed={showConfirmPassword}
-              >
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </label>
         </section>
 
-        <button type="submit" className="profile-save-btn" disabled={isSaving}>
-          <Save size={20} aria-hidden="true" />
-          {isSaving ? 'A guardar...' : 'Guardar alterações'}
-        </button>
+        <div className="profile-actions">
+          <button type="submit" className="profile-save-btn" disabled={isSaving}>
+            <Save size={20} aria-hidden="true" />
+            {isSaving ? t('profile.saving') : t('profile.save_button')}
+          </button>
+          <button type="button" className="profile-logout-btn" onClick={handleLogout}>
+            <LogOut size={20} aria-hidden="true" />
+            {t('profile.logout')}
+          </button>
+        </div>
       </form>
     </main>
   );

@@ -104,9 +104,17 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.avatar-circle .chameleon-avatar {
+    width: 50px;
+    transform: none;
 }
 
 .avatar-circle:focus-visible,
+.mascot-edit-btn:focus-visible,
 .main-scan-btn:focus-visible,
 .complete-mission-btn:focus-visible,
 .achievement-action:focus-visible,
@@ -252,6 +260,77 @@
     margin-bottom: 25px;
     box-shadow: 0 6px 15px rgba(0, 194, 203, 0.25);
     cursor: pointer;
+}
+
+.mascot-home-card {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+    box-sizing: border-box;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    background: white;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.mascot-home-copy {
+    width: 100%;
+    text-align: left;
+}
+
+.mascot-home-copy span {
+    color: var(--icon-teal);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.mascot-home-copy h2 {
+    margin: 4px 0 0;
+    color: var(--text-dark);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.mascot-home-stage {
+    width: 100%;
+    min-height: 300px;
+    max-height: 340px;
+    max-width: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mascot-home-stage .chameleon-avatar {
+    width: min(270px, 82%);
+    max-height: calc(100% - 12px);
+}
+
+.mascot-edit-btn {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 46px;
+    height: 46px;
+    border: 1px solid #d9ebe7;
+    border-radius: 14px;
+    background: #f1f8f6;
+    color: var(--icon-teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
 }
 
 .mission-card {
@@ -529,5 +608,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (min-width: 900px) {
+    .home-container {
+        max-width: 960px;
+        padding: 28px;
+        padding-bottom: 120px;
+    }
+
+    .bottom-navbar {
+        max-width: 960px;
+    }
 }
 

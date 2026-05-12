@@ -1,0 +1,50 @@
+.chameleon-avatar {
+  display: block;
+  position: relative;
+  aspect-ratio: 1080 / 1350;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.chameleon-avatar-sm {
+  width: 44px;
+}
+
+.chameleon-avatar-md {
+  width: 70px;
+}
+
+.chameleon-avatar-lg {
+  width: 230px;
+}
+
+.chameleon-avatar-base,
+.chameleon-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.chameleon-avatar-base {
+  object-fit: contain;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.chameleon-avatar-overlay {
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+.chameleon-avatar-outfit-simpleTee {
+  transform: translateY(7%) scale(0.9);
+}
+
+.chameleon-avatar-outfit-sweatshirt {
+  transform: translateY(5%) scale(0.92);
+}
+
+.chameleon-avatar-outfit-coat {
+  transform: translateY(5%) scale(0.92);
+}

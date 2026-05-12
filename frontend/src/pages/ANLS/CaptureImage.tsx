@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import {
     Camera,
     Upload,
@@ -30,6 +30,7 @@ export default function CaptureImage() {
 
     // 🔹 Estado para guardar a imagem selecionada (preview)
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedFileBlob, setSelectedFileBlob] = useState<Blob | null>(null);
     const [selectedFileName, setSelectedFileName] = useState<string>('');
     const [selectedFileSize, setSelectedFileSize] = useState<number>(0);
     const [demoScenario, setDemoScenario] = useState<DemoScenario>('auto');
@@ -39,24 +40,41 @@ export default function CaptureImage() {
     const [isCameraActive, setIsCameraActive] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const cameraContainerRef = useRef<HTMLDivElement>(null);
 
     // 🔹 Limpar a stream da câmara quando o componente for desmontado
-    useEffect(() => {
-        return () => {
-            stopCamera();
-        };
-    }, []);
-
-    const stopCamera = () => {
+    const stopCamera = useCallback(() => {
         if (videoRef.current && videoRef.current.srcObject) {
             const stream = videoRef.current.srcObject as MediaStream;
             stream.getTracks().forEach(track => track.stop());
             videoRef.current.srcObject = null;
         }
         setIsCameraActive(false);
-    };
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, [stopCamera]);
+
+    useEffect(() => {
+        if (!isCameraActive || !cameraContainerRef.current) return;
+
+        requestAnimationFrame(() => {
+            cameraContainerRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    }, [isCameraActive]);
 
     const startCamera = async () => {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setFeedback({ tone: 'warning', message: t('feedback.scan_camera_unavailable') });
+            return;
+        }
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: 'environment' }
@@ -67,9 +85,12 @@ export default function CaptureImage() {
                     videoRef.current.srcObject = stream;
                     videoRef.current.play();
                 }
+                if (cameraContainerRef.current) {
+                    cameraContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }, 100);
-        } catch (err) {
-            setFeedback({ tone: 'error', message: t('feedback.scan_camera_permission_denied') || 'Não foi possível aceder à câmara. Verifique as permissões.' });
+        } catch {
+            setFeedback({ tone: 'error', message: t('feedback.scan_camera_permission_denied') });
         }
     };
 
@@ -86,6 +107,7 @@ export default function CaptureImage() {
                     if (blob) {
                         const imageUrl = URL.createObjectURL(blob);
                         setSelectedImage(imageUrl);
+                        setSelectedFileBlob(blob);
                         setSelectedFileName(`camera_${Date.now()}.jpg`);
                         setSelectedFileSize(blob.size);
                         setDemoScenario('auto');
@@ -142,6 +164,7 @@ export default function CaptureImage() {
         // 🔹 Criar URL para preview da imagem
         const imageUrl = URL.createObjectURL(file);
         setSelectedImage(imageUrl);
+        setSelectedFileBlob(file);
         setSelectedFileName(file.name);
         setSelectedFileSize(file.size);
         setDemoScenario('auto');
@@ -151,38 +174,56 @@ export default function CaptureImage() {
     // 🔹 Cancelar preview → volta ao estado inicial
     const handleCancel = () => {
         setSelectedImage(null);
+        setSelectedFileBlob(null);
         setSelectedFileName('');
         setSelectedFileSize(0);
         setDemoScenario('auto');
         setFeedback({ tone: 'info', message: t('feedback.scan_selection_canceled') });
     };
 
+    const fileToBase64 = (fileOrBlob: Blob): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(fileOrBlob);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+        });
+    };
+
     const handleConfirm = async () => {
-        if (!selectedImage) {
+        if (!selectedImage || !selectedFileBlob) {
             setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image') });
             return;
         }
 
         const mockAssessment = getMockAssessment(selectedFileSize, demoScenario);
 
-        await appendAssessmentHistory({
-            createdAt: new Date().toISOString(),
-            fileName: selectedFileName,
-            imageUrl: selectedImage,
-            probability: mockAssessment.probability,
-            riskLevel: mockAssessment.riskLevel,
-            simulated: true
-        });
+        try {
+            const base64Image = await fileToBase64(selectedFileBlob);
 
-        navigate('/assessment-results', {
-            state: {
-                imageUrl: selectedImage,
+            await appendAssessmentHistory({
+                createdAt: new Date().toISOString(),
                 fileName: selectedFileName,
+                imageUrl: base64Image,
                 probability: mockAssessment.probability,
                 riskLevel: mockAssessment.riskLevel,
-                isSimulated: true
-            }
-        });
+                simulated: true
+            });
+
+            navigate('/assessment-results', {
+                state: {
+                    imageUrl: base64Image,
+                    fileName: selectedFileName,
+                    probability: mockAssessment.probability,
+                    riskLevel: mockAssessment.riskLevel,
+                    isSimulated: true
+                }
+            });
+        } catch (error: unknown) {
+            console.error("ERRO COMPLETO:", error);
+            const message = error instanceof Error ? error.message : String(error);
+            setFeedback({ tone: 'error', message: `Erro ao processar: ${message}` });
+        }
     };
 
     return (
@@ -260,7 +301,7 @@ export default function CaptureImage() {
 
             {/* 🔹 LIVE PREVIEW DA CÂMARA */}
             {isCameraActive && (
-                <div className="camera-live-container">
+                <div className="camera-live-container" ref={cameraContainerRef}>
                     <div className="camera-view">
                         <video ref={videoRef} className="camera-video" playsInline />
                         <div className="camera-overlay">

@@ -1,50 +1,94 @@
 .privacy-container {
-    padding: 20px;
-    max-width: 600px;
+    --legal-bg-start: #eaf7f3;
+    --legal-bg-end: #f8fbff;
+    --legal-card: rgba(255, 255, 255, 0.94);
+    --legal-border: rgba(95, 167, 154, 0.24);
+    --legal-text: #2d4742;
+    --legal-muted: #5b6f6b;
+    --legal-shadow: 0 18px 34px rgba(26, 79, 69, 0.12);
+
+    padding: 28px 20px 40px;
+    max-width: 860px;
     margin: 0 auto;
-    background-color: #f9fbfb;
     min-height: 100vh;
+    background-color: #f9fbfb;
 }
 
 .privacy-header {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: 14px;
+    margin-bottom: 18px;
 }
 
 .privacy-header h1 {
-    font-size: 24px;
-    color: var(--text-dark);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: #123731;
     margin: 0;
+    letter-spacing: 0.01em;
 }
 
 .back-btn {
-    background: none;
-    border: none;
-    color: var(--primary-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(22, 94, 82, 0.22);
+    background: rgba(255, 255, 255, 0.86);
+    color: #165e52;
     cursor: pointer;
-    padding: 5px;
+    padding: 0;
+    transition: transform 0.16s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.back-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(22, 94, 82, 0.16);
+    border-color: rgba(22, 94, 82, 0.35);
+}
+
+.back-btn:focus-visible {
+    outline: 3px solid rgba(95, 167, 154, 0.4);
+    outline-offset: 2px;
+}
+
+.privacy-content {
+    display: grid;
+    gap: 16px;
 }
 
 .privacy-intro {
-    font-size: 18px;
-    color: #4a4a4a;
+    font-size: 1.03rem;
+    color: var(--legal-text);
+    line-height: 1.65;
+    padding: 22px;
+    background: var(--legal-card);
+    border-radius: 18px;
+    border: 1px solid var(--legal-border);
+    display: grid;
+    gap: 12px;
+}
+
+.privacy-intro p {
+    margin: 0;
+}
+
+.privacy-security-note p {
+    margin: 0;
+    font-weight: 600;
     line-height: 1.5;
-    margin-bottom: 25px;
-    padding: 15px;
-    background: white;
-    border-radius: 12px;
-    border-left: 5px solid var(--primary-color);
 }
 
 .privacy-topic {
-    background: white;
+    background: var(--legal-card);
     padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    border: 1px solid var(--legal-border);
 }
+
+
 
 .topic-header {
     display: flex;
@@ -55,22 +99,51 @@
 
 .topic-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 1.04rem;
     color: var(--primary-color);
 }
 
 .privacy-topic p {
-    font-size: 16px;
-    color: #636e72;
-    line-height: 1.6;
+    font-size: 0.98rem;
+    color: var(--legal-muted);
+    line-height: 1.68;
     margin: 0;
 }
 
 .privacy-footer {
-    margin-top: 30px;
-    padding: 15px;
-    background: #fff3e0;
-    border-radius: 10px;
-    font-size: 13px;
-    color: #e67e22;
+    margin-top: 8px;
+    padding: 14px 16px;
+    background: rgba(255, 243, 224, 0.88);
+    border-radius: 12px;
+    border: 1px solid rgba(230, 126, 34, 0.24);
+    font-size: 0.84rem;
+    color: #8a4f17;
+
+    /* Novas propriedades para o alinhamento */
+    display: flex;
+    align-items: center;
+    /* Centraliza verticalmente se for apenas uma linha */
+    gap: 12px;
+}
+
+/* Garante que o texto não "esprema" o ícone se o texto for longo */
+.privacy-footer p {
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .privacy-container {
+        padding: 20px 14px 32px;
+    }
+
+    .privacy-intro,
+    .privacy-topic {
+        padding: 16px;
+    }
+
+    .privacy-topic:hover {
+        transform: none;
+    }
 }

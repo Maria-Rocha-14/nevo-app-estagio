@@ -1,0 +1,138 @@
+html[data-theme='dark'] body {
+  background: #0f1718;
+  color: #eef7f5;
+}
+
+html[data-theme='dark'] .home-container,
+html[data-theme='dark'] .profile-container,
+html[data-theme='dark'] .avatar-page {
+  --bg-app: #0f1718;
+  --text-dark: #eef7f5;
+  --card-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  background: var(--bg-app);
+  color: var(--text-dark);
+}
+
+html[data-theme='dark'] .level-card,
+html[data-theme='dark'] .stat-box,
+html[data-theme='dark'] .mascot-home-card,
+html[data-theme='dark'] .achievements-card,
+html[data-theme='dark'] .profile-card,
+html[data-theme='dark'] .profile-summary,
+html[data-theme='dark'] .profile-avatar-link,
+html[data-theme='dark'] .avatar-preview-card,
+html[data-theme='dark'] .avatar-section,
+html[data-theme='dark'] .avatar-icon-btn,
+html[data-theme='dark'] .profile-icon-btn,
+html[data-theme='dark'] .avatar-color-option,
+html[data-theme='dark'] .avatar-item-option,
+html[data-theme='dark'] .bottom-navbar {
+  background: #172223;
+  border-color: #294143;
+  color: #eef7f5;
+}
+
+html[data-theme='dark'] .avatar-stage,
+html[data-theme='dark'] .mascot-home-stage,
+html[data-theme='dark'] .avatar-home-preview,
+html[data-theme='dark'] .profile-avatar {
+  background: transparent;
+  border-color: #294143;
+}
+
+html[data-theme='dark'] .avatar-stage,
+html[data-theme='dark'] .mascot-home-stage {
+  border-color: transparent;
+}
+
+html[data-theme='dark'] .mascot-home-card,
+html[data-theme='dark'] .avatar-preview-card {
+  background: #172223;
+}
+
+html[data-theme='dark'] .avatar-circle {
+  background: #172223;
+  border-color: #294143;
+}
+
+html[data-theme='dark'] .user-info h1,
+html[data-theme='dark'] .level-text h3,
+html[data-theme='dark'] .section-title h3,
+html[data-theme='dark'] .profile-header h1,
+html[data-theme='dark'] .profile-summary-text strong,
+html[data-theme='dark'] .profile-section-heading h2,
+html[data-theme='dark'] .profile-field span,
+html[data-theme='dark'] .profile-preference-row > span,
+html[data-theme='dark'] .avatar-header h1,
+html[data-theme='dark'] .avatar-section-title h2,
+html[data-theme='dark'] .avatar-progress strong,
+html[data-theme='dark'] .avatar-name-field span,
+html[data-theme='dark'] .avatar-item-option span,
+html[data-theme='dark'] .mascot-home-copy h2,
+html[data-theme='dark'] .achievement-info h4,
+html[data-theme='dark'] .achievement-count {
+  color: #eef7f5;
+}
+
+html[data-theme='dark'] .user-info p,
+html[data-theme='dark'] .stat-box span,
+html[data-theme='dark'] .avatar-item-option small,
+html[data-theme='dark'] .profile-summary-text span,
+html[data-theme='dark'] .profile-section-heading p,
+html[data-theme='dark'] .profile-avatar-link span,
+html[data-theme='dark'] .avatar-progress,
+html[data-theme='dark'] .achievement-info p {
+  color: #a9bfbd;
+}
+
+html[data-theme='dark'] .profile-field input,
+html[data-theme='dark'] .profile-password-wrapper,
+html[data-theme='dark'] .avatar-name-field input,
+html[data-theme='dark'] .profile-segmented {
+  background: #101b1c;
+  border-color: #294143;
+  color: #eef7f5;
+}
+
+html[data-theme='dark'] .profile-field input:disabled,
+html[data-theme='dark'] .avatar-item-option:disabled {
+  background: #132022;
+  color: #7f9996;
+  border-color: #24383a;
+}
+
+html[data-theme='dark'] .profile-segmented button.active,
+html[data-theme='dark'] .avatar-color-option.selected,
+html[data-theme='dark'] .avatar-item-option.selected {
+  border-color: #eef7f5;
+  box-shadow: 0 0 0 3px rgba(238, 247, 245, 0.12);
+}
+
+html[data-theme='dark'] .progress-bar-bg,
+html[data-theme='dark'] .avatar-progress-bar {
+  background: #26393b;
+}
+
+html[data-theme='dark'] .progress-bar-fill,
+html[data-theme='dark'] .avatar-progress-bar span {
+  background: #eef7f5;
+}
+
+html[data-theme='dark'] .mission-card {
+  background: #2c241a;
+}
+
+html[data-theme='dark'] .medical-disclaimer {
+  background: #17263a;
+  border-color: #284664;
+}
+
+html[data-theme='dark'] .medical-disclaimer p {
+  color: #d8e7f8;
+}
+
+html[data-theme='dark'] .profile-logout-btn {
+  background: #172223;
+  border-color: #294143;
+  color: #eef7f5;
+}

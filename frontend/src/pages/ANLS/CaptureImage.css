@@ -331,3 +331,15 @@
         flex-direction: column;
     }
 }
+
+@media (min-width: 900px) {
+    .capture-container {
+        max-width: 960px;
+        padding: 28px;
+        padding-bottom: 120px;
+    }
+
+    .bottom-navbar {
+        max-width: 960px;
+    }
+}

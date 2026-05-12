@@ -182,11 +182,17 @@
 
 .primary-action {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: none;
   background: linear-gradient(135deg, #12967e 0%, #0d7f6a 100%);
   color: #fff;
   padding: 12px 14px;
   margin-top: 12px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .secondary-action {
@@ -224,5 +230,12 @@
 @media (max-width: 360px) {
   .assessment-container {
     padding: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .assessment-container {
+    max-width: 960px;
+    padding: 28px;
   }
 }

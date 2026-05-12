@@ -9,10 +9,19 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Edge versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "not dead"
+  ],
   "dependencies": {
     "dexie": "^4.4.1",
     "dexie-react-hooks": "^4.4.0",
     "i18next": "^26.0.2",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.7.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

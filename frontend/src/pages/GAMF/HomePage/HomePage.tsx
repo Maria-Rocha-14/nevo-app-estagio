@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import {
     Target, Flame, Award, Camera, Sun,
     Trophy, Home, History, BookOpen, AlertCircle, ChevronRight,
-    User as UserIcon, Sparkles, CheckCircle, MapPin
+    Sparkles, CheckCircle, MapPin, Pencil
 } from 'lucide-react';
 import './HomePage.css';
+import ChameleonAvatar from '../../../components/ChameleonAvatar';
 import FeedbackMessage from '../../../components/FeedbackMessage';
+import { getAvatar, getLevelProgress, getUserLevel, XP_PER_LEVEL } from '../../../services/avatar';
 import { awardDailyMissionXp, useSessionUser } from '../../../services/session';
 
 type FeedbackState = {
@@ -21,10 +23,14 @@ export default function HomePage() {
     const navigate = useNavigate();
 
     const user = useSessionUser();
-    const isMissionAlreadyCompleted = user?.lastMissionDate === new Date().toLocaleDateString();
-
+    const hoje = new Date().toISOString().split('T')[0];
+    const isMissionAlreadyCompleted = user?.lastMissionDate === hoje;
     const xp = user?.xp || 0;
+    const userLevel = getUserLevel(xp);
+    const levelProgress = getLevelProgress(xp);
     const missionCompleted = isMissionAlreadyCompleted;
+    const mascot = user ? getAvatar(user) : null;
+    const mascotName = mascot?.name?.trim() || t('avatar.default_name');
     const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
     const [uvIndex, setUvIndex] = useState<number | null>(null);
@@ -92,8 +98,8 @@ export default function HomePage() {
             return;
         }
 
-        await awardDailyMissionXp(25);
-        setFeedback({ tone: 'success', message: t('feedback.home_mission_completed') });
+            await awardDailyMissionXp(25);
+            setFeedback({ tone: 'success', message: t('feedback.home_mission_completed') });
     };
 
     const calculateProgress = (currentXp: number, total: number) => {
@@ -101,11 +107,11 @@ export default function HomePage() {
         return percentage > 100 ? 100 : percentage;
     };
 
-    if (user === undefined) return <main className="home-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>A carregar sessão...</div></main>;
+    if (user === undefined) return <main className="home-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>{t('profile.loading')}</div></main>;
     if (!user) return null;
 
     return (
-        <main className="home-container" aria-label="Página inicial do utilizador">
+        <main className="home-container" aria-label={t('nav.home')}>
             {feedback && (
                 <FeedbackMessage
                     tone={feedback.tone}
@@ -120,8 +126,8 @@ export default function HomePage() {
                     <h1>{t('home.welcome')}, {user.name.split(' ')[0]}!</h1>
                     <p>{t('home.subtitle')}</p>
                 </div>
-                <button type="button" className="avatar-circle" onClick={() => navigate('/profile')} aria-label="Abrir perfil">
-                    <UserIcon size={30} color="#5fa79a" strokeWidth={2.5} />
+                <button type="button" className="avatar-circle" onClick={() => navigate('/profile')} aria-label={t('nav.profile')}>
+                    <ChameleonAvatar avatar={getAvatar(user)} size="sm" />
                 </button>
             </header>
 
@@ -133,18 +139,18 @@ export default function HomePage() {
                     </div>
                     <div className="level-text">
                         <span>{t('home.level')}</span>
-                        <h3>{t('home.level_starter')}</h3>
+                        <h3>{t('avatar.level', { level: userLevel })}</h3>
                     </div>
                     <Sparkles className="sparkle-icon" size={28} color="#f1c40f" strokeWidth={2} />
                 </div>
 
                 <div className="progress-container">
                     <div className="progress-labels">
-                        <span>{xp} XP</span>
-                        <span>100 XP</span>
+                        <span>{t('home.progress')}</span>
+                        <span>{levelProgress}/{XP_PER_LEVEL} XP</span>
                     </div>
                     <div className="progress-bar-bg">
-                        <div className="progress-bar-fill" style={{ width: `${calculateProgress(xp, 100)}%` }}></div>
+                        <div className="progress-bar-fill" style={{ width: `${calculateProgress(levelProgress, XP_PER_LEVEL)}%` }}></div>
                     </div>
                 </div>
             </section>
@@ -172,6 +178,19 @@ export default function HomePage() {
                 <Camera size={24} color="white" />
                 {t('home.new_scan')}
             </button>
+
+            <section className="mascot-home-card" aria-label={t('avatar.home_title')}>
+                <div className="mascot-home-copy">
+                    <span>{t('avatar.home_kicker')}</span>
+                    <h2>{mascotName}</h2>
+                </div>
+                <div className="mascot-home-stage" aria-hidden="true">
+                    <ChameleonAvatar avatar={mascot || undefined} size="lg" />
+                </div>
+                <button type="button" className="mascot-edit-btn" onClick={() => navigate('/avatar')} aria-label={t('avatar.edit')}>
+                    <Pencil size={20} aria-hidden="true" />
+                </button>
+            </section>
 
             {/* Missão Diária com IPMA */}
             <section className="mission-card">
