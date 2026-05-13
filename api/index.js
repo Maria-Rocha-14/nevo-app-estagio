@@ -7,10 +7,10 @@ const cron = require('node-cron');
 
 // --- AJUSTE DE CAMINHOS PARA O VERCEL ---
 // Como o index.js está em /api, precisamos de ../ para chegar à pasta /models na raiz
-const ScanSetting = require('../models/ScanSetting');
-const User = require('../models/User');
-const Badge = require('../models/Badge');
-const AdminQuiz = require('../models/AdminQuizzes');
+const ScanSetting = require('./models/ScanSetting');
+const User = require('./models/User');
+const Badge = require('./models/Badge');
+const AdminQuiz = require('./models/AdminQuizzes');
 
 const app = express();
 
