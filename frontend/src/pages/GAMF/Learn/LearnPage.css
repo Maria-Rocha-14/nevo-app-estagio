@@ -279,50 +279,6 @@
   min-height: 245px;
 }
 
-.challenge-inline-notice {
-  margin-top: 12px;
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: grid;
-  gap: 4px;
-  animation: notice-pop 0.25s ease-out;
-}
-
-.challenge-inline-notice strong {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.challenge-inline-notice span {
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
-.challenge-inline-success {
-  background: #ecfdf5;
-  border: 1px solid #86efac;
-  color: #166534;
-}
-
-.challenge-inline-warning {
-  background: #fff7ed;
-  border: 1px solid #fdba74;
-  color: #9a3412;
-}
-
-.challenge-inline-error {
-  background: #fef2f2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
-}
-
-.challenge-inline-info {
-  background: #eff6ff;
-  border: 1px solid #93c5fd;
-  color: #1d4ed8;
-}
-
 .quiz-options {
   display: grid;
   gap: 8px;
@@ -419,17 +375,6 @@
   }
 }
 
-.quiz-error-message {
-  margin: 10px 0 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #fde8e8;
-  border: 1px solid #f8b4b4;
-  color: #991b1b;
-  font-size: 0.82rem;
-  line-height: 1.4;
-}
-
 .quiz-option {
   text-align: left;
   border: 1px solid #cad9d5;
@@ -450,6 +395,42 @@
   border-color: #0f766e;
   background: #ecfdf5;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.quiz-option.answer-correct,
+.image-choice-card.answer-correct {
+  border-color: #16a34a;
+  background: #ecfdf5;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+  opacity: 1;
+}
+
+.quiz-option.answer-wrong,
+.image-choice-card.answer-wrong {
+  border-color: #dc2626;
+  background: #fef2f2;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+  opacity: 1;
+}
+
+.answer-review {
+  margin: 10px 0 0;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.answer-review.correct {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.answer-review.wrong {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
 }
 
 .challenge-footer {
@@ -630,7 +611,6 @@
 @media (prefers-reduced-motion: reduce) {
   .learn-card-transition,
   .learn-card.celebrating,
-  .challenge-inline-notice,
   .learn-skeleton-block,
   .learn-skeleton-card {
     animation: none;

@@ -6,6 +6,12 @@ import type {
   User,
   UserAvatar
 } from '../db/db';
+import {
+  calculateLevelFromTotalXp,
+  getLevelProgress as getProgressForTotalXp
+} from './levelService';
+
+export type AvatarItemCategory = 'outfit' | 'accessory' | 'special';
 
 type UnlockRule =
   | { type: 'free' }
@@ -23,11 +29,20 @@ export type AvatarColorOption = {
 
 export type AvatarItemOption<TId extends string> = {
   id: TId;
+  label: string;
   nameKey: string;
+  category: AvatarItemCategory;
+  requiredLevel: number;
+  cost: number;
+  defaultUnlocked: boolean;
+  unlockKey: string;
+  assetPath?: string;
   unlock: UnlockRule;
 };
 
 export const XP_PER_LEVEL = 100;
+
+export const DEFAULT_UNLOCKED_AVATAR_ITEMS = ['no-outfit', 'no-accessory', 'no-special'];
 
 export const DEFAULT_AVATAR: UserAvatar = {
   name: '',
@@ -74,29 +89,154 @@ export const AVATAR_COLORS: AvatarColorOption[] = [
 ];
 
 export const AVATAR_OUTFITS: AvatarItemOption<AvatarOutfitId>[] = [
-  { id: 'none', nameKey: 'avatar.outfits.none', unlock: { type: 'free' } },
-  { id: 'simpleTee', nameKey: 'avatar.outfits.simpleTee', unlock: { type: 'free' } },
-  { id: 'sweatshirt', nameKey: 'avatar.outfits.sweatshirt', unlock: { type: 'level', value: 2 } },
-  { id: 'coat', nameKey: 'avatar.outfits.coat', unlock: { type: 'points', value: 150 } }
+  {
+    id: 'none',
+    label: 'No outfit',
+    nameKey: 'avatar.outfits.none',
+    category: 'outfit',
+    requiredLevel: 1,
+    cost: 0,
+    defaultUnlocked: true,
+    unlockKey: 'no-outfit',
+    unlock: { type: 'free' }
+  },
+  {
+    id: 'simpleTee',
+    label: 'Simple T-shirt',
+    nameKey: 'avatar.outfits.simpleTee',
+    category: 'outfit',
+    requiredLevel: 2,
+    cost: 40,
+    defaultUnlocked: false,
+    unlockKey: 'outfit-simpleTee',
+    unlock: { type: 'level', value: 2 }
+  },
+  {
+    id: 'sweatshirt',
+    label: 'Simple sweatshirt',
+    nameKey: 'avatar.outfits.sweatshirt',
+    category: 'outfit',
+    requiredLevel: 4,
+    cost: 80,
+    defaultUnlocked: false,
+    unlockKey: 'outfit-sweatshirt',
+    unlock: { type: 'level', value: 4 }
+  },
+  {
+    id: 'coat',
+    label: 'Medical coat',
+    nameKey: 'avatar.outfits.coat',
+    category: 'outfit',
+    requiredLevel: 6,
+    cost: 140,
+    defaultUnlocked: false,
+    unlockKey: 'outfit-coat',
+    unlock: { type: 'level', value: 6 }
+  }
 ];
 
 export const AVATAR_ACCESSORIES: AvatarItemOption<AvatarAccessoryId>[] = [
-  { id: 'none', nameKey: 'avatar.accessories.none', unlock: { type: 'free' } },
-  { id: 'glasses', nameKey: 'avatar.accessories.glasses', unlock: { type: 'points', value: 60 } },
-  { id: 'stethoscope', nameKey: 'avatar.accessories.stethoscope', unlock: { type: 'points', value: 120 } }
+  {
+    id: 'none',
+    label: 'No accessory',
+    nameKey: 'avatar.accessories.none',
+    category: 'accessory',
+    requiredLevel: 1,
+    cost: 0,
+    defaultUnlocked: true,
+    unlockKey: 'no-accessory',
+    unlock: { type: 'free' }
+  },
+  {
+    id: 'glasses',
+    label: 'Glasses',
+    nameKey: 'avatar.accessories.glasses',
+    category: 'accessory',
+    requiredLevel: 3,
+    cost: 60,
+    defaultUnlocked: false,
+    unlockKey: 'accessory-glasses',
+    unlock: { type: 'level', value: 3 }
+  },
+  {
+    id: 'stethoscope',
+    label: 'Stethoscope',
+    nameKey: 'avatar.accessories.stethoscope',
+    category: 'accessory',
+    requiredLevel: 5,
+    cost: 120,
+    defaultUnlocked: false,
+    unlockKey: 'accessory-stethoscope',
+    unlock: { type: 'level', value: 5 }
+  }
 ];
 
 export const AVATAR_SPECIALS: AvatarItemOption<AvatarSpecialId>[] = [
-  { id: 'none', nameKey: 'avatar.specials.none', unlock: { type: 'free' } },
-  { id: 'football', nameKey: 'avatar.specials.football', unlock: { type: 'points', value: 250 } },
-  { id: 'programmer', nameKey: 'avatar.specials.programmer', unlock: { type: 'level', value: 4 } },
-  { id: 'doctor', nameKey: 'avatar.specials.doctor', unlock: { type: 'level', value: 5 } },
-  { id: 'tennis', nameKey: 'avatar.specials.tennis', unlock: { type: 'points', value: 350 } }
+  {
+    id: 'none',
+    label: 'No special',
+    nameKey: 'avatar.specials.none',
+    category: 'special',
+    requiredLevel: 1,
+    cost: 0,
+    defaultUnlocked: true,
+    unlockKey: 'no-special',
+    unlock: { type: 'free' }
+  },
+  {
+    id: 'football',
+    label: 'Football',
+    nameKey: 'avatar.specials.football',
+    category: 'special',
+    requiredLevel: 4,
+    cost: 100,
+    defaultUnlocked: false,
+    unlockKey: 'special-football',
+    unlock: { type: 'level', value: 4 }
+  },
+  {
+    id: 'tennis',
+    label: 'Tennis',
+    nameKey: 'avatar.specials.tennis',
+    category: 'special',
+    requiredLevel: 5,
+    cost: 120,
+    defaultUnlocked: false,
+    unlockKey: 'special-tennis',
+    unlock: { type: 'level', value: 5 }
+  },
+  {
+    id: 'programmer',
+    label: 'Programmer',
+    nameKey: 'avatar.specials.programmer',
+    category: 'special',
+    requiredLevel: 7,
+    cost: 220,
+    defaultUnlocked: false,
+    unlockKey: 'special-programmer',
+    unlock: { type: 'level', value: 7 }
+  },
+  {
+    id: 'doctor',
+    label: 'Doctor',
+    nameKey: 'avatar.specials.doctor',
+    category: 'special',
+    requiredLevel: 8,
+    cost: 300,
+    defaultUnlocked: false,
+    unlockKey: 'special-doctor',
+    unlock: { type: 'level', value: 8 }
+  }
 ];
 
-export const getUserLevel = (xp = 0): number => Math.floor(xp / XP_PER_LEVEL) + 1;
+export const normalizeUnlockedAvatarItems = (items?: string[]): string[] => {
+  const mergedItems = new Set([...(items || []), ...DEFAULT_UNLOCKED_AVATAR_ITEMS]);
+  return Array.from(mergedItems);
+};
 
-export const getLevelProgress = (xp = 0): number => xp % XP_PER_LEVEL;
+export const getUserLevel = (xp = 0): number => calculateLevelFromTotalXp(xp);
+
+export const getLevelProgress = (xp = 0): number => getProgressForTotalXp(xp).currentLevelXp;
 
 const getAvatarOutfit = (outfitId?: string): AvatarOutfitId =>
   AVATAR_OUTFITS.some((outfit) => outfit.id === outfitId) ? (outfitId as AvatarOutfitId) : DEFAULT_AVATAR.outfitId;

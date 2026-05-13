@@ -4,6 +4,7 @@ import DevErrorBoundary from './components/DevErrorBoundary';
 import { applyTheme, getStoredTheme } from './services/preferences';
 import BrowserCompatibilityNotice from './components/BrowserCompatibilityNotice';
 import { getBrowserSupport } from './services/browserSupport';
+import SessionTimeout from './components/SessionTimeout/SessionTimeout';
 
 // Lazy load all pages for code-splitting
 const Login = lazy(() => import('./pages/USERM/Login/Login'));
@@ -39,6 +40,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <SessionTimeout />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Login />} />

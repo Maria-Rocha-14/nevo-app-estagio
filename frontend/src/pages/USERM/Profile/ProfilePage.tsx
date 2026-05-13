@@ -1,14 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft, ChevronRight, Eye, EyeOff, Languages, Lock,
-  Moon, Palette, Save, ShieldCheck, Sun, User as UserIcon,
-  LogOut, Trophy, Medal, Award
-} from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Eye, EyeOff, Languages, Lock, Moon, Pencil, Save, ShieldCheck, Sun, User as UserIcon, LogOut, Trophy, Medal, Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; 
 import ChameleonAvatar from '../../../components/ChameleonAvatar';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { db, type User, type AdminBadge } from '../../../db/db';
+import { db, type AdminBadge } from '../../../db/db';
 import { getAvatar } from '../../../services/avatar';
 import { getStoredTheme, setStoredTheme, type AppTheme } from '../../../services/preferences';
 import { useSessionUser, validatePassword, logoutUser } from '../../../services/session';
@@ -24,7 +20,6 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const sessionUser = useSessionUser();
 
-  // Estados do formulário e UI
   const [name, setName] = useState('');
   const [theme, setTheme] = useState<AppTheme>(() => getStoredTheme());
   const [newPassword, setNewPassword] = useState('');
@@ -33,23 +28,25 @@ export default function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
-  // Estado para os Badges
   const [allBadges, setAllBadges] = useState<AdminBadge[]>([]);
 
   useEffect(() => {
     if (sessionUser) {
       setName(sessionUser.name);
     }
-    // Carregar todos os badges definidos pelo Admin
+    // Carregar badges do MongoDB/Dexie
     db.adminBadges.toArray().then(setAllBadges);
   }, [sessionUser]);
+
+  if (sessionUser === undefined) return <main className="profile-container" aria-busy="true"><div style={{ padding: '20px', textAlign: 'center' }}>{t('profile.loading')}</div></main>;
+  if (!sessionUser) { navigate('/'); return null; }
+
+  const mascot = getAvatar(sessionUser);
+  const mascotName = mascot.name?.trim() || t('avatar.default_name');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback(null);
-
-    if (!sessionUser) return;
 
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -101,9 +98,6 @@ export default function ProfilePage() {
     setStoredTheme(nextTheme);
   };
 
-  if (sessionUser === undefined) return <main className="profile-container" aria-busy="true"><div style={{ padding: '20px', textAlign: 'center' }}>{t('profile.loading')}</div></main>;
-  if (!sessionUser) { navigate('/'); return null; }
-
   return (
     <main className="profile-container" aria-labelledby="profile-title">
       <header className="profile-header">
@@ -116,30 +110,21 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      {/* Resumo do Utilizador */}
-      <section className="profile-summary">
-        <div className="profile-avatar" aria-hidden="true">
-          <ChameleonAvatar avatar={getAvatar(sessionUser)} size="sm" />
+      {/* Card do Camaleão (Mascote) */}
+      <section className="profile-mascot-card" aria-label={t('avatar.profile_title')}>
+        <div className="profile-mascot-copy">
+          <span>{t('avatar.home_kicker')}</span>
+          <h2>{mascotName}</h2>
         </div>
-        <div className="profile-summary-text">
-          <strong>{sessionUser.name}</strong>
-          <span>{sessionUser.email}</span>
+        <div className="profile-mascot-stage" aria-hidden="true">
+          <ChameleonAvatar avatar={mascot} size="lg" />
         </div>
+        <button type="button" className="profile-mascot-edit-btn" onClick={() => navigate('/avatar')} aria-label={t('avatar.edit')}>
+          <Pencil size={20} aria-hidden="true" />
+        </button>
       </section>
 
-      {/* Atalho para Avatar */}
-      <button type="button" className="profile-avatar-link" onClick={() => navigate('/avatar')}>
-        <div className="profile-section-icon">
-          <Palette size={20} aria-hidden="true" />
-        </div>
-        <div>
-          <strong>{t('avatar.profile_title')}</strong>
-          <span>{t('avatar.profile_desc')}</span>
-        </div>
-        <ChevronRight size={18} aria-hidden="true" />
-      </button>
-
-      {/* SECÇÃO DE CONQUISTAS (BADGES) - Estilo lista conforme imagem */}
+      {/* Secção de Conquistas (Badges) */}
       <section className="profile-card profile-badges-section">
         <div className="profile-section-heading">
           <div className="profile-section-icon profile-section-icon-gold">
@@ -165,7 +150,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Preferências */}
+      {/* Preferências (Língua e Tema) */}
       <section className="profile-card">
         <div className="profile-section-heading">
           <div className="profile-section-icon">
@@ -200,7 +185,7 @@ export default function ProfilePage() {
 
       {feedback && <FeedbackMessage tone={feedback.tone} message={feedback.message} onClose={() => setFeedback(null)} />}
 
-      {/* Formulário de Dados */}
+      {/* Formulário de Dados Pessoais */}
       <form className="profile-form" onSubmit={handleSubmit} noValidate>
         <section className="profile-card">
           <div className="profile-section-heading">

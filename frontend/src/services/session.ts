@@ -93,15 +93,19 @@ type ChallengeCompletionStatus = 'awarded' | 'already-completed' | 'daily-limit'
 type ChallengeCompletionInput = {
   id: string;
   points: number;
+  xp?: number;
 };
 
 type DailyChallengesCompletionResult = {
   status: ChallengeCompletionStatus;
   pointsAwarded: number;
+  xpAwarded: number;
   completedCount: number;
 };
 
 const DAILY_CHALLENGE_LIMIT = 4;
+export const SCAN_XP_REWARD = 200;
+export const SCAN_POINTS_REWARD = 50;
 
 const getLocalDateKey = (date: Date): string => {
   const year = date.getFullYear();
@@ -110,7 +114,13 @@ const getLocalDateKey = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-export const completeChallengeOnce = async (challengeId: string, pointsToAdd: number): Promise<ChallengeCompletionStatus> => {
+const getChallengeIdsCompletedOnDate = (challengeHistory: User['challengeHistory'], dateKey: string): Set<string> => (
+  new Set((challengeHistory || [])
+    .filter((entry) => entry.completedAt.startsWith(dateKey))
+    .map((entry) => entry.challengeId))
+);
+
+export const completeChallengeOnce = async (challengeId: string, pointsToAdd: number, xpToAdd = pointsToAdd): Promise<ChallengeCompletionStatus> => {
   const userId = getLoggedInUserId();
   if (!userId) return 'no-session';
 
@@ -124,7 +134,8 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
       return;
     }
 
-    if (current.completedChallenges.includes(challengeId)) {
+    const completedTodayIds = getChallengeIdsCompletedOnDate(current.challengeHistory || [], today);
+    if (completedTodayIds.has(challengeId)) {
       status = 'already-completed';
       return;
     }
@@ -135,10 +146,13 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
       return;
     }
 
+    const completedChallengeIds = new Set(current.completedChallenges || []);
+    completedChallengeIds.add(challengeId);
+
     await db.users.update(userId, {
       points: (current.points || 0) + pointsToAdd,
-      xp: (current.xp || 0) + pointsToAdd, // Unificação aqui também
-      completedChallenges: [...(current.completedChallenges || []), challengeId],
+      xp: (current.xp || 0) + xpToAdd,
+      completedChallenges: [...completedChallengeIds],
       challengeHistory: [
         ...(current.challengeHistory || []),
         {
@@ -157,48 +171,48 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
 
 export const completeDailyChallengesOnce = async (challenges: ChallengeCompletionInput[]): Promise<DailyChallengesCompletionResult> => {
   const userId = getLoggedInUserId();
-  if (!userId) return { status: 'no-session', pointsAwarded: 0, completedCount: 0 };
+  if (!userId) return { status: 'no-session', pointsAwarded: 0, xpAwarded: 0, completedCount: 0 };
 
-  let result: DailyChallengesCompletionResult = { status: 'user-missing', pointsAwarded: 0, completedCount: 0 };
+  let result: DailyChallengesCompletionResult = { status: 'user-missing', pointsAwarded: 0, xpAwarded: 0, completedCount: 0 };
   const today = getLocalDateKey(new Date());
 
   await db.transaction('rw', db.users, async () => {
     const current = await db.users.get(userId);
     if (!current) {
-      result = { status: 'user-missing', pointsAwarded: 0, completedCount: 0 };
-      return;
-    }
-
-    const completedChallengeIds = new Set(current.completedChallenges || []);
-    const uniquePendingChallenges = challenges.filter((challenge, index, allChallenges) => (
-      !completedChallengeIds.has(challenge.id)
-      && allChallenges.findIndex((item) => item.id === challenge.id) === index
-    ));
-
-    if (uniquePendingChallenges.length === 0) {
-      result = { status: 'already-completed', pointsAwarded: 0, completedCount: 0 };
+      result = { status: 'user-missing', pointsAwarded: 0, xpAwarded: 0, completedCount: 0 };
       return;
     }
 
     const challengeHistory = current.challengeHistory || [];
+    const completedTodayIds = getChallengeIdsCompletedOnDate(challengeHistory, today);
+    const uniquePendingChallenges = challenges.filter((challenge, index, allChallenges) => (
+      !completedTodayIds.has(challenge.id)
+      && allChallenges.findIndex((item) => item.id === challenge.id) === index
+    ));
+
+    if (uniquePendingChallenges.length === 0) {
+      result = { status: 'already-completed', pointsAwarded: 0, xpAwarded: 0, completedCount: 0 };
+      return;
+    }
+
     const completedToday = challengeHistory.filter((entry) => entry.completedAt.startsWith(today)).length;
     const remainingToday = DAILY_CHALLENGE_LIMIT - completedToday;
 
     if (remainingToday < uniquePendingChallenges.length) {
-      result = { status: 'daily-limit', pointsAwarded: 0, completedCount: 0 };
+      result = { status: 'daily-limit', pointsAwarded: 0, xpAwarded: 0, completedCount: 0 };
       return;
     }
 
     const completedAt = new Date().toISOString();
     const pointsAwarded = uniquePendingChallenges.reduce((sum, challenge) => sum + challenge.points, 0);
+    const xpAwarded = uniquePendingChallenges.reduce((sum, challenge) => sum + (challenge.xp ?? challenge.points), 0);
+    const completedChallengeIds = new Set(current.completedChallenges || []);
+    uniquePendingChallenges.forEach((challenge) => completedChallengeIds.add(challenge.id));
 
     await db.users.update(userId, {
       points: (current.points || 0) + pointsAwarded,
-      xp: (current.xp || 0) + pointsAwarded,
-      completedChallenges: [
-        ...(current.completedChallenges || []),
-        ...uniquePendingChallenges.map((challenge) => challenge.id)
-      ],
+      xp: (current.xp || 0) + xpAwarded,
+      completedChallenges: [...completedChallengeIds],
       challengeHistory: [
         ...challengeHistory,
         ...uniquePendingChallenges.map((challenge) => ({
@@ -212,6 +226,7 @@ export const completeDailyChallengesOnce = async (challenges: ChallengeCompletio
     result = {
       status: 'awarded',
       pointsAwarded,
+      xpAwarded,
       completedCount: uniquePendingChallenges.length
     };
   });
@@ -220,7 +235,7 @@ export const completeDailyChallengesOnce = async (challenges: ChallengeCompletio
 };
 
 // Atualização para a Missão Diária (IPMA)
-export const awardDailyMissionXp = async (xpToAdd: number): Promise<void> => {
+export const awardDailyMissionXp = async (xpToAdd: number, pointsToAdd = 0): Promise<void> => {
   const userId = getLoggedInUserId();
   if (!userId) return;
 
@@ -232,7 +247,7 @@ export const awardDailyMissionXp = async (xpToAdd: number): Promise<void> => {
 
     await db.users.update(userId, {
       xp: (current.xp || 0) + xpToAdd,
-      points: (current.points || 0) + xpToAdd, // Unificação: XP e Pontos sobem juntos
+      points: (current.points || 0) + pointsToAdd,
       lastMissionDate: today
     });
   });
@@ -250,7 +265,11 @@ export const appendAssessmentHistory = async (entry: AssessmentHistoryEntry): Pr
 
     await db.users.update(userId, {
       scansCount: (current.scansCount || 0) + 1,
+      xp: (current.xp || 0) + SCAN_XP_REWARD,
+      points: (current.points || 0) + SCAN_POINTS_REWARD,
       assessmentHistory: [...(current.assessmentHistory || []), entry]
     });
   });
 };
+
+

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-    Users, BookOpen, Medal, Settings,
+    Users, BookOpen, Medal,
     BarChart3, Plus, LogOut, ChevronRight, Menu,
     Settings2
 } from 'lucide-react';
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
                     <div className="global-view">
                         <header className="main-header">
                             <h1>Painel de Administração</h1>
-                            <p>Bem-vinda, Admin. Escolha uma área para gerir a plataforma.</p>
+                            <p>Bem-vindo, Admin. Escolha uma área para gerir a plataforma.</p>
                         </header>
 
                         <div className="stats-highlight-card">

@@ -103,6 +103,7 @@ interface User {
     // Campos locais gerados pela aplicação e gamificação
     xp: number;
     points: number;
+    unlockedAvatarItems?: string[];
     weeksStreak: number;
     scansCount: number;
     earnedBadges: number[]; // Lista de IDs de badges ganhos

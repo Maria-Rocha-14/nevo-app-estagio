@@ -113,7 +113,7 @@ export default function AdminBadges() {
                 <header className="admin-header-row">
                     <div className="header-titles">
                         <h1>Gestão de Conquistas</h1>
-                        <p>Configura as metas e medalhas.</p>
+                        <p>Configuração das metas e medalhas.</p>
                     </div>
                     <button className="btn-create-new" onClick={() => handleOpenModal()}><Plus size={20} /><span>Criar Novo Badge</span></button>
                 </header>

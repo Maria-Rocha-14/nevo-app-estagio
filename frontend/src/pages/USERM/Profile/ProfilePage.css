@@ -109,40 +109,75 @@
   gap: 18px;
 }
 
-.profile-avatar-link {
+.profile-mascot-card {
+  position: relative;
   width: 100%;
-  min-height: 78px;
-  margin-bottom: 18px;
+  min-height: 400px;
+  box-sizing: border-box;
   border: 2px solid #e0e0e0;
   border-radius: 20px;
   background: #ffffff;
-  box-shadow: var(--card-shadow);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  color: #1a1a1a;
-  text-align: left;
-  cursor: pointer;
-}
-
-.profile-avatar-link div:nth-child(2) {
-  flex: 1;
-  min-width: 0;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
 }
 
-.profile-avatar-link strong {
-  font-size: 15px;
+.profile-mascot-copy {
+  width: 100%;
+  text-align: left;
+}
+
+.profile-mascot-copy span {
+  color: var(--icon-teal);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-mascot-copy h2 {
+  margin: 4px 0 0;
+  color: var(--text-dark);
+  font-size: 24px;
   font-weight: 800;
 }
 
-.profile-avatar-link span {
-  color: #636e72;
-  font-size: 12px;
-  line-height: 1.35;
+.profile-mascot-stage {
+  width: 100%;
+  min-height: 300px;
+  max-height: 340px;
+  max-width: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-mascot-stage .chameleon-avatar {
+  width: min(270px, 82%);
+  max-height: calc(100% - 12px);
+}
+
+.profile-mascot-edit-btn {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #d9ebe7;
+  border-radius: 14px;
+  background: #f1f8f6;
+  color: var(--icon-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
 }
 
 .profile-preferences-card {
@@ -343,7 +378,7 @@
 }
 
 .profile-icon-btn:focus-visible,
-.profile-avatar-link:focus-visible,
+.profile-mascot-edit-btn:focus-visible,
 .profile-segmented button:focus-visible,
 .profile-password-wrapper button:focus-visible,
 .profile-save-btn:focus-visible {

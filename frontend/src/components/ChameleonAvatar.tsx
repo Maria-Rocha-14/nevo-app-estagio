@@ -20,6 +20,8 @@ import yellowDoctorSpecialAvatar from '../assets/avatar/yellow/doctor.png';
 import yellowFootballAvatar from '../assets/avatar/yellow/football.png';
 import yellowProgrammerAvatar from '../assets/avatar/yellow/programmer.png';
 import yellowTennisAvatar from '../assets/avatar/yellow/tennis.png';
+import yellowBaseGlassesAvatar from '../assets/avatar/yellow/yellow-base-glasses.png';
+import yellowBaseStethoscopeAvatar from '../assets/avatar/yellow/yellow-base-stethoscope.png';
 import yellowTShirtAvatar from '../assets/avatar/yellow/yellow-t-shirt.png';
 import yellowTShirtGlassesAvatar from '../assets/avatar/yellow/yellow-t-shirt-glasses.png';
 import yellowTShirtStethoscopeAvatar from '../assets/avatar/yellow/yellow-t-shirt-stethoscope.png';
@@ -78,7 +80,9 @@ const YELLOW_AVATAR_IMAGES: Partial<
   Record<UserAvatar['outfitId'], Partial<Record<UserAvatar['accessoryId'], string>>>
 > = {
   none: {
-    none: yellowNudeAvatar
+    none: yellowNudeAvatar,
+    glasses: yellowBaseGlassesAvatar,
+    stethoscope: yellowBaseStethoscopeAvatar
   },
   simpleTee: {
     none: yellowTShirtAvatar,

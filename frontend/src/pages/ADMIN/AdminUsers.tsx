@@ -73,8 +73,8 @@ export default function AdminUsers() {
             <main className="admin-page">
                 <header className="admin-header-row">
                     <div className="header-titles">
-                        <h1>Gestão de Utilizadores (Cloud)</h1>
-                        <p>Controlo centralizado de acessos no MongoDB.</p>
+                        <h1>Gestão de Utilizadores</h1>
+                        <p>Controlo centralizado de acessos no servidor externo.</p>
                     </div>
                 </header>
 

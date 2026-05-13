@@ -1,0 +1,19 @@
+# Dependências (Extremamente pesado - nunca mandar)
+node_modules/
+
+# Variáveis de Ambiente (SEGURANÇA - Contém passwords do MongoDB e Gmail)
+.env
+.env.local
+
+# Ficheiros de Build (Gerados automaticamente)
+dist/
+build/
+.vite/
+
+# Pastas que já tinhas
+.tools/
+frontend/src/assets/avatar/base/_originals/
+
+# Ficheiros do Sistema
+.DS_Store
+Thumbs.db

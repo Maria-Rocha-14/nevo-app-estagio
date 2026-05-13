@@ -4,19 +4,36 @@ import { useTranslation } from 'react-i18next';
 import {
     Target, Flame, Award, Camera, Sun,
     Trophy, Home, History, BookOpen, AlertCircle, ChevronRight,
-    Sparkles, CheckCircle, MapPin, Pencil
+    Sparkles, CheckCircle, MapPin
 } from 'lucide-react';
 import './HomePage.css';
 import ChameleonAvatar from '../../../components/ChameleonAvatar';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { getAvatar, getLevelProgress, getUserLevel, XP_PER_LEVEL } from '../../../services/avatar';
+import { getAvatar } from '../../../services/avatar';
+import { getLevelProgress } from '../../../services/levelService';
 import { awardDailyMissionXp, useSessionUser } from '../../../services/session';
+import { calculateAge, calculateClinicalRoutine, calculateMonthStreak, isScanDoneThisMonth } from '../../../services/riskProfile';
 
 type FeedbackState = {
     tone: 'success' | 'error' | 'warning' | 'info';
     message: string;
 };
 
+const DAILY_MISSION_XP_REWARD = 25;
+const DAILY_MISSION_POINTS_REWARD = 10;
+
+const getXpFromStoredUserSession = (): number => {
+    try {
+        const storedSession = localStorage.getItem('user_session');
+        if (!storedSession) return 0;
+
+        const parsedSession = JSON.parse(storedSession) as { xp?: unknown; user?: { xp?: unknown } };
+        const storedXp = parsedSession.xp ?? parsedSession.user?.xp;
+        return typeof storedXp === 'number' && Number.isFinite(storedXp) ? storedXp : 0;
+    } catch {
+        return 0;
+    }
+};
 
 export default function HomePage() {
     const { t } = useTranslation();
@@ -25,13 +42,15 @@ export default function HomePage() {
     const user = useSessionUser();
     const hoje = new Date().toISOString().split('T')[0];
     const isMissionAlreadyCompleted = user?.lastMissionDate === hoje;
-    const xp = user?.xp || 0;
-    const userLevel = getUserLevel(xp);
+    const xp = user?.xp ?? getXpFromStoredUserSession();
     const levelProgress = getLevelProgress(xp);
     const missionCompleted = isMissionAlreadyCompleted;
-    const mascot = user ? getAvatar(user) : null;
-    const mascotName = mascot?.name?.trim() || t('avatar.default_name');
     const [feedback, setFeedback] = useState<FeedbackState | null>(null);
+
+    const age = calculateAge(user?.dob || '');
+    const routine = calculateClinicalRoutine(age, user?.skinHistory || 'nao');
+    const monthsStreak = calculateMonthStreak(user?.assessmentHistory || []);
+    const scanDoneThisMonth = isScanDoneThisMonth(user?.assessmentHistory || []);
 
     const [uvIndex, setUvIndex] = useState<number | null>(null);
     const [locationError, setLocationError] = useState(false);
@@ -98,13 +117,14 @@ export default function HomePage() {
             return;
         }
 
-            await awardDailyMissionXp(25);
-            setFeedback({ tone: 'success', message: t('feedback.home_mission_completed') });
-    };
-
-    const calculateProgress = (currentXp: number, total: number) => {
-        const percentage = (currentXp / total) * 100;
-        return percentage > 100 ? 100 : percentage;
+            await awardDailyMissionXp(DAILY_MISSION_XP_REWARD, DAILY_MISSION_POINTS_REWARD);
+            setFeedback({
+                tone: 'success',
+                message: t('feedback.home_mission_completed', {
+                    points: DAILY_MISSION_POINTS_REWARD,
+                    xp: DAILY_MISSION_XP_REWARD
+                })
+            });
     };
 
     if (user === undefined) return <main className="home-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>{t('profile.loading')}</div></main>;
@@ -139,7 +159,7 @@ export default function HomePage() {
                     </div>
                     <div className="level-text">
                         <span>{t('home.level')}</span>
-                        <h3>{t('avatar.level', { level: userLevel })}</h3>
+                        <h3>{t('avatar.level', { level: levelProgress.currentLevel })}</h3>
                     </div>
                     <Sparkles className="sparkle-icon" size={28} color="#f1c40f" strokeWidth={2} />
                 </div>
@@ -147,10 +167,10 @@ export default function HomePage() {
                 <div className="progress-container">
                     <div className="progress-labels">
                         <span>{t('home.progress')}</span>
-                        <span>{levelProgress}/{XP_PER_LEVEL} XP</span>
+                        <span>{levelProgress.currentLevelXp}/{levelProgress.xpForNextLevel} XP</span>
                     </div>
                     <div className="progress-bar-bg">
-                        <div className="progress-bar-fill" style={{ width: `${calculateProgress(levelProgress, XP_PER_LEVEL)}%` }}></div>
+                        <div className="progress-bar-fill" style={{ width: `${levelProgress.progressPercentage}%` }}></div>
                     </div>
                 </div>
             </section>
@@ -164,8 +184,8 @@ export default function HomePage() {
                 </div>
                 <div className="stat-box">
                     <Flame size={24} color="#e67e22" />
-                    <strong>{user.weeksStreak || 0}</strong>
-                    <span>{t('home.weeks')}</span>
+                    <strong>{monthsStreak}</strong>
+                    <span>{t('home.months')}</span>
                 </div>
                 <div className="stat-box">
                     <Award size={24} color="#3498db" />
@@ -179,18 +199,36 @@ export default function HomePage() {
                 {t('home.new_scan')}
             </button>
 
-            <section className="mascot-home-card" aria-label={t('avatar.home_title')}>
-                <div className="mascot-home-copy">
-                    <span>{t('avatar.home_kicker')}</span>
-                    <h2>{mascotName}</h2>
+            {/* Meta Adaptativa e Lembrete */}
+            <section className="adaptive-goal-card" style={{ background: '#fff', borderRadius: '16px', padding: '16px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Target size={20} color="#3498db" />
+                        <h3 style={{ margin: 0, fontSize: '16px', color: '#2c3e50' }}>{t('home.adaptive_goal')}</h3>
+                    </div>
+                    <span style={{ fontSize: '12px', background: '#ecf0f1', padding: '4px 8px', borderRadius: '12px', color: '#7f8c8d', fontWeight: 600 }}>
+                        {age} Anos
+                    </span>
                 </div>
-                <div className="mascot-home-stage" aria-hidden="true">
-                    <ChameleonAvatar avatar={mascot || undefined} size="lg" />
+                
+                <div style={{ background: '#f8f9fa', padding: '12px', borderRadius: '12px', borderLeft: `4px solid ${routine === 'semestral' ? '#9b59b6' : routine === 'annual' ? '#f1c40f' : '#3498db'}` }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 600, color: '#34495e' }}>
+                        {t(`home.routine_${routine}`)}
+                    </p>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#7f8c8d', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {scanDoneThisMonth ? (
+                            <><CheckCircle size={14} color="#2ecc71" /> <span style={{ color: '#2ecc71', fontWeight: 500 }}>{t('home.scan_done')}</span></>
+                        ) : (
+                            <><AlertCircle size={14} color="#e67e22" /> <span style={{ color: '#e67e22', fontWeight: 500 }}>{t('home.scan_pending')}</span></>
+                        )}
+                    </p>
                 </div>
-                <button type="button" className="mascot-edit-btn" onClick={() => navigate('/avatar')} aria-label={t('avatar.edit')}>
-                    <Pencil size={20} aria-hidden="true" />
-                </button>
+
+                <div style={{ marginTop: '12px', fontSize: '13px', color: '#555', background: '#eef2f5', padding: '10px', borderRadius: '8px', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                    <span>{t(`home.reminder_${routine}`)}</span>
+                </div>
             </section>
+
 
             {/* Missão Diária com IPMA */}
             <section className="mission-card">
@@ -223,7 +261,7 @@ export default function HomePage() {
                                 <span>{t('home.mission_done')}</span>
                             </>
                         ) : (
-                            `${t('home.complete_mission')} (+25 XP)`
+                            `${t('home.complete_mission')} (+${DAILY_MISSION_XP_REWARD} XP +${DAILY_MISSION_POINTS_REWARD} ${t('home.points')})`
                         )}
                     </button>
                 </div>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit3, Plus, Trash2, X, Inbox, BookOpenCheck, ExternalLink } from 'lucide-react';
-import type { AdminQuiz, AdminQuizOption, AdminQuizType } from '../../db/db';
+import type {  AdminQuizOption, AdminQuizType } from '../../db/db';
 import FeedbackMessage from '../../components/FeedbackMessage';
 import { isAdminLoggedIn } from '../../services/session';
 import './AdminQuizzes.css';
@@ -142,7 +142,7 @@ export default function AdminQuizzes() {
                 <header className="admin-header-row">
                     <div className="header-titles">
                         <h1>Quizzes Educativos</h1>
-                        <p>Gestão de conteúdos (Cloud).</p>
+                        <p>Gestão de conteúdos que aparecem na área Aprender.</p>
                     </div>
                     <button className="btn-create-new" onClick={() => handleOpenModal()}>
                         <Plus size={20} />

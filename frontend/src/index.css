@@ -16,10 +16,10 @@ html[data-theme='dark'] .avatar-page {
 html[data-theme='dark'] .level-card,
 html[data-theme='dark'] .stat-box,
 html[data-theme='dark'] .mascot-home-card,
+html[data-theme='dark'] .profile-mascot-card,
 html[data-theme='dark'] .achievements-card,
 html[data-theme='dark'] .profile-card,
 html[data-theme='dark'] .profile-summary,
-html[data-theme='dark'] .profile-avatar-link,
 html[data-theme='dark'] .avatar-preview-card,
 html[data-theme='dark'] .avatar-section,
 html[data-theme='dark'] .avatar-icon-btn,
@@ -34,6 +34,7 @@ html[data-theme='dark'] .bottom-navbar {
 
 html[data-theme='dark'] .avatar-stage,
 html[data-theme='dark'] .mascot-home-stage,
+html[data-theme='dark'] .profile-mascot-stage,
 html[data-theme='dark'] .avatar-home-preview,
 html[data-theme='dark'] .profile-avatar {
   background: transparent;
@@ -41,11 +42,13 @@ html[data-theme='dark'] .profile-avatar {
 }
 
 html[data-theme='dark'] .avatar-stage,
-html[data-theme='dark'] .mascot-home-stage {
+html[data-theme='dark'] .mascot-home-stage,
+html[data-theme='dark'] .profile-mascot-stage {
   border-color: transparent;
 }
 
 html[data-theme='dark'] .mascot-home-card,
+html[data-theme='dark'] .profile-mascot-card,
 html[data-theme='dark'] .avatar-preview-card {
   background: #172223;
 }
@@ -69,6 +72,7 @@ html[data-theme='dark'] .avatar-progress strong,
 html[data-theme='dark'] .avatar-name-field span,
 html[data-theme='dark'] .avatar-item-option span,
 html[data-theme='dark'] .mascot-home-copy h2,
+html[data-theme='dark'] .profile-mascot-copy h2,
 html[data-theme='dark'] .achievement-info h4,
 html[data-theme='dark'] .achievement-count {
   color: #eef7f5;
@@ -79,7 +83,6 @@ html[data-theme='dark'] .stat-box span,
 html[data-theme='dark'] .avatar-item-option small,
 html[data-theme='dark'] .profile-summary-text span,
 html[data-theme='dark'] .profile-section-heading p,
-html[data-theme='dark'] .profile-avatar-link span,
 html[data-theme='dark'] .avatar-progress,
 html[data-theme='dark'] .achievement-info p {
   color: #a9bfbd;

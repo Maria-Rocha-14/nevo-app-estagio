@@ -3,6 +3,11 @@ import type { User } from '../db/db';
 import { setLoggedInUserId } from './session';
 
 const DEMO_EMAIL = 'demo@nevo.local';
+const yesterdayIso = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  return date.toISOString();
+};
 
 const createDemoUser = (): User => ({
   name: 'Utilizador Demo',
@@ -16,6 +21,7 @@ const createDemoUser = (): User => ({
   points: 9999,
   weeksStreak: 52,
   scansCount: 12,
+  earnedBadges: [],
   lastMissionDate: new Date().toISOString().split('T')[0],
   avatar: {
     name: 'Nemi',
@@ -25,21 +31,21 @@ const createDemoUser = (): User => ({
     accessoryId: 'none',
     specialId: 'none'
   },
-  completedChallenges: ['abcde-card', 'warning-sign-quiz', 'sun-protection-card'],
+  completedChallenges: ['card-abcde', 'quiz-warning-sign', 'card-protective-barriers'],
   challengeHistory: [
     {
-      challengeId: 'abcde-card',
-      completedAt: new Date().toISOString(),
+      challengeId: 'card-abcde',
+      completedAt: yesterdayIso(),
       pointsAwarded: 10
     },
     {
-      challengeId: 'warning-sign-quiz',
-      completedAt: new Date().toISOString(),
+      challengeId: 'quiz-warning-sign',
+      completedAt: yesterdayIso(),
       pointsAwarded: 20
     },
     {
-      challengeId: 'sun-protection-card',
-      completedAt: new Date().toISOString(),
+      challengeId: 'card-protective-barriers',
+      completedAt: yesterdayIso(),
       pointsAwarded: 15
     }
   ],

@@ -6,6 +6,7 @@ import { BookOpen, Brain, Camera, History, Home, ShieldCheck, Sparkles, SunMediu
 import { completeDailyChallengesOnce, useSessionUser } from '../../../services/session';
 import { db } from '../../../db/db';
 import type { AdminQuiz } from '../../../db/db';
+import FeedbackMessage from '../../../components/FeedbackMessage';
 import './LearnPage.css';
 
 type ChallengeType = 'card' | 'quiz';
@@ -15,6 +16,7 @@ type Challenge = {
   type: ChallengeType;
   visualTheme: 'teal' | 'blue' | 'orange';
   points: number;
+  xp?: number;
   titleKey?: string;
   titleText?: string;
   contentKey?: string;
@@ -35,6 +37,16 @@ type Challenge = {
 type FeedbackTone = 'success' | 'error' | 'warning' | 'info';
 
 const DAILY_CHALLENGES_COUNT = 4;
+
+type ChallengeReviewResult = {
+  selectedIndex: number;
+  correctIndex: number;
+  isCorrect: boolean;
+};
+
+const getChallengeXpReward = (challenge: Challenge): number => (
+  challenge.xp ?? Math.max(challenge.points + 1, challenge.points * 2)
+);
 
 const getLocalDateKey = (date: Date): string => {
   const year = date.getFullYear();
@@ -384,9 +396,9 @@ export default function LearnPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
-  const [quizErrors, setQuizErrors] = useState<Record<string, string>>({});
-  const [challengeNotice, setChallengeNotice] = useState<{ challengeId: string; tone: FeedbackTone; message: string } | null>(null);
+  const [challengeNotice, setChallengeNotice] = useState<{ challengeId?: string; tone: FeedbackTone; message: string } | null>(null);
   const [celebratingChallengeId, setCelebratingChallengeId] = useState<string | null>(null);
+  const [reviewResults, setReviewResults] = useState<Record<string, ChallengeReviewResult>>({});
   const [activeDailyIndex, setActiveDailyIndex] = useState(0);
   const [isSubmittingDailyQuiz, setIsSubmittingDailyQuiz] = useState(false);
   const adminQuizzes = useLiveQuery(() => db.adminQuizzes.orderBy('createdAt').reverse().toArray(), []);
@@ -435,10 +447,12 @@ export default function LearnPage() {
     return null;
   }
 
-  const completed = new Set(user.completedChallenges || []);
-  const completedToday = (user.challengeHistory || []).filter((entry) => entry.completedAt.startsWith(todayKey)).length;
-  const completedDailyChallenges = dailyChallenges.filter((challenge) => completed.has(challenge.id)).length;
-  const allDailyChallengesCompleted = dailyChallenges.length > 0 && dailyChallenges.every((challenge) => completed.has(challenge.id));
+  const completedTodayIds = new Set((user.challengeHistory || [])
+    .filter((entry) => entry.completedAt.startsWith(todayKey))
+    .map((entry) => entry.challengeId));
+  const completedToday = completedTodayIds.size;
+  const completedDailyChallenges = dailyChallenges.filter((challenge) => completedTodayIds.has(challenge.id)).length;
+  const allDailyChallengesCompleted = dailyChallenges.length > 0 && dailyChallenges.every((challenge) => completedTodayIds.has(challenge.id));
   const pointsEarnedToday = (user.challengeHistory || [])
     .filter((entry) => entry.completedAt.startsWith(todayKey))
     .reduce((sum, entry) => sum + (entry.pointsAwarded || 0), 0);
@@ -459,33 +473,21 @@ export default function LearnPage() {
     });
   };
 
-  const isChallengeAnswerCorrect = (challenge: Challenge, selected: number) => {
+  const getCorrectOptionIndex = (challenge: Challenge) => {
     if (challenge.type === 'quiz') {
-      return selected === challenge.correctIndex;
+      return challenge.correctIndex ?? 0;
     }
 
     if (challenge.imageOptions) {
-      return selected === challenge.correctIndex;
+      return challenge.correctIndex ?? 0;
     }
 
-    return (selected === 0) === (challenge.correctAnswer ?? true);
+    return (challenge.correctAnswer ?? true) ? 0 : 1;
   };
 
   const handleSelectOption = (challenge: Challenge, selected: number) => {
     setSelectedOptions((prev) => ({ ...prev, [challenge.id]: selected }));
     setChallengeNotice((current) => (current?.challengeId === challenge.id ? null : current));
-
-    setQuizErrors((prev) => {
-      const next = { ...prev };
-
-      if (isChallengeAnswerCorrect(challenge, selected)) {
-        delete next[challenge.id];
-      } else {
-        next[challenge.id] = t('learn.wrong_answer');
-      }
-
-      return next;
-    });
   };
 
   const handleDailyQuizSubmit = async () => {
@@ -493,7 +495,7 @@ export default function LearnPage() {
       return;
     }
 
-    const pendingChallenges = dailyChallenges.filter((challenge) => !completed.has(challenge.id));
+    const pendingChallenges = dailyChallenges.filter((challenge) => !completedTodayIds.has(challenge.id));
     const noticeChallengeId = activeDailyChallenge?.id ?? pendingChallenges[0]?.id ?? dailyChallenges[0]?.id;
 
     if (!noticeChallengeId) {
@@ -519,38 +521,36 @@ export default function LearnPage() {
       return;
     }
 
-    const nextErrors = pendingChallenges.reduce<Record<string, string>>((errors, challenge) => {
+    const evaluatedResults = pendingChallenges.map((challenge) => {
       const selected = selectedOptions[challenge.id];
-      if (selected !== undefined && !isChallengeAnswerCorrect(challenge, selected)) {
-        errors[challenge.id] = t('learn.wrong_answer');
-      }
+      const correctIndex = getCorrectOptionIndex(challenge);
 
-      return errors;
-    }, {});
-
-    if (Object.keys(nextErrors).length > 0) {
-      const firstWrongId = Object.keys(nextErrors)[0];
-      setQuizErrors((prev) => ({ ...prev, ...nextErrors }));
-      setActiveDailyIndex(dailyChallenges.findIndex((challenge) => challenge.id === firstWrongId));
-      setChallengeNotice({ challengeId: firstWrongId, tone: 'warning', message: t('learn.try_again') });
-      return;
-    }
-
-    setQuizErrors((prev) => {
-      const next = { ...prev };
-      pendingChallenges.forEach((challenge) => {
-        delete next[challenge.id];
-      });
-      return next;
+      return {
+        challenge,
+        selectedIndex: selected ?? -1,
+        correctIndex,
+        isCorrect: selected === correctIndex
+      };
     });
+    const nextReviewResults = evaluatedResults.reduce<Record<string, ChallengeReviewResult>>((results, result) => ({
+      ...results,
+      [result.challenge.id]: {
+        selectedIndex: result.selectedIndex,
+        correctIndex: result.correctIndex,
+        isCorrect: result.isCorrect
+      }
+    }), {});
+    const correctCount = evaluatedResults.filter((result) => result.isCorrect).length;
+    const firstWrong = evaluatedResults.find((result) => !result.isCorrect);
 
     setIsSubmittingDailyQuiz(true);
 
     try {
       const result = await completeDailyChallengesOnce(
-        pendingChallenges.map((challenge) => ({
-          id: challenge.id,
-          points: challenge.points
+        evaluatedResults.map((result) => ({
+          id: result.challenge.id,
+          points: result.isCorrect ? result.challenge.points : 0,
+          xp: result.isCorrect ? getChallengeXpReward(result.challenge) : 0
         }))
       );
 
@@ -564,15 +564,26 @@ export default function LearnPage() {
         return;
       }
 
+      setReviewResults((current) => ({ ...current, ...nextReviewResults }));
       setChallengeNotice({
-        challengeId: noticeChallengeId,
-        tone: result.completedCount > 0 ? 'success' : 'info',
-        message: result.completedCount > 0 ? t('learn.points_awarded', { points: result.pointsAwarded }) : t('learn.already_completed')
+        challengeId: firstWrong?.challenge.id ?? noticeChallengeId,
+        tone: correctCount === pendingChallenges.length ? 'success' : correctCount > 0 ? 'warning' : 'info',
+        message: result.completedCount > 0
+          ? t('learn.quiz_review_summary', {
+            correct: correctCount,
+            total: pendingChallenges.length,
+            points: result.pointsAwarded,
+            xp: result.xpAwarded
+          })
+          : t('learn.already_completed')
       });
-      setCelebratingChallengeId(noticeChallengeId);
+      setActiveDailyIndex(firstWrong ? dailyChallenges.findIndex((challenge) => challenge.id === firstWrong.challenge.id) : activeDailyIndex);
+      if (correctCount > 0) {
+        setCelebratingChallengeId(firstWrong?.challenge.id ?? noticeChallengeId);
+      }
 
       window.setTimeout(() => {
-        setCelebratingChallengeId((current) => (current === noticeChallengeId ? null : current));
+        setCelebratingChallengeId(null);
       }, 900);
     } catch (err) {
       console.error('Error submitting daily quiz', err);
@@ -600,6 +611,14 @@ export default function LearnPage() {
 
   return (
     <main className="learn-container">
+      {challengeNotice && (
+        <FeedbackMessage
+          tone={challengeNotice.tone}
+          message={challengeNotice.message}
+          onClose={() => setChallengeNotice(null)}
+        />
+      )}
+
       <header className="learn-header">
         <h1>{t('learn.title')}</h1>
         <p>{t('learn.subtitle')}</p>
@@ -619,9 +638,9 @@ export default function LearnPage() {
         {activeDailyChallenge ? (
           (() => {
             const challenge = activeDailyChallenge;
-            const isDone = completed.has(challenge.id);
+            const isDone = completedTodayIds.has(challenge.id);
+            const reviewResult = reviewResults[challenge.id];
             const challengeVisual = getChallengeVisual(challenge);
-            const notice = challengeNotice?.challengeId === challenge.id ? challengeNotice : null;
 
             return (
               <article key={challenge.id} className={`learn-card learn-card-transition ${isDone ? 'completed' : ''} ${celebratingChallengeId === challenge.id ? 'celebrating' : ''}`}>
@@ -657,7 +676,7 @@ export default function LearnPage() {
                         <button
                           key={`${challenge.id}-option-${index}`}
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === index ? 'selected' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, index)}
                           disabled={isDone}
                         >
@@ -665,9 +684,9 @@ export default function LearnPage() {
                         </button>
                       ))}
                     </div>
-                    {quizErrors[challenge.id] && (
-                      <p className="quiz-error-message" role="alert" aria-live="assertive">
-                        {quizErrors[challenge.id]}
+                    {reviewResult && (
+                      <p className={`answer-review ${reviewResult.isCorrect ? 'correct' : 'wrong'}`}>
+                        {reviewResult.isCorrect ? t('learn.review_correct') : t('learn.review_wrong')}
                       </p>
                     )}
                   </div>
@@ -682,7 +701,7 @@ export default function LearnPage() {
                           <button
                             key={option.alt}
                             type="button"
-                            className={`image-choice-card ${selectedOptions[challenge.id] === index ? 'selected' : ''}`}
+                            className={`image-choice-card ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                             onClick={() => handleSelectOption(challenge, index)}
                             disabled={isDone}
                           >
@@ -695,7 +714,7 @@ export default function LearnPage() {
                       <div className="quiz-options">
                         <button
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === 0 ? 'selected' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === 0 ? 'selected' : ''} ${reviewResult?.correctIndex === 0 ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === 0 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, 0)}
                           disabled={isDone}
                         >
@@ -703,7 +722,7 @@ export default function LearnPage() {
                         </button>
                         <button
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === 1 ? 'selected' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === 1 ? 'selected' : ''} ${reviewResult?.correctIndex === 1 ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === 1 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, 1)}
                           disabled={isDone}
                         >
@@ -711,23 +730,16 @@ export default function LearnPage() {
                         </button>
                       </div>
                     )}
-                    {quizErrors[challenge.id] && (
-                      <p className="quiz-error-message" role="alert" aria-live="assertive">
-                        {quizErrors[challenge.id]}
+                    {reviewResult && (
+                      <p className={`answer-review ${reviewResult.isCorrect ? 'correct' : 'wrong'}`}>
+                        {reviewResult.isCorrect ? t('learn.review_correct') : t('learn.review_wrong')}
                       </p>
                     )}
                   </div>
                 )}
 
-                {notice && (
-                  <div className={`challenge-inline-notice challenge-inline-${notice.tone}`} role={notice.tone === 'error' ? 'alert' : 'status'} aria-live={notice.tone === 'error' ? 'assertive' : 'polite'}>
-                    <strong>{notice.tone === 'success' ? t('learn.correct_answer') : notice.tone === 'warning' ? t('learn.try_again') : t('learn.notice')}</strong>
-                    <span>{notice.message}</span>
-                  </div>
-                )}
-
                 <div className="challenge-footer">
-                  <span>+{challenge.points} {t('learn.points_unit')}</span>
+                  <span>+{challenge.points} {t('learn.points_unit')} / +{getChallengeXpReward(challenge)} XP</span>
                   <div className="challenge-footer-actions">
                     <button type="button" className="nav-step-button" onClick={() => moveDailyIndex(-1)} disabled={!canGoPrevious}>
                       {t('learn.previous')}

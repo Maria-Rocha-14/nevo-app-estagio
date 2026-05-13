@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import './FeedbackMessage.css';
 
 type FeedbackTone = 'success' | 'error' | 'warning' | 'info';
@@ -8,13 +8,22 @@ type FeedbackMessageProps = {
   message: string;
   onClose?: () => void;
   maxWidth?: string;
+  autoCloseMs?: number;
 };
 
-export default function FeedbackMessage({ tone, message, onClose, maxWidth }: FeedbackMessageProps) {
-  if (!message) return null;
-
+export default function FeedbackMessage({ tone, message, onClose, maxWidth, autoCloseMs }: FeedbackMessageProps) {
   const isUrgent = tone === 'error';
   const style = maxWidth ? ({ '--feedback-popup-max-width': maxWidth } as CSSProperties) : undefined;
+  const closeDelay = autoCloseMs ?? (isUrgent ? 5000 : 3200);
+
+  useEffect(() => {
+    if (!message || !onClose || closeDelay <= 0) return;
+
+    const timeoutId = window.setTimeout(onClose, closeDelay);
+    return () => window.clearTimeout(timeoutId);
+  }, [closeDelay, message, onClose]);
+
+  if (!message) return null;
 
   return (
     <div className="feedback-popup-layer">

@@ -95,7 +95,7 @@ export default function AdminScanSettings() {
                 <header className="admin-header-row">
                     <div className="header-titles">
                         <h1>Frequência de Scans</h1>
-                        <p>Configura intervalos base e de risco por faixa etária.</p>
+                        <p>Configuração de intervalos base e de risco por faixa etária.</p>
                     </div>
                     <button className="btn-create-new" onClick={handleAddRow}>
                         <Plus size={20} /> <span>Nova Regra</span>
