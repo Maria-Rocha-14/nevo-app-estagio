@@ -1,4 +1,4 @@
-const API_BASE_URL = '/Backend';
+const API_BASE_URL = '/api';
 
 export const api = {
     // Auth & Users
