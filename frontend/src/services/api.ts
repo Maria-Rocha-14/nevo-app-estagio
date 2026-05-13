@@ -8,6 +8,7 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }),
+        
 
     // ADMIN: Quizzes
     getQuizzes: () => fetch(`${API_BASE_URL}/admin/quizzes`).then(res => res.json()),
