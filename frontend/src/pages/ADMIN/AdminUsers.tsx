@@ -26,7 +26,7 @@ export default function AdminUsers() {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/admin/users');
+            const response = await fetch('/api/admin/users');
             if (!response.ok) throw new Error('Erro ao carregar utilizadores externos');
             const data = await response.json();
             setUsers(data);
@@ -50,7 +50,7 @@ export default function AdminUsers() {
     const handleToggleStatus = async (user: any) => {
         const nextStatus = user.accountStatus === 'active' ? 'suspended' : 'active';
         try {
-            const response = await fetch(`http://127.0.0.1:5000/api/admin/users/${user._id}/status`, {
+            const response = await fetch(`/api/admin/users/${user._id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: nextStatus })
