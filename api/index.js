@@ -93,7 +93,7 @@ cron.schedule('0 9 * * *', () => {
 
 // --- ROTAS DA API ---
 
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
     try {
         const { name, email, dob, skinHistory } = req.body;
         const newUser = new User({
