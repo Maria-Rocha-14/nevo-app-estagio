@@ -19,7 +19,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
         'https://localhost:5173',
-        'https://nevo-xi.vercel.app' 
+        'https://nevo-xi.vercel.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type'],
@@ -85,7 +85,7 @@ cron.schedule('0 9 * * *', () => {
 
 // --- ROTAS DA API ---
 
-app.post('/api/register', async (req, res) => {
+app.post('/register', async (req, res) => {
     try {
         const { name, email, dob, skinHistory } = req.body;
         const newUser = new User({
@@ -116,7 +116,8 @@ app.post('/api/register', async (req, res) => {
 
         res.status(201).json({ message: "User registado!", user: newUser });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: error.message || "Erro interno no servidor" });
     }
 });
 
@@ -197,5 +198,5 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`🚀 Servidor a correr na porta ${PORT}`));
 }
 
-module.exports = app; 
+module.exports = app;
 export default app;
