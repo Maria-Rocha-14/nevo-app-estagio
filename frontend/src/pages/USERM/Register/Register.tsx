@@ -8,6 +8,7 @@ import { db } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
 import { DEFAULT_AVATAR } from '../../../services/avatar';
 import { validatePassword } from '../../../services/session';
+import { api } from '../../../services/api';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -54,30 +55,26 @@ export default function Register() {
         }
 
         try {
-            // 1. GUARDAR NO MONGODB (Servidor Externo)
+            // --- O CÓDIGO NOVO ENTRA AQUI ---
             const mappedHistory = historicoPele === 'sim' ? 'yes' : 'no';
 
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: nome,
-                    email: email,
-                    dob: dataNasc,
-                    skinHistory: mappedHistory,
-                    // Dados iniciais para o Admin acompanhar
-                    xp: 0,
-                    points: 0,
-                    accountStatus: 'active'
-                }),
+            const response = await api.registerExternal({
+                name: nome,
+                email: email,
+                dob: dataNasc,
+                skinHistory: mappedHistory,
+                xp: 0,
+                points: 0,
+                accountStatus: 'active'
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Erro no servidor');
             }
+            // --------------------------------
 
-            // 2. GUARDAR NO DEXIE (Base de Dados Local) - Mantido integralmente
+            // 2. GUARDAR NO DEXIE (Base de Dados Local)
             await db.users.add({
                 name: nome,
                 email,
@@ -97,11 +94,8 @@ export default function Register() {
                 assessmentHistory: []
             });
 
-            setSucessoUI('Conta criada com sucesso! A enviar email...');
-
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
+            setSucessoUI('Conta criada com sucesso!');
+            setTimeout(() => navigate('/'), 2000);
 
         } catch (err: any) {
             console.error("Erro no registo:", err);
