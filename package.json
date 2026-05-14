@@ -1,8 +1,9 @@
 {
   "devDependencies": {
-    "vite-plugin-pwa": "^1.2.0"
-  },
-  "dependencies": {
-    "dotenv": "^17.4.2"
+    "vite-plugin-pwa": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2"
   }
 }
