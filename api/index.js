@@ -41,6 +41,14 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
+// No topo do teu api/index.js
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        require('dotenv').config();
+    } catch (e) {
+        console.log("Dotenv não encontrado, a usar variáveis de ambiente do sistema.");
+    }
+}
 
 // --- LÓGICA DE LEMBRETES (CRON JOB) ---
 const checkScansAndSendReminders = async () => {
