@@ -42,13 +42,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 // No topo do teu api/index.js
-if (process.env.NODE_ENV !== 'production') {
+/*if (process.env.NODE_ENV !== 'production') {
     try {
         require('dotenv').config();
     } catch (e) {
         console.log("Dotenv não encontrado, a usar variáveis de ambiente do sistema.");
     }
-}
+}*/
 
 // --- LÓGICA DE LEMBRETES (CRON JOB) ---
 const checkScansAndSendReminders = async () => {
@@ -207,4 +207,3 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = app;
-export default app;

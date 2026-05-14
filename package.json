@@ -1,9 +1,20 @@
 {
+  "name": "nevo-app-estagio",
+  "version": "1.0.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5",
+    "nodemailer": "^6.9.16"
+  },
   "devDependencies": {
     "vite-plugin-pwa": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.6.2"
+    "mongoose": "^9.6.2",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.7"
   }
 }
