@@ -1,11 +1,38 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import { VitePWA } from 'vite-plugin-pwa' // 1. IMPORTAR O PLUGIN DA PWA
 
 export default defineConfig({
   plugins: [
     react(),
-    basicSsl()
+    basicSsl(),
+    // 2. CONFIGURAR A PWA
+    VitePWA({
+      registerType: 'autoUpdate', // Força a atualização quando mudas o código
+      includeAssets: ['favicon.png'], // Inclui o teu logo na memória cache
+      manifest: {
+        name: 'Nevo App',
+        short_name: 'Nevo',
+        description: 'Nevo - Monitorização e Cuidado da Pele',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '/',
+        icons: [
+          {
+            src: 'favicon.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'favicon.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
   ],
   server: {
     allowedHosts: true,
