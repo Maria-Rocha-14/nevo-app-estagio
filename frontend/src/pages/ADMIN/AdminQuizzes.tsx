@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Edit3, Plus, Trash2, X, Inbox, BookOpenCheck, ExternalLink } from 'lucide-react';
-import type {  AdminQuizOption, AdminQuizType } from '../../db/db';
+import type { AdminQuizOption, AdminQuizType } from '../../db/db';
 import FeedbackMessage from '../../components/FeedbackMessage';
 import { isAdminLoggedIn } from '../../services/session';
 import './AdminQuizzes.css';
 
-// URL do teu servidor Node.js
-const API_QUIZ_URL = 'http://localhost:5000/api/admin/quizzes';
+const API_QUIZ_URL = '/api/admin/quizzes';
+
+interface AdminContextType {
+    autoOpenQuizModal: boolean;
+    setAutoOpenQuizModal: (value: boolean) => void;
+}
 
 export default function AdminQuizzes() {
     const navigate = useNavigate();
+
+    const context = useOutletContext<AdminContextType | null>();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [feedback, setFeedback] = useState<{ tone: 'success' | 'error' | 'warning' | 'info'; message: string } | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,6 +51,7 @@ export default function AdminQuizzes() {
         }
     };
 
+    // Efeito para validar login e carregar os quizzes
     useEffect(() => {
         if (!isAdminLoggedIn()) {
             navigate('/');
@@ -51,6 +59,13 @@ export default function AdminQuizzes() {
             fetchQuizzes();
         }
     }, [navigate]);
+
+    useEffect(() => {
+        if (context && context.autoOpenQuizModal) {
+            handleOpenModal(); // Limpa o formulário e abre o modal
+            context.setAutoOpenQuizModal(false); // Desliga a flag no pai para não repetir
+        }
+    }, [context]);
 
     const sortedQuizzes = useMemo(() => [...quizzes].reverse(), [quizzes]);
 

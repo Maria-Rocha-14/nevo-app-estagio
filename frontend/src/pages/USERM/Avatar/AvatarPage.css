@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
 .avatar-page {
-  --icon-teal: #5fa79a;
-  --btn-gradient: linear-gradient(135deg, #00c2cb 0%, #009cb7 100%);
-  --bg-app: #f1f8f6;
+  --icon-teal: var(--app-accent);
+  --btn-gradient: var(--app-primary-gradient);
+  --bg-app: var(--app-page-bg);
   --text-dark: #1a1a1a;
-  --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  --card-shadow: var(--shadow-sm);
 
   min-height: 100vh;
-  max-width: 450px;
+  max-width: var(--app-mobile-max-width);
   margin: 0 auto;
   padding: 24px 20px 40px;
   background: var(--bg-app);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-page-shadow);
   color: var(--text-dark);
   font-family: 'Inter', sans-serif;
 }
@@ -63,15 +63,12 @@
 .avatar-preview-card,
 .avatar-section {
   border: 2px solid #e0e0e0;
-  border-radius: 20px;
-  background: #ffffff;
+  border-radius: var(--app-card-radius);
+  background: var(--app-card-bg);
   box-shadow: var(--card-shadow);
 }
 
 .avatar-preview-card {
-  position: sticky;
-  top: 12px;
-  z-index: 20;
   padding: 20px;
   margin-bottom: 18px;
 }
@@ -263,6 +260,7 @@
   justify-content: center;
   gap: 5px;
   position: relative;
+  overflow: hidden;
 }
 
 .avatar-item-option span {
@@ -298,6 +296,37 @@
   cursor: progress;
 }
 
+.avatar-item-action {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-height: 26px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(17, 17, 17, 0.16);
+  z-index: 2;
+}
+
+.avatar-item-action.try {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #d7eee9;
+}
+
+.avatar-item-action.buy {
+  background: #111111;
+  color: #ffffff;
+}
+
 .avatar-save-btn {
   width: 100%;
   min-height: 52px;
@@ -324,8 +353,9 @@
 .avatar-name-field input:focus-visible,
 .avatar-color-option:focus-visible,
 .avatar-item-option:focus-visible,
+.avatar-item-action:focus-visible,
 .avatar-save-btn:focus-visible {
-  outline: 3px solid #0b5fff;
+  outline: var(--app-focus-ring);
   outline-offset: 3px;
 }
 
@@ -344,7 +374,7 @@
   }
 
   .avatar-preview-card {
-    top: 8px;
+    margin-bottom: 14px;
   }
 
   .avatar-stage {
@@ -358,7 +388,131 @@
 
 @media (min-width: 900px) {
   .avatar-page {
-    max-width: 960px;
+    max-width: var(--app-desktop-max-width);
     padding: 28px;
+  }
+
+  .avatar-preview-card {
+    position: sticky;
+    top: 12px;
+    z-index: 20;
+  }
+}
+
+@media (max-width: 520px) {
+  .avatar-page {
+    max-width: none;
+    padding: 14px 14px 28px;
+    box-shadow: none;
+  }
+
+  .avatar-header {
+    gap: 12px;
+    padding-top: 6px;
+    margin-bottom: 12px;
+  }
+
+  .avatar-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .avatar-header h1 {
+    font-size: 22px;
+  }
+
+  .avatar-kicker {
+    font-size: 11px;
+  }
+
+  .avatar-preview-card,
+  .avatar-section {
+    border-width: 1.5px;
+    border-radius: 16px;
+  }
+
+  .avatar-preview-card {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 6px);
+    z-index: 20;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .avatar-stage {
+    height: 126px;
+    border-radius: 14px;
+  }
+
+  .avatar-stage .chameleon-avatar {
+    width: min(118px, 54%);
+    max-height: calc(100% - 12px);
+  }
+
+  .avatar-name-field {
+    margin-top: 10px;
+  }
+
+  .avatar-name-field span {
+    font-size: 12px;
+  }
+
+  .avatar-name-field input {
+    min-height: 42px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .avatar-progress {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .avatar-wallet {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .avatar-section {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .avatar-section-title {
+    margin-bottom: 10px;
+  }
+
+  .avatar-section-title h2 {
+    font-size: 15px;
+  }
+
+  .avatar-color-grid {
+    gap: 8px;
+  }
+
+  .avatar-item-grid {
+    gap: 8px;
+  }
+
+  .avatar-item-option {
+    min-height: 74px;
+    border-radius: 14px;
+    padding: 10px;
+  }
+
+  .avatar-item-option span {
+    font-size: 12px;
+  }
+
+  .avatar-item-option small {
+    font-size: 10px;
+  }
+
+  .avatar-save-btn {
+    min-height: 48px;
+    border-radius: 14px;
+    font-size: 15px;
   }
 }

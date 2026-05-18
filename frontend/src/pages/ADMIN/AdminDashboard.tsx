@@ -11,6 +11,8 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [autoOpenQuizModal, setAutoOpenQuizModal] = useState(false);
+    const [autoOpenBadgeModal, setAutoOpenBadgeModal] = useState(false);
 
     const isHome = location.pathname === '/admin' || location.pathname === '/admin/';
 
@@ -46,13 +48,13 @@ export default function AdminDashboard() {
                         <Medal size={22} />
                         {!isCollapsed && <span>Badges</span>}
                     </button>
-                        <button
-                            className={`nav-item ${location.pathname.includes('settings') ? 'active' : ''}`}
-                            onClick={() => navigate('/admin/settings')}
-                        >
-                            <Settings2 size={22} />
-                            {!isCollapsed && <span>Configurações</span>}
-                        </button>
+                    <button
+                        className={`nav-item ${location.pathname.includes('settings') ? 'active' : ''}`}
+                        onClick={() => navigate('/admin/settings')}
+                    >
+                        <Settings2 size={22} />
+                        {!isCollapsed && <span>Configurações</span>}
+                    </button>
                 </nav>
 
                 <div className="sidebar-footer">
@@ -86,7 +88,11 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="quick-actions-grid">
-                            <div className="action-card-row" onClick={() => navigate('/admin/quizzes')}>
+
+                            <div className="action-card-row" onClick={() => {
+                                setAutoOpenQuizModal(true); // Ativa a bandeira
+                                navigate('/admin/quizzes'); // Salta para a página
+                            }}>
                                 <div className="action-icon-circle" style={{ backgroundColor: '#60a5fa' }}>
                                     <Plus size={24} />
                                 </div>
@@ -97,7 +103,10 @@ export default function AdminDashboard() {
                                 <ChevronRight size={20} className="arrow-icon" />
                             </div>
 
-                            <div className="action-card-row" onClick={() => navigate('/admin/badges')}>
+                            <div className="action-card-row" onClick={() => {
+                                setAutoOpenBadgeModal(true); // Ativa a bandeira
+                                navigate('/admin/badges'); // Salta para a página
+                            }}>
                                 <div className="action-icon-circle" style={{ backgroundColor: '#facc15' }}>
                                     <Plus size={24} />
                                 </div>
@@ -110,7 +119,10 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                 ) : (
-                    <Outlet />
+                    <Outlet context={{
+                        autoOpenQuizModal, setAutoOpenQuizModal,
+                        autoOpenBadgeModal, setAutoOpenBadgeModal
+                    }} />
                 )}
             </main>
         </div>

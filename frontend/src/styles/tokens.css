@@ -1,0 +1,145 @@
+/* ===== DESIGN TOKENS ===== */
+/* Centralized design system tokens for consistent interface design */
+
+:root {
+  /* Color Palette - Light Mode */
+  --color-primary: #1abc9c;
+  --color-primary-dark: #16a085;
+  --color-primary-light: #48d1b5;
+  
+  --color-secondary: #3498db;
+  --color-secondary-dark: #2980b9;
+  --color-secondary-light: #5dade2;
+  
+  --color-success: #27ae60;
+  --color-success-dark: #229954;
+  --color-success-light: #52be80;
+  
+  --color-warning: #f39c12;
+  --color-warning-dark: #d68910;
+  --color-warning-light: #f8b739;
+  
+  --color-danger: #e74c3c;
+  --color-danger-dark: #c0392b;
+  --color-danger-light: #f5b7b1;
+  
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-800: #333333;
+  --color-neutral-700: #4d4d4d;
+  --color-neutral-600: #666666;
+  --color-neutral-500: #808080;
+  --color-neutral-400: #999999;
+  --color-neutral-300: #cccccc;
+  --color-neutral-200: #e6e6e6;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-0: #ffffff;
+
+  /* Semantic Tokens - Light Mode */
+  --bg-app: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-input: #f5f5f5;
+  --bg-hover: #e8f4f8;
+  --bg-active: #d4ebf2;
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-disabled: #999999;
+  --text-inverse: #ffffff;
+  
+  --border-color: #e0e0e0;
+  --border-color-light: #f0f0f0;
+  --border-color-dark: #cccccc;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  /* Typography */
+  --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-family-mono: 'Courier New', Courier, monospace;
+  
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* App shell tokens used by mobile-first pages */
+  --app-mobile-max-width: 450px;
+  --app-desktop-max-width: 960px;
+  --app-page-bg: #f1f8f6;
+  --app-card-bg: #ffffff;
+  --app-card-border: #e0e0e0;
+  --app-card-radius: 16px;
+  --app-control-radius: 12px;
+  --app-control-height: 42px;
+  --app-accent: #5fa79a;
+  --app-primary-gradient: linear-gradient(135deg, #00c2cb 0%, #009cb7 100%);
+  --app-focus-ring: 3px solid #0b5fff;
+  --app-page-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode */
+html[data-theme='dark'] {
+  --bg-app: #0f1718;
+  --bg-card: #172223;
+  --bg-input: #1a2a2b;
+  --bg-hover: #1f3235;
+  --bg-active: #234649;
+  
+  --text-primary: #eef7f5;
+  --text-secondary: #a9bfbd;
+  --text-disabled: #738482;
+  --text-inverse: #0f1718;
+  
+  --border-color: #294143;
+  --border-color-light: #1f3235;
+  --border-color-dark: #3d5759;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.48);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.56);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  --app-page-bg: #0f1718;
+  --app-card-bg: #172223;
+  --app-card-border: #294143;
+  --app-accent: #7ed6c8;
+  --app-page-shadow: 0 0 30px rgba(0, 0, 0, 0.28);
+}

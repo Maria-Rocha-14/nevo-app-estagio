@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { Plus, Trash2, Award, X, Inbox, Edit3, AlertTriangle, HelpCircle } from 'lucide-react';
 import FeedbackMessage from '../../components/FeedbackMessage';
 import { isAdminLoggedIn } from '../../services/session';
 import './AdminQuizzes.css';
 
-const API_URL = 'http://localhost:5000/api/badges';
+const API_URL = '/api/badges';
 
 const AVAILABLE_ICONS = [
     { name: 'Trophy', label: 'Troféu' }, { name: 'Medal', label: 'Medalha' },
@@ -16,6 +16,11 @@ const AVAILABLE_ICONS = [
     { name: 'Camera', label: 'Scan' }
 ];
 
+interface AdminContextType {
+    autoOpenBadgeModal: boolean;
+    setAutoOpenBadgeModal: (value: boolean) => void;
+}
+
 const IconRenderer = ({ name, size = 20, color = 'currentColor' }: { name: string, size?: number, color?: string }) => {
     const IconComponent = (LucideIcons as any)[name];
     return IconComponent ? <IconComponent size={size} color={color} /> : <HelpCircle size={size} />;
@@ -23,6 +28,9 @@ const IconRenderer = ({ name, size = 20, color = 'currentColor' }: { name: strin
 
 export default function AdminBadges() {
     const navigate = useNavigate();
+
+    const context = useOutletContext<AdminContextType | null>();
+
     const [badges, setBadges] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -30,10 +38,13 @@ export default function AdminBadges() {
     const [feedback, setFeedback] = useState<{ tone: 'success' | 'error' | 'warning' | 'info'; message: string } | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    // 🔥 Estado inicial atualizado com streak e campos de recompensas
     const [form, setForm] = useState({
         name: '', description: '', iconType: 'Trophy',
         requirementType: 'points' as 'points' | 'scans' | 'streak',
         requirementValue: 0,
+        xpReward: 0,
+        pointsReward: 0,
     });
 
     useEffect(() => {
@@ -58,13 +69,30 @@ export default function AdminBadges() {
         else fetchBadges();
     }, [navigate]);
 
+    useEffect(() => {
+        if (context && context.autoOpenBadgeModal) {
+            handleOpenModal(); // Inicializa limpo e abre o modal
+            context.setAutoOpenBadgeModal(false); // Desliga a flag no Dashboard pai
+        }
+    }, [context]);
+
     const handleOpenModal = (badge?: any) => {
         if (badge && badge._id) {
             setEditingId(badge._id);
-            setForm({ ...badge });
+            setForm({
+                ...badge,
+                requirementType: badge.requirementType || 'points',
+                xpReward: badge.xpReward || 0,
+                pointsReward: badge.pointsReward || 0
+            });
         } else {
             setEditingId(null);
-            setForm({ name: '', description: '', iconType: 'Trophy', requirementType: 'points', requirementValue: 0 });
+            setForm({
+                name: '', description: '', iconType: 'Trophy',
+                requirementType: 'points', requirementValue: 0,
+                xpReward: 0,
+                pointsReward: 0
+            });
         }
         setIsModalOpen(true);
     };
@@ -107,13 +135,20 @@ export default function AdminBadges() {
         }
     };
 
+    const getRequirementLabel = (type: string) => {
+        if (type === 'points') return 'XP';
+        if (type === 'scans') return 'Scans';
+        if (type === 'streak') return 'Streak';
+        return type;
+    };
+
     return (
         <div className="admin-quizzes-wrapper">
             <main className="admin-page">
                 <header className="admin-header-row">
                     <div className="header-titles">
                         <h1>Gestão de Conquistas</h1>
-                        <p>Configuração das metas e medalhas.</p>
+                        <p>Configuração das metas, medalhas e recompensas da plataforma.</p>
                     </div>
                     <button className="btn-create-new" onClick={() => handleOpenModal()}><Plus size={20} /><span>Criar Novo Badge</span></button>
                 </header>
@@ -125,7 +160,17 @@ export default function AdminBadges() {
                     ) : (
                         <div className="admin-table-wrap">
                             <table className="admin-custom-table">
-                                <thead><tr><th>Badge</th><th>Descrição</th><th>Tipo</th><th>Meta</th><th className="text-right">Ações</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Badge</th>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Meta</th>
+                                        <th>Prémio XP</th>
+                                        <th>Prémio Pontos</th>
+                                        <th className="text-right">Ações</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {badges.map(badge => (
                                         <tr key={badge._id}>
@@ -134,8 +179,10 @@ export default function AdminBadges() {
                                                 <strong>{badge.name}</strong>
                                             </td>
                                             <td className="td-desc">{badge.description}</td>
-                                            <td><span className={`badge-type-tag ${badge.requirementType}`}>{badge.requirementType}</span></td>
+                                            <td><span className={`badge-type-tag ${badge.requirementType}`}>{getRequirementLabel(badge.requirementType)}</span></td>
                                             <td><strong>{badge.requirementValue}</strong></td>
+                                            <td><span style={{ color: '#2ecc71', fontWeight: 600 }}>+{badge.xpReward || 0} XP</span></td>
+                                            <td><span style={{ color: '#3498db', fontWeight: 600 }}>+{badge.pointsReward || 0} Pts</span></td>
                                             <td className="text-right">
                                                 <div className="admin-actions-cell">
                                                     <button className="action-btn edit" onClick={() => handleOpenModal(badge)}><Edit3 size={16} /></button>
@@ -164,9 +211,21 @@ export default function AdminBadges() {
                                     </div>
                                 </div>
                                 <div className="form-row-group">
-                                    <div className="form-row"><label>Tipo</label><select className="input-field" value={form.requirementType} onChange={e => setForm({ ...form, requirementType: e.target.value as any })}><option value="points">XP</option><option value="scans">Scans</option></select></div>
-                                    <div className="form-row"><label>Meta</label><input type="number" className="input-field" value={form.requirementValue} onChange={e => setForm({ ...form, requirementValue: Number(e.target.value) })} required /></div>
+                                    <div className="form-row"><label>Tipo de Meta</label><select className="input-field" value={form.requirementType} onChange={e => setForm({ ...form, requirementType: e.target.value as any })}><option value="points">XP</option><option value="scans">Scans</option><option value="streak">Streak (Semanas)</option></select></div>
+                                    <div className="form-row"><label>Valor da Meta</label><input type="number" min="1" className="input-field" value={form.requirementValue} onChange={e => setForm({ ...form, requirementValue: Number(e.target.value) })} required /></div>
                                 </div>
+
+                                <div className="form-row-group" style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed #e2e8f0' }}>
+                                    <div className="form-row">
+                                        <label>Recompensa (XP)</label>
+                                        <input type="number" min="0" className="input-field" value={form.xpReward} onChange={e => setForm({ ...form, xpReward: Number(e.target.value) })} required />
+                                    </div>
+                                    <div className="form-row">
+                                        <label>Recompensa (Pontos)</label>
+                                        <input type="number" min="0" className="input-field" value={form.pointsReward} onChange={e => setForm({ ...form, pointsReward: Number(e.target.value) })} required />
+                                    </div>
+                                </div>
+
                                 <div className="modal-footer-actions"><button type="button" className="btn-secondary" onClick={() => setIsModalOpen(false)}>Cancelar</button><button type="submit" className="btn-primary">{editingId ? 'Atualizar' : 'Criar'}</button></div>
                             </form>
                         </div>

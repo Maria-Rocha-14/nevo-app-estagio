@@ -258,6 +258,19 @@
   color: #5c6b68;
 }
 
+.history-compare-risk-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.history-compare-risk-row strong {
+  color: #1f2d2a;
+  font-size: 15px;
+}
+
 .history-scan-card-wrapper {
   display: grid;
   gap: 8px;

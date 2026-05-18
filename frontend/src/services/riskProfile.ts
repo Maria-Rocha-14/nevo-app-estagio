@@ -4,6 +4,11 @@ export type ClinicalRoutine = 'educative' | 'annual' | 'semestral';
 
 export const calculateAge = (dob: string): number => {
     if (!dob) return 0;
+
+    if (/^\d{4}$/.test(dob)) {
+        return Math.max(0, new Date().getFullYear() - Number(dob));
+    }
+
     const birthDate = new Date(dob);
     if (isNaN(birthDate.getTime())) return 0;
     

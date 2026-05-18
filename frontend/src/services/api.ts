@@ -8,7 +8,15 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }),
-        
+    //Badges
+    getBadges: () => fetch(`${API_BASE_URL}/badges`).then(res => res.json()),
+
+    updateUserBadges: (userId: string, earnedBadges: (string | number)[]) =>
+        fetch(`${API_BASE_URL}/users/${userId}/badges`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ earnedBadges })
+        }),
 
     // ADMIN: Quizzes
     getQuizzes: () => fetch(`${API_BASE_URL}/admin/quizzes`).then(res => res.json()),

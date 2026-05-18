@@ -6,11 +6,7 @@ import './Login.css';
 import logoImg from '../../../assets/logo.png';
 import { db } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { seedAndLoginDemoUser } from '../../../services/devSeed';
 import { setAdminLoggedIn, setLoggedInUserId, validateAdminCredentials } from '../../../services/session';
-
-const DEMO_EMAIL = 'demo@nevo.local';
-const DEMO_PASSWORD = 'Demo#1234';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -35,13 +31,7 @@ export default function Login() {
         try {
             if (validateAdminCredentials(email, password)) {
                 setAdminLoggedIn(true);
-                navigate('/admin/quizzes');
-                return;
-            }
-
-            if (import.meta.env.DEV && email === DEMO_EMAIL && password === DEMO_PASSWORD) {
-                await seedAndLoginDemoUser();
-                navigate('/homepage');
+                navigate('/admin');
                 return;
             }
 
@@ -79,17 +69,6 @@ export default function Login() {
     const mudarIdioma = () => {
         const novoIdioma = i18n.language === 'pt' ? 'en' : 'pt';
         i18n.changeLanguage(novoIdioma);
-    };
-
-    const handleDemoLogin = async () => {
-        try {
-            setErroUI('');
-            await seedAndLoginDemoUser();
-            navigate('/homepage');
-        } catch (error) {
-            console.error('Demo seed error:', error);
-            setErroUI(t('errors.database_error'));
-        }
     };
 
     return (
@@ -176,25 +155,18 @@ export default function Login() {
                     {t('login.enter')}
                 </button>
 
-                {import.meta.env.DEV && (
-                    <button type="button" className="demo-login-button" onClick={handleDemoLogin}>
-                        {t('login.demo_profile')}
-                    </button>
-                )}
-
                 <div className="login-footer">
-                    <p className="legal-text">
-                        {t('login.terms')}{' '}
-                        <strong className="link-clicavel" onClick={() => navigate('/terms')}>
-                            {t('terms.title')}
-                        </strong>{' '}
-                        {t('login.privacy')}{' '}
-                        <strong className="link-clicavel" onClick={() => navigate('/privacy')}>
-                            {t('privacy.title')}
-                        </strong>
-                    </p>
                     <p className="register-text">
                         {t('login.no_account')} <Link to="/register" className="login-link">{t('login.register')}</Link>
+                    </p>
+                    <p className="legal-links">
+                        <button type="button" onClick={() => navigate('/terms')}>
+                            {t('terms.title')}
+                        </button>
+                        <span aria-hidden="true">·</span>
+                        <button type="button" onClick={() => navigate('/privacy')}>
+                            {t('privacy.title')}
+                        </button>
                     </p>
                 </div>
             </form>

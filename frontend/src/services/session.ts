@@ -1,6 +1,7 @@
 import { db } from '../db/db';
 import type { User, AssessmentHistoryEntry } from '../db/db';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { achievementService } from './achievementService';
 
 const SESSION_KEY = 'logged_in_user_id';
 const ADMIN_SESSION_KEY = 'admin_logged_in';
@@ -9,15 +10,15 @@ export const ADMIN_EMAIL = 'admin@nevo.local';
 export const ADMIN_PASSWORD = 'Admin#1234';
 
 export const useSessionUser = (): User | null | undefined => {
-    const userId = getLoggedInUserId();
-    return useLiveQuery<User | null>(
-      async () => {
-        if (!userId) return null;
-        const u = await db.users.get(userId);
-        return u || null;
-      },
-      [userId]
-    );
+  const userId = getLoggedInUserId();
+  return useLiveQuery<User | null>(
+    async () => {
+      if (!userId) return null;
+      const u = await db.users.get(userId);
+      return u || null;
+    },
+    [userId]
+  );
 };
 
 export const getLoggedInUserId = (): number | null => {
@@ -149,9 +150,11 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
     const completedChallengeIds = new Set(current.completedChallenges || []);
     completedChallengeIds.add(challengeId);
 
+    const novoXp = (current.xp || 0) + xpToAdd;
+
     await db.users.update(userId, {
       points: (current.points || 0) + pointsToAdd,
-      xp: (current.xp || 0) + xpToAdd,
+      xp: novoXp,
       completedChallenges: [...completedChallengeIds],
       challengeHistory: [
         ...(current.challengeHistory || []),
@@ -164,6 +167,9 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
     });
 
     status = 'awarded';
+
+    const atualizado = await db.users.get(userId);
+    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
   });
 
   return status;
@@ -209,9 +215,11 @@ export const completeDailyChallengesOnce = async (challenges: ChallengeCompletio
     const completedChallengeIds = new Set(current.completedChallenges || []);
     uniquePendingChallenges.forEach((challenge) => completedChallengeIds.add(challenge.id));
 
+    const novoXp = (current.xp || 0) + xpAwarded;
+
     await db.users.update(userId, {
       points: (current.points || 0) + pointsAwarded,
-      xp: (current.xp || 0) + xpAwarded,
+      xp: novoXp,
       completedChallenges: [...completedChallengeIds],
       challengeHistory: [
         ...challengeHistory,
@@ -229,6 +237,9 @@ export const completeDailyChallengesOnce = async (challenges: ChallengeCompletio
       xpAwarded,
       completedCount: uniquePendingChallenges.length
     };
+
+    const atualizado = await db.users.get(userId);
+    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
   });
 
   return result;
@@ -245,15 +256,18 @@ export const awardDailyMissionXp = async (xpToAdd: number, pointsToAdd = 0): Pro
     const current = await db.users.get(userId);
     if (!current || current.lastMissionDate === today) return;
 
+    const novoXp = (current.xp || 0) + xpToAdd;
+
     await db.users.update(userId, {
-      xp: (current.xp || 0) + xpToAdd,
+      xp: novoXp,
       points: (current.points || 0) + pointsToAdd,
       lastMissionDate: today
     });
+
+    const atualizado = await db.users.get(userId);
+    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
   });
 };
-
-
 
 export const appendAssessmentHistory = async (entry: AssessmentHistoryEntry): Promise<void> => {
   const userId = getLoggedInUserId();
@@ -263,13 +277,23 @@ export const appendAssessmentHistory = async (entry: AssessmentHistoryEntry): Pr
     const current = await db.users.get(userId);
     if (!current) return;
 
+    const novosScans = (current.scansCount || 0) + 1;
+    const novoXp = (current.xp || 0) + SCAN_XP_REWARD;
+
     await db.users.update(userId, {
-      scansCount: (current.scansCount || 0) + 1,
-      xp: (current.xp || 0) + SCAN_XP_REWARD,
+      scansCount: novosScans,
+      xp: novoXp,
       points: (current.points || 0) + SCAN_POINTS_REWARD,
       assessmentHistory: [...(current.assessmentHistory || []), entry]
     });
+
+    const atualizado = await db.users.get(userId);
+    if (atualizado) {
+      await achievementService.checkBadgeProgress(atualizado, 'scans', novosScans);
+      const utilizadorRecarregado = await db.users.get(userId);
+      if (utilizadorRecarregado) {
+        void achievementService.checkBadgeProgress(utilizadorRecarregado, 'points', novoXp);
+      }
+    }
   });
 };
-
-

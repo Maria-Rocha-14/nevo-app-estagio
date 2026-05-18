@@ -2,13 +2,13 @@
 .capture-container {
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
-    background: #f1f8f6;
+    background: var(--app-page-bg);
     padding: 20px;
     padding-bottom: 120px;
-    max-width: 450px;
+    max-width: var(--app-mobile-max-width);
     margin: 0 auto;
     box-sizing: border-box;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--app-page-shadow);
     position: relative;
 }
 
@@ -37,7 +37,7 @@
 .scan-option-card {
     background: linear-gradient(180deg, #ffffff 0%, #fdfefe 100%);
     border: 1px solid #d5e6e0;
-    border-radius: 22px;
+    border-radius: var(--app-card-radius);
     padding: 22px 18px;
     text-align: center;
     cursor: pointer;
@@ -85,7 +85,7 @@
 /* 🔹 Caixa de dicas */
 .scan-tips-card {
     background: linear-gradient(135deg, #ecf7ff 0%, #e2f0ff 100%);
-    border-radius: 20px;
+    border-radius: var(--app-card-radius);
     padding: 18px;
     border: 1px solid #cce2ff;
     box-shadow: 0 8px 20px rgba(74, 144, 226, 0.12);
@@ -113,13 +113,13 @@
 
 .preview-image {
     width: 100%;
-    border-radius: 20px;
+    border-radius: var(--app-card-radius);
     border: 1px solid #d7e5e1;
     box-shadow: 0 12px 26px rgba(21, 37, 33, 0.1);
     margin-bottom: 20px;
 }
 
-.demo-controls {
+.body-area-controls {
     background: #ffffff;
     border: 1px solid #d6e4df;
     border-radius: 14px;
@@ -128,20 +128,20 @@
     text-align: left;
 }
 
-.demo-controls p {
+.body-area-controls p {
     margin: 0 0 8px;
     color: #33504b;
     font-size: 0.85rem;
     font-weight: 700;
 }
 
-.demo-options {
+.body-area-options {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.demo-option {
+.body-area-option {
     border: 1px solid #cfdad6;
     background: #fff;
     color: #2f3f3c;
@@ -152,7 +152,7 @@
     cursor: pointer;
 }
 
-.demo-option.active {
+.body-area-option.active {
     background: #0f766e;
     border-color: #0f766e;
     color: #fff;
@@ -191,7 +191,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 450px;
+    max-width: var(--app-mobile-max-width);
     background: white;
     display: flex;
     justify-content: space-around;
@@ -219,9 +219,10 @@
 .scan-option-card:focus-visible,
 .confirm-btn:focus-visible,
 .cancel-btn:focus-visible,
+.switch-camera-btn:focus-visible,
 .nav-btn:focus-visible,
-.demo-option:focus-visible {
-    outline: 3px solid #0b5fff;
+.body-area-option:focus-visible {
+    outline: var(--app-focus-ring);
     outline-offset: 2px;
 }
 
@@ -238,7 +239,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 3 / 4;
-    border-radius: 20px;
+    border-radius: var(--app-card-radius);
     overflow: hidden;
     background: #000;
     box-shadow: 0 12px 26px rgba(21, 37, 33, 0.1);
@@ -248,6 +249,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.camera-video.front-camera {
+    transform: scaleX(-1);
 }
 
 .camera-overlay {
@@ -317,6 +322,25 @@
     cursor: pointer;
 }
 
+.switch-camera-btn {
+    min-height: 42px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #cfdad6;
+    color: #1f2d2a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.switch-camera-btn svg {
+    color: #5fa79a;
+}
+
 @media (max-width: 380px) {
     .capture-container {
         padding: 16px;
@@ -334,12 +358,12 @@
 
 @media (min-width: 900px) {
     .capture-container {
-        max-width: 960px;
+        max-width: var(--app-desktop-max-width);
         padding: 28px;
         padding-bottom: 120px;
     }
 
     .bottom-navbar {
-        max-width: 960px;
+        max-width: var(--app-desktop-max-width);
     }
 }

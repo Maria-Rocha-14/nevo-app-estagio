@@ -2,17 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Clock, Settings2, ShieldAlert, Inbox } from 'lucide-react';
 import FeedbackMessage from '../../components/FeedbackMessage';
-import { isAdminLoggedIn } from '../../services/session'; // Importado para segurança
+import { isAdminLoggedIn } from '../../services/session';
 import './AdminQuizzes.css';
 
-const API_URL = 'http://localhost:5000/api/scan-settings';
+const API_URL = '/api/scan-settings';
 
 export default function AdminScanSettings() {
     const navigate = useNavigate();
     const [settings, setSettings] = useState<any[]>([]);
     const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
 
-    // Auto-ocultar feedback
     useEffect(() => {
         if (feedback) {
             const timer = setTimeout(() => setFeedback(null), 3000);

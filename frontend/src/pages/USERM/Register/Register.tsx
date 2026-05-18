@@ -17,7 +17,7 @@ export default function Register() {
 
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
-    const [dataNasc, setDataNasc] = useState('');
+    const [anoNasc, setAnoNasc] = useState('');
     const [password, setPassword] = useState('');
     const [historicoPele, setHistoricoPele] = useState('');
     const [aceitouTermos, setAceitouTermos] = useState(false);
@@ -34,12 +34,17 @@ export default function Register() {
         }
     }, [erroUI, sucessoUI]);
 
+    const listaAnos = Array.from(
+        { length: 100 },
+        (_, i) => (new Date().getFullYear() - i).toString()
+    );
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setErroUI('');
         setSucessoUI('');
 
-        if (!nome || !email || !dataNasc || !password || !historicoPele) {
+        if (!nome || !email || !anoNasc || !password || !historicoPele) {
             setErroUI(t('errors.fill_all'));
             return;
         }
@@ -55,13 +60,12 @@ export default function Register() {
         }
 
         try {
-            // --- O CÓDIGO NOVO ENTRA AQUI ---
             const mappedHistory = historicoPele === 'sim' ? 'yes' : 'no';
 
             const response = await api.registerExternal({
                 name: nome,
                 email: email,
-                dob: dataNasc,
+                dob: anoNasc, 
                 skinHistory: mappedHistory,
                 xp: 0,
                 points: 0,
@@ -72,13 +76,11 @@ export default function Register() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Erro no servidor');
             }
-            // --------------------------------
 
-            // 2. GUARDAR NO DEXIE (Base de Dados Local)
             await db.users.add({
                 name: nome,
                 email,
-                dob: dataNasc,
+                dob: anoNasc, 
                 password,
                 skinHistory: historicoPele,
                 createdAt: new Date().toISOString(),
@@ -154,11 +156,24 @@ export default function Register() {
                     </div>
                 </div>
 
+                {/* 🔥 SELEÇÃO APENAS DO ANO DE NASCIMENTO (Substitui o calendário completo) */}
                 <div className="login-input-group">
-                    <label htmlFor="register-dob">{t('register.dob')} *</label>
+                    <label htmlFor="register-dob">{t('register.dob', 'Ano de Nascimento')} *</label>
                     <div className="input-wrapper">
                         <Calendar className="input-icon" size={20} />
-                        <input id="register-dob" type="date" value={dataNasc} onChange={(e) => setDataNasc(e.target.value)} className="login-input with-icon" required />
+                        <select
+                            id="register-dob"
+                            value={anoNasc}
+                            onChange={(e) => setAnoNasc(e.target.value)}
+                            className="login-input with-icon"
+                            style={{ appearance: 'none', WebkitAppearance: 'none' }}
+                            required
+                        >
+                            <option value="" disabled hidden>{t('register.select_year', 'Selecione o ano')}</option>
+                            {listaAnos.map(ano => (
+                                <option key={ano} value={ano}>{ano}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
@@ -205,7 +220,7 @@ export default function Register() {
                         <strong className="link-clicavel" onClick={() => navigate('/terms')}>
                             {t('terms.title')}
                         </strong>
-                        {t('register.consent_and')}{' '}
+                        {' '}{t('register.consent_and')}{' '}
                         <strong className="link-clicavel" onClick={() => navigate('/privacy')}>
                             {t('privacy.title')}
                         </strong>{' '}

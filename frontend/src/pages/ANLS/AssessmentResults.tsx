@@ -10,9 +10,11 @@ type RiskLevel = 'low' | 'moderate' | 'high';
 type AssessmentState = {
   imageUrl?: string;
   fileName?: string;
+  bodyAreaLabel?: string;
   probability?: number;
   riskLevel?: RiskLevel;
   isSimulated?: boolean;
+  returnTo?: '/scan' | '/history';
 };
 
 type RiskMeta = {
@@ -35,6 +37,8 @@ export default function AssessmentResults() {
 
   const normalizedProbability = Math.min(99, Math.max(1, Math.round(state.probability ?? 0)));
   const riskLevel: RiskLevel = state.riskLevel ?? 'low';
+  const returnTo = state.returnTo ?? '/scan';
+  const backLabel = returnTo === '/history' ? t('assessment.back_to_history') : t('assessment.back_to_scan');
 
   const riskMeta: RiskMeta = useMemo(() => {
     if (riskLevel === 'high') {
@@ -83,9 +87,9 @@ export default function AssessmentResults() {
   return (
     <main className="assessment-container" aria-labelledby="assessment-title">
       <header className="assessment-header">
-        <button type="button" className="ghost-action" onClick={() => navigate('/scan')}>
+        <button type="button" className="ghost-action" onClick={() => navigate(returnTo)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          {t('assessment.back_to_scan')}
+          {backLabel}
         </button>
         <h1 id="assessment-title">{t('assessment.title')}</h1>
       </header>
@@ -121,6 +125,11 @@ export default function AssessmentResults() {
           <p>
             {t('assessment.file_label')}: <strong>{state.fileName || t('assessment.unknown_file')}</strong>
           </p>
+          {state.bodyAreaLabel && (
+            <p>
+              {t('assessment.body_area_label')}: <strong>{state.bodyAreaLabel}</strong>
+            </p>
+          )}
           {state.isSimulated && <p className="simulated-tag">{t('assessment.simulated_notice')}</p>}
 
           {recentAssessments.length > 0 && (

@@ -450,10 +450,16 @@
 .achievement-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
     gap: 12px;
     transition: background 0.2s;
+    background-color: transparent;
+}
+
+.achievement-item.home-badge-first-item {
+    background-color: #fdf8e6;
+    border-radius: 18px;
 }
 
 .achievement-action {
@@ -467,9 +473,6 @@
     background-color: #f9f4db;
 }
 
-.achievement-item.unlocked {
-    background-color: #fef9e7;
-}
 
 .achievement-info {
     flex: 1;
@@ -622,3 +625,29 @@
     }
 }
 
+.achievements-section-header-link {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0 0 12px 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    font: inherit;
+}
+
+.achievements-section-header-link .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.achievements-section-header-link:focus-visible {
+    outline: 2px solid #5fa79a;
+    border-radius: 6px;
+}

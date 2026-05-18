@@ -7,19 +7,36 @@ import {
     Home,
     History,
     BookOpen,
-    Lightbulb
+    Lightbulb,
+    SwitchCamera
 } from 'lucide-react';
 import './CaptureImage.css';
 import FeedbackMessage from '../../components/FeedbackMessage';
 import { appendAssessmentHistory } from '../../services/session';
 
-type RiskLevel = 'low' | 'moderate' | 'high';
-type DemoScenario = 'auto' | RiskLevel;
+const BODY_AREA_IDS = [
+    'face',
+    'neck',
+    'trunk',
+    'back',
+    'left_arm',
+    'right_arm',
+    'left_hand',
+    'right_hand',
+    'left_leg',
+    'right_leg',
+    'left_foot',
+    'right_foot'
+] as const;
+
+type BodyAreaId = typeof BODY_AREA_IDS[number];
 
 type FeedbackState = {
     tone: 'success' | 'error' | 'warning' | 'info';
     message: string;
 };
+
+type CameraFacingMode = 'environment' | 'user';
 
 export default function CaptureImage() {
     const navigate = useNavigate();
@@ -33,11 +50,12 @@ export default function CaptureImage() {
     const [selectedFileBlob, setSelectedFileBlob] = useState<Blob | null>(null);
     const [selectedFileName, setSelectedFileName] = useState<string>('');
     const [selectedFileSize, setSelectedFileSize] = useState<number>(0);
-    const [demoScenario, setDemoScenario] = useState<DemoScenario>('auto');
+    const [selectedBodyArea, setSelectedBodyArea] = useState<BodyAreaId | ''>('');
     const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
     // 🔹 Estados da câmara
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [cameraFacingMode, setCameraFacingMode] = useState<CameraFacingMode>('environment');
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const cameraContainerRef = useRef<HTMLDivElement>(null);
@@ -59,6 +77,14 @@ export default function CaptureImage() {
     }, [stopCamera]);
 
     useEffect(() => {
+        return () => {
+            if (selectedImage?.startsWith('blob:')) {
+                URL.revokeObjectURL(selectedImage);
+            }
+        };
+    }, [selectedImage]);
+
+    useEffect(() => {
         if (!isCameraActive || !cameraContainerRef.current) return;
 
         requestAnimationFrame(() => {
@@ -69,16 +95,18 @@ export default function CaptureImage() {
         });
     }, [isCameraActive]);
 
-    const startCamera = async () => {
+    const startCamera = async (facingMode: CameraFacingMode = cameraFacingMode) => {
         if (!navigator.mediaDevices?.getUserMedia) {
             setFeedback({ tone: 'warning', message: t('feedback.scan_camera_unavailable') });
             return;
         }
 
         try {
+            stopCamera();
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' }
+                video: { facingMode }
             });
+            setCameraFacingMode(facingMode);
             setIsCameraActive(true);
             setTimeout(() => {
                 if (videoRef.current) {
@@ -94,6 +122,11 @@ export default function CaptureImage() {
         }
     };
 
+    const switchCamera = () => {
+        const nextFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
+        void startCamera(nextFacingMode);
+    };
+
     const takePhoto = () => {
         if (videoRef.current && canvasRef.current) {
             const video = videoRef.current;
@@ -102,6 +135,10 @@ export default function CaptureImage() {
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             if (context) {
+                if (cameraFacingMode === 'user') {
+                    context.translate(canvas.width, 0);
+                    context.scale(-1, 1);
+                }
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 canvas.toBlob((blob) => {
                     if (blob) {
@@ -110,7 +147,7 @@ export default function CaptureImage() {
                         setSelectedFileBlob(blob);
                         setSelectedFileName(`camera_${Date.now()}.jpg`);
                         setSelectedFileSize(blob.size);
-                        setDemoScenario('auto');
+                        setSelectedBodyArea('');
                         setFeedback({ tone: 'success', message: t('feedback.scan_image_loaded') || 'Fotografia capturada com sucesso.' });
                         stopCamera();
                     }
@@ -119,19 +156,7 @@ export default function CaptureImage() {
         }
     };
 
-    const getMockAssessment = (fileSize: number, scenario: DemoScenario) => {
-        if (scenario === 'low') {
-            return { probability: 22, riskLevel: 'low' as const };
-        }
-
-        if (scenario === 'moderate') {
-            return { probability: 56, riskLevel: 'moderate' as const };
-        }
-
-        if (scenario === 'high') {
-            return { probability: 83, riskLevel: 'high' as const };
-        }
-
+    const getMockAssessment = (fileSize: number) => {
         const probability = Math.min(95, Math.max(8, Math.round((fileSize % 100000) / 1000)));
 
         if (probability >= 70) {
@@ -167,7 +192,7 @@ export default function CaptureImage() {
         setSelectedFileBlob(file);
         setSelectedFileName(file.name);
         setSelectedFileSize(file.size);
-        setDemoScenario('auto');
+        setSelectedBodyArea('');
         setFeedback({ tone: 'success', message: t('feedback.scan_image_loaded') });
     };
 
@@ -177,7 +202,7 @@ export default function CaptureImage() {
         setSelectedFileBlob(null);
         setSelectedFileName('');
         setSelectedFileSize(0);
-        setDemoScenario('auto');
+        setSelectedBodyArea('');
         setFeedback({ tone: 'info', message: t('feedback.scan_selection_canceled') });
     };
 
@@ -196,7 +221,13 @@ export default function CaptureImage() {
             return;
         }
 
-        const mockAssessment = getMockAssessment(selectedFileSize, demoScenario);
+        if (!selectedBodyArea) {
+            setFeedback({ tone: 'warning', message: t('feedback.scan_body_area_required') });
+            return;
+        }
+
+        const bodyAreaLabel = t(`scan.body_area_${selectedBodyArea}`);
+        const mockAssessment = getMockAssessment(selectedFileSize);
 
         try {
             const base64Image = await fileToBase64(selectedFileBlob);
@@ -205,6 +236,8 @@ export default function CaptureImage() {
                 createdAt: new Date().toISOString(),
                 fileName: selectedFileName,
                 imageUrl: base64Image,
+                bodyAreaId: selectedBodyArea,
+                bodyAreaLabel,
                 probability: mockAssessment.probability,
                 riskLevel: mockAssessment.riskLevel,
                 simulated: true
@@ -214,9 +247,11 @@ export default function CaptureImage() {
                 state: {
                     imageUrl: base64Image,
                     fileName: selectedFileName,
+                    bodyAreaLabel,
                     probability: mockAssessment.probability,
                     riskLevel: mockAssessment.riskLevel,
-                    isSimulated: true
+                    isSimulated: true,
+                    returnTo: '/scan'
                 }
             });
         } catch (error: unknown) {
@@ -259,7 +294,7 @@ export default function CaptureImage() {
                         {/* Tirar Foto */}
                         <button
                             className="scan-option-card"
-                            onClick={startCamera}
+                            onClick={() => void startCamera()}
                         >
                             <div className="scan-option-icon camera-icon">
                                 <Camera size={30} color="#5fa79a" strokeWidth={2.3} />
@@ -303,7 +338,7 @@ export default function CaptureImage() {
             {isCameraActive && (
                 <div className="camera-live-container" ref={cameraContainerRef}>
                     <div className="camera-view">
-                        <video ref={videoRef} className="camera-video" playsInline />
+                        <video ref={videoRef} className={`camera-video ${cameraFacingMode === 'user' ? 'front-camera' : ''}`} playsInline />
                         <div className="camera-overlay">
                             <div className="reticle"></div>
                             <p className="camera-hint">{t('scan.camera_hint') || 'Centre a lesão no círculo'}</p>
@@ -313,6 +348,10 @@ export default function CaptureImage() {
                     <div className="camera-actions">
                         <button className="capture-btn" onClick={takePhoto}>
                             <Camera size={32} />
+                        </button>
+                        <button className="switch-camera-btn" onClick={switchCamera}>
+                            <SwitchCamera size={20} />
+                            {cameraFacingMode === 'environment' ? 'Frontal' : 'Traseira'}
                         </button>
                         <button className="cancel-camera-btn" onClick={stopCamera}>
                             Cancelar
@@ -333,13 +372,19 @@ export default function CaptureImage() {
                     />
 
                     {/* Botões de ação */}
-                    <div className="demo-controls" aria-label={t('assessment.demo_selector_label')}>
-                        <p>{t('assessment.demo_selector_title')}</p>
-                        <div className="demo-options">
-                            <button type="button" className={`demo-option ${demoScenario === 'auto' ? 'active' : ''}`} onClick={() => setDemoScenario('auto')}>{t('assessment.demo_auto')}</button>
-                            <button type="button" className={`demo-option ${demoScenario === 'low' ? 'active' : ''}`} onClick={() => setDemoScenario('low')}>{t('assessment.demo_low')}</button>
-                            <button type="button" className={`demo-option ${demoScenario === 'moderate' ? 'active' : ''}`} onClick={() => setDemoScenario('moderate')}>{t('assessment.demo_moderate')}</button>
-                            <button type="button" className={`demo-option ${demoScenario === 'high' ? 'active' : ''}`} onClick={() => setDemoScenario('high')}>{t('assessment.demo_high')}</button>
+                    <div className="body-area-controls" aria-label={t('scan.body_area_label')}>
+                        <p>{t('scan.body_area_title')}</p>
+                        <div className="body-area-options">
+                            {BODY_AREA_IDS.map((areaId) => (
+                                <button
+                                    key={areaId}
+                                    type="button"
+                                    className={`body-area-option ${selectedBodyArea === areaId ? 'active' : ''}`}
+                                    onClick={() => setSelectedBodyArea(areaId)}
+                                >
+                                    {t(`scan.body_area_${areaId}`)}
+                                </button>
+                            ))}
                         </div>
                     </div>
 

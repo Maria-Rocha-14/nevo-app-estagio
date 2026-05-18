@@ -1,36 +1,6 @@
-import type { AvatarColorId, UserAvatar } from '../db/db';
+import { memo, useEffect, useMemo, useState } from 'react';
+import type { UserAvatar } from '../db/db';
 import { DEFAULT_AVATAR } from '../services/avatar';
-import greenNudeAvatar from '../assets/avatar/green/nude.png';
-import greenDoctorAvatar from '../assets/avatar/green/doctor.png';
-import greenFootballAvatar from '../assets/avatar/green/football.png';
-import greenProgrammerAvatar from '../assets/avatar/green/programmer.png';
-import greenTennisAvatar from '../assets/avatar/green/tennis.png';
-import blueNudeAvatar from '../assets/avatar/blue/nude.png';
-import blueDoctorAvatar from '../assets/avatar/blue/doctor.png';
-import blueFootballAvatar from '../assets/avatar/blue/football.png';
-import blueProgrammerAvatar from '../assets/avatar/blue/programmer.png';
-import blueTennisAvatar from '../assets/avatar/blue/tennis.png';
-import redNudeAvatar from '../assets/avatar/red/nude.png';
-import redDoctorAvatar from '../assets/avatar/red/doctor.png';
-import redFootballAvatar from '../assets/avatar/red/football.png';
-import redProgrammerAvatar from '../assets/avatar/red/programmer.png';
-import redTennisAvatar from '../assets/avatar/red/tennis.png';
-import yellowNudeAvatar from '../assets/avatar/yellow/nude.png';
-import yellowDoctorSpecialAvatar from '../assets/avatar/yellow/doctor.png';
-import yellowFootballAvatar from '../assets/avatar/yellow/football.png';
-import yellowProgrammerAvatar from '../assets/avatar/yellow/programmer.png';
-import yellowTennisAvatar from '../assets/avatar/yellow/tennis.png';
-import yellowBaseGlassesAvatar from '../assets/avatar/yellow/yellow-base-glasses.png';
-import yellowBaseStethoscopeAvatar from '../assets/avatar/yellow/yellow-base-stethoscope.png';
-import yellowTShirtAvatar from '../assets/avatar/yellow/yellow-t-shirt.png';
-import yellowTShirtGlassesAvatar from '../assets/avatar/yellow/yellow-t-shirt-glasses.png';
-import yellowTShirtStethoscopeAvatar from '../assets/avatar/yellow/yellow-t-shirt-stethoscope.png';
-import yellowSweatshirtAvatar from '../assets/avatar/yellow/yellow-sweatshirt.png';
-import yellowSweatshirtGlassesAvatar from '../assets/avatar/yellow/yellow-sweatshirt-glasses.png';
-import yellowSweatshirtStethoscopeAvatar from '../assets/avatar/yellow/yellow-sweatshirt-stethoscope.png';
-import yellowLabCoatAvatar from '../assets/avatar/yellow/yellow-lab-coat.png';
-import yellowLabCoatGlassesAvatar from '../assets/avatar/yellow/yellow-lab-coat-glasses.png';
-import yellowLabCoatStethoscopeAvatar from '../assets/avatar/yellow/yellow-lab-coat-stethoscope.png';
 import './ChameleonAvatar.css';
 
 type ChameleonAvatarProps = {
@@ -39,84 +9,81 @@ type ChameleonAvatarProps = {
   className?: string;
 };
 
-const BASE_AVATAR_IMAGES: Record<AvatarColorId, string> = {
-  green: greenNudeAvatar,
-  blue: blueNudeAvatar,
-  yellow: yellowNudeAvatar,
-  red: redNudeAvatar
+type AvatarImageModule = {
+  default: string;
 };
 
-const SPECIAL_AVATAR_IMAGES: Record<
-  AvatarColorId,
-  Partial<Record<NonNullable<UserAvatar['specialId']>, string>>
-> = {
-  green: {
-    football: greenFootballAvatar,
-    programmer: greenProgrammerAvatar,
-    doctor: greenDoctorAvatar,
-    tennis: greenTennisAvatar
-  },
-  blue: {
-    football: blueFootballAvatar,
-    programmer: blueProgrammerAvatar,
-    doctor: blueDoctorAvatar,
-    tennis: blueTennisAvatar
-  },
-  yellow: {
-    football: yellowFootballAvatar,
-    programmer: yellowProgrammerAvatar,
-    doctor: yellowDoctorSpecialAvatar,
-    tennis: yellowTennisAvatar
-  },
-  red: {
-    football: redFootballAvatar,
-    programmer: redProgrammerAvatar,
-    doctor: redDoctorAvatar,
-    tennis: redTennisAvatar
+const avatarModules = import.meta.glob<AvatarImageModule>('../assets/avatar/**/*.png');
+const avatarSrcCache = new Map<string, string>();
+
+const getYellowAvatarFileName = (avatar: UserAvatar): string => {
+  if (avatar.specialId !== 'none') return avatar.specialId;
+
+  const baseName =
+    avatar.outfitId === 'coat' ? 'yellow-lab-coat' :
+    avatar.outfitId === 'sweatshirt' ? 'yellow-sweatshirt' :
+    avatar.outfitId === 'simpleTee' ? 'yellow-t-shirt' :
+    'yellow-base';
+
+  if (avatar.accessoryId === 'glasses') return `${baseName}-glasses`;
+  if (avatar.accessoryId === 'stethoscope') return `${baseName}-stethoscope`;
+  return baseName;
+};
+
+const getAvatarAssetPath = (avatar: UserAvatar): string => {
+  if (avatar.colorId === 'yellow') {
+    return `../assets/avatar/yellow/${getYellowAvatarFileName(avatar)}.png`;
   }
-};
 
-const YELLOW_AVATAR_IMAGES: Partial<
-  Record<UserAvatar['outfitId'], Partial<Record<UserAvatar['accessoryId'], string>>>
-> = {
-  none: {
-    none: yellowNudeAvatar,
-    glasses: yellowBaseGlassesAvatar,
-    stethoscope: yellowBaseStethoscopeAvatar
-  },
-  simpleTee: {
-    none: yellowTShirtAvatar,
-    glasses: yellowTShirtGlassesAvatar,
-    stethoscope: yellowTShirtStethoscopeAvatar
-  },
-  sweatshirt: {
-    none: yellowSweatshirtAvatar,
-    glasses: yellowSweatshirtGlassesAvatar,
-    stethoscope: yellowSweatshirtStethoscopeAvatar
-  },
-  coat: {
-    none: yellowLabCoatAvatar,
-    glasses: yellowLabCoatGlassesAvatar,
-    stethoscope: yellowLabCoatStethoscopeAvatar
+  if (avatar.specialId !== 'none') {
+    return `../assets/avatar/${avatar.colorId}/${avatar.specialId}.png`;
   }
+
+  return `../assets/avatar/${avatar.colorId}/nude.png`;
 };
 
-const getCombinedYellowAvatar = (avatar: UserAvatar): string | undefined => {
-  if (avatar.colorId !== 'yellow' || avatar.specialId !== 'none') return undefined;
-  return YELLOW_AVATAR_IMAGES[avatar.outfitId]?.[avatar.accessoryId];
+const loadAvatarSrc = async (path: string): Promise<string> => {
+  const cachedSrc = avatarSrcCache.get(path);
+  if (cachedSrc) return cachedSrc;
+
+  const loader = avatarModules[path] ?? avatarModules['../assets/avatar/green/nude.png'];
+  const module = await loader();
+  avatarSrcCache.set(path, module.default);
+  return module.default;
 };
 
-export default function ChameleonAvatar({ avatar, size = 'md', className = '' }: ChameleonAvatarProps) {
-  const currentAvatar: UserAvatar = {
+const ChameleonAvatar = memo(function ChameleonAvatar({
+  avatar,
+  size = 'md',
+  className = ''
+}: ChameleonAvatarProps) {
+  const currentAvatar: UserAvatar = useMemo(() => ({
     ...DEFAULT_AVATAR,
     ...avatar
-  };
-  const combinedYellowAvatar = getCombinedYellowAvatar(currentAvatar);
-  const specialImage =
-    currentAvatar.specialId !== 'none'
-      ? SPECIAL_AVATAR_IMAGES[currentAvatar.colorId]?.[currentAvatar.specialId]
-      : undefined;
-  const baseImage = BASE_AVATAR_IMAGES[currentAvatar.colorId] || BASE_AVATAR_IMAGES.green;
+  }), [avatar]);
+  const assetPath = useMemo(() => getAvatarAssetPath(currentAvatar), [currentAvatar]);
+  const [imageSrc, setImageSrc] = useState(() => avatarSrcCache.get(assetPath) || '');
+
+  useEffect(() => {
+    let cancelled = false;
+    const cachedSrc = avatarSrcCache.get(assetPath);
+
+    if (cachedSrc) {
+      setImageSrc(cachedSrc);
+      return;
+    }
+
+    setImageSrc('');
+    loadAvatarSrc(assetPath).then((src) => {
+      if (!cancelled) {
+        setImageSrc(src);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [assetPath]);
 
   return (
     <div
@@ -124,7 +91,18 @@ export default function ChameleonAvatar({ avatar, size = 'md', className = '' }:
       role="img"
       aria-label="Mascote camaleao"
     >
-      <img className="chameleon-avatar-base" src={specialImage || combinedYellowAvatar || baseImage} alt="" aria-hidden="true" />
+      {imageSrc && (
+        <img
+          className="chameleon-avatar-base"
+          src={imageSrc}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
     </div>
   );
-}
+});
+
+export default ChameleonAvatar;

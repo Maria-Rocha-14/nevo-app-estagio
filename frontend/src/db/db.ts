@@ -10,6 +10,8 @@ export type AssessmentHistoryEntry = {
     createdAt: string;
     fileName: string;
     imageUrl?: string;
+    bodyAreaId?: string;
+    bodyAreaLabel?: string;
     probability: number;
     riskLevel: 'low' | 'moderate' | 'high';
     simulated: boolean;
@@ -94,7 +96,7 @@ interface User {
     id?: number;
     name: string;
     email: string;
-    dob: string;      // Data de nascimento
+    dob: string;      // Ano de nascimento nas contas novas; data completa em contas antigas
     password: string;
     skinHistory: string;
     createdAt: string;
@@ -106,7 +108,7 @@ interface User {
     unlockedAvatarItems?: string[];
     weeksStreak: number;
     scansCount: number;
-    earnedBadges: number[]; // Lista de IDs de badges ganhos
+    earnedBadges: string[]; // Lista de IDs de badges ganhos
     lastMissionDate?: string;
     avatar?: UserAvatar;
     completedChallenges: string[];

@@ -4,6 +4,7 @@
   aspect-ratio: 1080 / 1350;
   overflow: hidden;
   flex-shrink: 0;
+  background: transparent;
 }
 
 .chameleon-avatar-sm {
@@ -32,6 +33,15 @@
   transition: opacity 160ms ease, transform 160ms ease;
 }
 
+.chameleon-avatar:empty::after {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8f8f5, #f8fcfb);
+  animation: avatar-placeholder-pulse 1.1s ease-in-out infinite alternate;
+}
+
 .chameleon-avatar-overlay {
   pointer-events: none;
   transform-origin: center center;
@@ -47,4 +57,22 @@
 
 .chameleon-avatar-outfit-coat {
   transform: translateY(5%) scale(0.92);
+}
+
+@keyframes avatar-placeholder-pulse {
+  from {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chameleon-avatar:empty::after {
+    animation: none;
+  }
 }

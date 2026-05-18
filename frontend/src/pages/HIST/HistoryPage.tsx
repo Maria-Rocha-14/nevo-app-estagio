@@ -136,9 +136,11 @@ export default function HistoryPage() {
       state: {
         imageUrl: scan.imageUrl,
         fileName: scan.fileName,
+        bodyAreaLabel: scan.bodyAreaLabel,
         probability: scan.probability,
         riskLevel: scan.riskLevel,
-        isSimulated: scan.simulated
+        isSimulated: scan.simulated,
+        returnTo: '/history'
       }
     });
   };
@@ -230,23 +232,31 @@ export default function HistoryPage() {
 
               {selectedScans.length === 2 ? (
                 <div className="history-compare-grid">
-                  {selectedScans.map((scan) => (
-                    <figure key={`${scan.createdAt}-${scan.fileName}`} className="history-compare-image-card">
-                      <div className="history-compare-image-wrap">
-                        {scan.imageUrl ? (
-                          <img src={scan.imageUrl} alt={scan.fileName || t('history_page.scan_alt')} className="history-compare-image" />
-                        ) : (
-                          <div className="history-compare-image-fallback">
-                            <ImageIcon size={28} aria-hidden="true" />
+                  {selectedScans.map((scan) => {
+                    const riskMeta = getRiskMeta(scan.riskLevel, t);
+
+                    return (
+                      <figure key={`${scan.createdAt}-${scan.fileName}`} className="history-compare-image-card">
+                        <div className="history-compare-image-wrap">
+                          {scan.imageUrl ? (
+                            <img src={scan.imageUrl} alt={scan.fileName || t('history_page.scan_alt')} className="history-compare-image" />
+                          ) : (
+                            <div className="history-compare-image-fallback">
+                              <ImageIcon size={28} aria-hidden="true" />
+                            </div>
+                          )}
+                        </div>
+                        <figcaption>
+                          <strong>{scan.fileName || t('history_page.unnamed_scan')}</strong>
+                          <span>{formatDate(scan.createdAt)}</span>
+                          <div className="history-compare-risk-row">
+                            <span className={`history-risk-pill ${riskMeta.className}`}>{riskMeta.label}</span>
+                            <strong>{scan.probability}%</strong>
                           </div>
-                        )}
-                      </div>
-                      <figcaption>
-                        <strong>{scan.fileName || t('history_page.unnamed_scan')}</strong>
-                        <span>{formatDate(scan.createdAt)}</span>
-                      </figcaption>
-                    </figure>
-                  ))}
+                        </figcaption>
+                      </figure>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="history-compare-empty">{t('history_page.compare_empty')}</p>

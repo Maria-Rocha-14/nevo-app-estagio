@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { BrowserSupportCheck } from '../services/browserSupport';
 import './BrowserCompatibilityNotice.css';
@@ -6,7 +7,7 @@ type BrowserCompatibilityNoticeProps = {
   support: BrowserSupportCheck;
 };
 
-export default function BrowserCompatibilityNotice({ support }: BrowserCompatibilityNoticeProps) {
+const BrowserCompatibilityNotice = memo(function BrowserCompatibilityNotice({ support }: BrowserCompatibilityNoticeProps) {
   return (
     <main className="compat-page" aria-labelledby="compat-title">
       <section className="compat-card">
@@ -43,4 +44,6 @@ export default function BrowserCompatibilityNotice({ support }: BrowserCompatibi
       </section>
     </main>
   );
-}
+});
+
+export default BrowserCompatibilityNotice;

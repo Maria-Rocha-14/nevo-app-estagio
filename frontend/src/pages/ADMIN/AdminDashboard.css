@@ -4,32 +4,30 @@
     background-color: #f8fdfc;
 }
 
-/* SIDEBAR FIXA */
 .admin-sidebar {
     width: 280px;
     background: white;
     border-right: 1px solid #eaf2f1;
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 24px 16px 12px 16px;
     height: 100vh;
-    /* Ocupa a altura do ecrã */
+    box-sizing: border-box;
     position: sticky;
     top: 0;
     transition: width 0.3s ease;
+    overflow: hidden;
 }
 
 .collapsed .admin-sidebar {
     width: 88px;
 }
-
-/* HEADER DA SIDEBAR (AdminPanel) */
 .sidebar-header {
     display: flex;
     align-items: center;
-    /* Alinha o menu e o texto na mesma linha */
     gap: 12px;
     margin-bottom: 40px;
+    flex-shrink: 0;
 }
 
 .admin-brand h1 {
@@ -66,20 +64,20 @@
     background: #f0f7f6;
 }
 
-/* NAVEGAÇÃO E FOOTER */
 .sidebar-nav {
     flex: 1;
-    /* Faz o menu ocupar o espaço disponível */
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow-y: auto;
 }
 
 .sidebar-footer {
     margin-top: auto;
-    /* Empurra o Sair para o fim da sidebar */
-    padding-top: 16px;
+    padding-top: 12px;
+    padding-bottom: 4px;
     border-top: 1px solid #f0f4f4;
+    flex-shrink: 0;
 }
 
 .nav-item {
@@ -111,7 +109,6 @@
     color: #e74c3c;
 }
 
-/* CONTEÚDO PRINCIPAL */
 .admin-main {
     flex: 1;
     padding: 40px;
@@ -129,7 +126,6 @@
     margin-bottom: 8px;
 }
 
-/* CARD DE DESTAQUE (VISTA GLOBAL) */
 .stats-highlight-card {
     background: white;
     padding: 24px;
@@ -163,7 +159,6 @@
     font-size: 14px;
 }
 
-/* SEPARADOR */
 .admin-separator {
     display: flex;
     align-items: center;

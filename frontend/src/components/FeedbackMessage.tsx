@@ -1,4 +1,4 @@
-import { useEffect, type CSSProperties } from 'react';
+import { memo, useEffect, type CSSProperties } from 'react';
 import './FeedbackMessage.css';
 
 type FeedbackTone = 'success' | 'error' | 'warning' | 'info';
@@ -11,7 +11,7 @@ type FeedbackMessageProps = {
   autoCloseMs?: number;
 };
 
-export default function FeedbackMessage({ tone, message, onClose, maxWidth, autoCloseMs }: FeedbackMessageProps) {
+const FeedbackMessage = memo(function FeedbackMessage({ tone, message, onClose, maxWidth, autoCloseMs }: FeedbackMessageProps) {
   const isUrgent = tone === 'error';
   const style = maxWidth ? ({ '--feedback-popup-max-width': maxWidth } as CSSProperties) : undefined;
   const closeDelay = autoCloseMs ?? (isUrgent ? 5000 : 3200);
@@ -47,4 +47,6 @@ export default function FeedbackMessage({ tone, message, onClose, maxWidth, auto
       </div>
     </div>
   );
-}
+});
+
+export default FeedbackMessage;

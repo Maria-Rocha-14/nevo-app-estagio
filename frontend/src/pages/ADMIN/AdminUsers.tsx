@@ -10,7 +10,13 @@ type FeedbackState = { tone: 'success' | 'error' | 'warning' | 'info'; message: 
 
 const calculateAge = (dob?: string) => {
     if (!dob) return 'N/A';
+    if (/^\d{4}$/.test(dob)) {
+        return Math.max(0, new Date().getFullYear() - Number(dob));
+    }
+
     const birthDate = new Date(dob);
+    if (isNaN(birthDate.getTime())) return 'N/A';
+
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
@@ -50,7 +56,7 @@ export default function AdminUsers() {
     const handleToggleStatus = async (user: any) => {
         const nextStatus = user.accountStatus === 'active' ? 'suspended' : 'active';
         try {
-            const response = await fetch(`/api/admin/users/${user._id}/status`, {
+            const response = await fetch(`http://127.0.0.1:5000/api/admin/users/${user._id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: nextStatus })

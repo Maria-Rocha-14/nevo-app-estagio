@@ -127,24 +127,6 @@
     background-color: #111;
 }
 
-.demo-login-button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 12px;
-    border: 2px solid #d9ebe7;
-    border-radius: 12px;
-    background: #f8fdfc;
-    color: #007b8f;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.demo-login-button:hover {
-    background: #e8f8f5;
-    border-color: #5fa79a;
-}
-
 /* A magia das linhas horizontais no "ou" */
 .login-divider {
     display: flex;
@@ -202,22 +184,36 @@
     margin-top: 30px;
 }
 
-.legal-text {
-    font-size: 11px;
-    color: #888;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-.legal-text strong {
-    color: #333;
-}
-
 .register-text {
     font-size: 14px;
     color: #1f1f1f;
+    margin: 0;
 }
 
+.legal-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    color: #7a7a7a;
+    font-size: 11px;
+}
+
+.legal-links button {
+    border: 0;
+    background: transparent;
+    color: #4f4f4f;
+    padding: 0;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.legal-links button:hover {
+    color: #007b8f;
+    text-decoration: underline;
+}
 
 .login-link {
     color: #007b8f;
@@ -250,9 +246,9 @@
 
 .language-toggle:focus-visible,
 .login-button:focus-visible,
-.demo-login-button:focus-visible,
 .login-social-button:focus-visible,
 .eye-button:focus-visible,
+.legal-links button:focus-visible,
 .login-link:focus-visible,
 .login-input.with-icon:focus-visible,
 input[type="checkbox"]:focus-visible {

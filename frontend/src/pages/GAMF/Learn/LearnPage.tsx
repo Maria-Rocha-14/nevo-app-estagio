@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -7,6 +7,7 @@ import { completeDailyChallengesOnce, useSessionUser } from '../../../services/s
 import { db } from '../../../db/db';
 import type { AdminQuiz } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
+import { api } from '../../../services/api'; // 🔥 Importação do teu ficheiro de rotas
 import './LearnPage.css';
 
 type ChallengeType = 'card' | 'quiz';
@@ -42,6 +43,17 @@ type ChallengeReviewResult = {
   selectedIndex: number;
   correctIndex: number;
   isCorrect: boolean;
+  pointsAwarded: number;
+  xpAwarded: number;
+  possiblePoints: number;
+  possibleXp: number;
+};
+
+type QuizSummary = {
+  correct: number;
+  total: number;
+  pointsAwarded: number;
+  xpAwarded: number;
 };
 
 const getChallengeXpReward = (challenge: Challenge): number => (
@@ -84,15 +96,16 @@ const getAdminQuizTypeTitle = (quiz: AdminQuiz): string => {
   return 'Admin: Escolha múltipla';
 };
 
-const mapAdminQuizToChallenge = (quiz: AdminQuiz): Challenge | null => {
-  if (!quiz.id) return null;
+const mapAdminQuizToChallenge = (quiz: any): Challenge | null => {
+  const quizId = quiz._id || quiz.id;
+  if (!quizId) return null;
 
-  const correctIndex = quiz.options.findIndex((option) => option.id === quiz.correctOptionId);
+  const correctIndex = quiz.options.findIndex((option: any) => option.id === quiz.correctOptionId);
   if (correctIndex < 0) return null;
 
   if (quiz.questionType === 'image_choice') {
     return {
-      id: `admin-quiz-${quiz.id}`,
+      id: `admin-quiz-${quizId}`,
       type: 'card',
       visualTheme: 'teal',
       points: quiz.xpValue,
@@ -100,7 +113,7 @@ const mapAdminQuizToChallenge = (quiz: AdminQuiz): Challenge | null => {
       contentText: quiz.questionText,
       sourceLabel: 'Fundamento médico indicado pelo administrador',
       sourceUrl: quiz.medicalSourceUrl,
-      imageOptions: quiz.options.map((option) => ({
+      imageOptions: quiz.options.map((option: any) => ({
         src: option.imageUrl || '',
         alt: option.text
       })),
@@ -111,7 +124,7 @@ const mapAdminQuizToChallenge = (quiz: AdminQuiz): Challenge | null => {
 
   if (quiz.questionType === 'true_false') {
     return {
-      id: `admin-quiz-${quiz.id}`,
+      id: `admin-quiz-${quizId}`,
       type: 'card',
       visualTheme: 'orange',
       points: quiz.xpValue,
@@ -125,7 +138,7 @@ const mapAdminQuizToChallenge = (quiz: AdminQuiz): Challenge | null => {
   }
 
   return {
-    id: `admin-quiz-${quiz.id}`,
+    id: `admin-quiz-${quizId}`,
     type: 'quiz',
     visualTheme: 'blue',
     points: quiz.xpValue,
@@ -134,7 +147,7 @@ const mapAdminQuizToChallenge = (quiz: AdminQuiz): Challenge | null => {
     sourceLabel: 'Fundamento médico indicado pelo administrador',
     sourceUrl: quiz.medicalSourceUrl,
     questionText: quiz.questionText,
-    optionsText: quiz.options.map((option) => option.text),
+    optionsText: quiz.options.map((option: any) => option.text),
     correctIndex,
     featuredDaily: true
   };
@@ -160,7 +173,7 @@ const CHALLENGES: Challenge[] = [
     titleKey: 'learn.challenge2_title',
     contentKey: 'learn.challenge2_content',
     sourceLabelKey: 'learn.challenge2_source',
-    sourceUrl: 'https://www.aimatmelanoma.org/melanoma-101/how-melanoma-is-diagnosed/' ,
+    sourceUrl: 'https://www.aimatmelanoma.org/melanoma-101/how-melanoma-is-diagnosed/',
     questionKey: 'learn.challenge2_question',
     optionsKeys: ['learn.challenge2_opt1', 'learn.challenge2_opt2', 'learn.challenge2_opt3'],
     correctIndex: 0
@@ -399,18 +412,39 @@ export default function LearnPage() {
   const [challengeNotice, setChallengeNotice] = useState<{ challengeId?: string; tone: FeedbackTone; message: string } | null>(null);
   const [celebratingChallengeId, setCelebratingChallengeId] = useState<string | null>(null);
   const [reviewResults, setReviewResults] = useState<Record<string, ChallengeReviewResult>>({});
+  const [quizSummary, setQuizSummary] = useState<QuizSummary | null>(null);
+  const [isReviewingQuiz, setIsReviewingQuiz] = useState(false);
   const [activeDailyIndex, setActiveDailyIndex] = useState(0);
   const [isSubmittingDailyQuiz, setIsSubmittingDailyQuiz] = useState(false);
+
+  const [remoteQuizzes, setRemoteQuizzes] = useState<any[]>([]);
   const adminQuizzes = useLiveQuery(() => db.adminQuizzes.orderBy('createdAt').reverse().toArray(), []);
 
   const todayKey = getLocalDateKey(new Date());
+
+  useEffect(() => {
+    const fetchQuizzesDoBackend = async () => {
+      try {
+        const data = await api.getQuizzes();
+        setRemoteQuizzes(data);
+      } catch (err) {
+        console.warn("Falha ao ligar ao Mongo, a usar dados locais do Dexie...", err);
+      }
+    };
+    fetchQuizzesDoBackend();
+  }, []);
+
   const allChallenges = useMemo(() => {
-    const adminChallenges = (adminQuizzes || [])
+    // Escolhe os dados remotos se existirem, caso contrário faz o fallback para o Dexie
+    const fonteDeDados = remoteQuizzes.length > 0 ? remoteQuizzes : (adminQuizzes || []);
+
+    const adminChallenges = fonteDeDados
       .map(mapAdminQuizToChallenge)
       .filter((challenge): challenge is Challenge => challenge !== null);
 
     return [...adminChallenges, ...CHALLENGES];
-  }, [adminQuizzes]);
+  }, [adminQuizzes, remoteQuizzes]);
+
   const dailyChallenges = useMemo(() => {
     try {
       return getDailyChallenges(allChallenges, todayKey);
@@ -419,6 +453,7 @@ export default function LearnPage() {
       return [] as Challenge[];
     }
   }, [allChallenges, todayKey]);
+
   const activeDailyChallenge = dailyChallenges[activeDailyIndex] || null;
   const activeDailyChallengeId = activeDailyChallenge?.id;
 
@@ -427,6 +462,29 @@ export default function LearnPage() {
     if (text) return text;
     return key ? t(key) : '';
   };
+
+  const resetLearnProgress = useCallback(async (userId: number, cleanUrl = false) => {
+    try {
+      await db.users.update(userId, {
+        completedChallenges: [],
+        challengeHistory: []
+      });
+
+      setSelectedOptions({});
+      setReviewResults({});
+      setQuizSummary(null);
+      setIsReviewingQuiz(false);
+      setActiveDailyIndex(0);
+      setChallengeNotice({ tone: 'success', message: 'Questionarios reiniciados para este utilizador.' });
+
+      if (cleanUrl) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    } catch (error) {
+      console.error('Learn reset error:', error);
+      setChallengeNotice({ tone: 'error', message: t('errors.database_error') });
+    }
+  }, [t]);
 
   useEffect(() => {
     if (user === null) {
@@ -438,11 +496,37 @@ export default function LearnPage() {
     if (!activeDailyChallengeId) {
       return;
     }
-
     setCelebratingChallengeId((current) => (current === activeDailyChallengeId ? null : current));
   }, [activeDailyChallengeId]);
 
-  if (user === undefined) return <main className="learn-container" aria-busy="true"><div style={{padding: '20px', textAlign: 'center'}}>A carregar sessão...</div></main>;
+  useEffect(() => {
+    if (!import.meta.env.DEV || !user?.id) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('resetLearn') !== '1') {
+      return;
+    }
+
+    void db.users.update(user.id, {
+      completedChallenges: [],
+      challengeHistory: []
+    }).then(() => {
+      setSelectedOptions({});
+      setReviewResults({});
+      setQuizSummary(null);
+      setIsReviewingQuiz(false);
+      setActiveDailyIndex(0);
+      setChallengeNotice({ tone: 'success', message: 'Questionários reiniciados para este utilizador.' });
+      window.history.replaceState(null, '', window.location.pathname);
+    }).catch((error) => {
+      console.error('Learn reset error:', error);
+      setChallengeNotice({ tone: 'error', message: t('errors.database_error') });
+    });
+  }, [t, user?.id]);
+
+  if (user === undefined) return <main className="learn-container" aria-busy="true"><div style={{ padding: '20px', textAlign: 'center' }}>A carregar sessão...</div></main>;
   if (!user) {
     return null;
   }
@@ -462,13 +546,19 @@ export default function LearnPage() {
   const canGoNext = activeDailyIndex < dailyChallenges.length - 1;
   const isLastDailyChallenge = activeDailyIndex === dailyChallenges.length - 1;
 
+  const handleResetLearnProgress = () => {
+    if (!user.id) {
+      return;
+    }
+    void resetLearnProgress(user.id);
+  };
+
   const moveDailyIndex = (direction: -1 | 1) => {
     setActiveDailyIndex((current) => {
       const nextIndex = current + direction;
       if (nextIndex < 0 || nextIndex >= dailyChallenges.length) {
         return current;
       }
-
       return nextIndex;
     });
   };
@@ -477,13 +567,49 @@ export default function LearnPage() {
     if (challenge.type === 'quiz') {
       return challenge.correctIndex ?? 0;
     }
-
     if (challenge.imageOptions) {
       return challenge.correctIndex ?? 0;
     }
-
     return (challenge.correctAnswer ?? true) ? 0 : 1;
   };
+
+  const completedDailyEntries = dailyChallenges
+    .map((challenge) => ({
+      challenge,
+      entry: (user.challengeHistory || []).find((historyEntry) => (
+        historyEntry.challengeId === challenge.id && historyEntry.completedAt.startsWith(todayKey)
+      ))
+    }))
+    .filter((item): item is { challenge: Challenge; entry: NonNullable<typeof item.entry> } => Boolean(item.entry));
+
+  const completedQuizSummary = allDailyChallengesCompleted ? {
+    correct: completedDailyEntries.filter(({ entry }) => (entry.pointsAwarded || 0) > 0).length,
+    total: dailyChallenges.length,
+    pointsAwarded: completedDailyEntries.reduce((sum, { entry }) => sum + (entry.pointsAwarded || 0), 0),
+    xpAwarded: completedDailyEntries.reduce((sum, { challenge, entry }) => (
+      sum + ((entry.pointsAwarded || 0) > 0 ? getChallengeXpReward(challenge) : 0)
+    ), 0)
+  } : null;
+
+  const displayedQuizSummary = quizSummary ?? completedQuizSummary;
+
+  const reconstructedReviewResults = completedDailyEntries.reduce<Record<string, ChallengeReviewResult>>((results, { challenge, entry }) => {
+    const correctIndex = getCorrectOptionIndex(challenge);
+    const isCorrect = (entry.pointsAwarded || 0) > 0;
+
+    return {
+      ...results,
+      [challenge.id]: {
+        selectedIndex: isCorrect ? correctIndex : -1,
+        correctIndex,
+        isCorrect,
+        pointsAwarded: entry.pointsAwarded || 0,
+        xpAwarded: isCorrect ? getChallengeXpReward(challenge) : 0,
+        possiblePoints: challenge.points,
+        possibleXp: getChallengeXpReward(challenge)
+      }
+    };
+  }, {});
 
   const handleSelectOption = (challenge: Challenge, selected: number) => {
     setSelectedOptions((prev) => ({ ...prev, [challenge.id]: selected }));
@@ -532,14 +658,20 @@ export default function LearnPage() {
         isCorrect: selected === correctIndex
       };
     });
+
     const nextReviewResults = evaluatedResults.reduce<Record<string, ChallengeReviewResult>>((results, result) => ({
       ...results,
       [result.challenge.id]: {
         selectedIndex: result.selectedIndex,
         correctIndex: result.correctIndex,
-        isCorrect: result.isCorrect
+        isCorrect: result.isCorrect,
+        pointsAwarded: result.isCorrect ? result.challenge.points : 0,
+        xpAwarded: result.isCorrect ? getChallengeXpReward(result.challenge) : 0,
+        possiblePoints: result.challenge.points,
+        possibleXp: getChallengeXpReward(result.challenge)
       }
     }), {});
+
     const correctCount = evaluatedResults.filter((result) => result.isCorrect).length;
     const firstWrong = evaluatedResults.find((result) => !result.isCorrect);
 
@@ -565,19 +697,16 @@ export default function LearnPage() {
       }
 
       setReviewResults((current) => ({ ...current, ...nextReviewResults }));
-      setChallengeNotice({
-        challengeId: firstWrong?.challenge.id ?? noticeChallengeId,
-        tone: correctCount === pendingChallenges.length ? 'success' : correctCount > 0 ? 'warning' : 'info',
-        message: result.completedCount > 0
-          ? t('learn.quiz_review_summary', {
-            correct: correctCount,
-            total: pendingChallenges.length,
-            points: result.pointsAwarded,
-            xp: result.xpAwarded
-          })
-          : t('learn.already_completed')
+      setQuizSummary({
+        correct: correctCount,
+        total: pendingChallenges.length,
+        pointsAwarded: result.pointsAwarded,
+        xpAwarded: result.xpAwarded
       });
-      setActiveDailyIndex(firstWrong ? dailyChallenges.findIndex((challenge) => challenge.id === firstWrong.challenge.id) : activeDailyIndex);
+      setIsReviewingQuiz(false);
+      setChallengeNotice(null);
+      setActiveDailyIndex(firstWrong ? dailyChallenges.findIndex((challenge) => challenge.id === firstWrong.challenge.id) : 0);
+
       if (correctCount > 0) {
         setCelebratingChallengeId(firstWrong?.challenge.id ?? noticeChallengeId);
       }
@@ -597,15 +726,12 @@ export default function LearnPage() {
     if (challenge.type === 'quiz') {
       return { emoji: '🧠', icon: <Brain size={18} aria-hidden="true" /> };
     }
-
     if (challenge.visualTheme === 'orange') {
       return { emoji: '☀️', icon: <SunMedium size={18} aria-hidden="true" /> };
     }
-
     if (challenge.id === 'card-abcde' || challenge.id === 'card-self-check') {
       return { emoji: '🔎', icon: <Sparkles size={18} aria-hidden="true" /> };
     }
-
     return { emoji: '🛡️', icon: <ShieldCheck size={18} aria-hidden="true" /> };
   };
 
@@ -635,12 +761,46 @@ export default function LearnPage() {
       </section>
 
       <section className="learn-grid">
-        {activeDailyChallenge ? (
+        {displayedQuizSummary && !isReviewingQuiz ? (
+          <article className="learn-card quiz-summary-card">
+            <div className="learn-card-header">
+              <h3>{t('learn.summary_title')}</h3>
+              <span className="completed-badge">{t('learn.completed')}</span>
+            </div>
+
+            <div className="quiz-summary-stats" aria-label={t('learn.summary_title')}>
+              <div>
+                <span>{t('learn.summary_correct')}</span>
+                <strong>{displayedQuizSummary.correct}/{displayedQuizSummary.total}</strong>
+              </div>
+              <div>
+                <span>{t('learn.summary_points')}</span>
+                <strong>{displayedQuizSummary.pointsAwarded}</strong>
+              </div>
+              <div>
+                <span>{t('learn.summary_xp')}</span>
+                <strong>{displayedQuizSummary.xpAwarded}</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="review-questions-button"
+              onClick={() => {
+                setIsReviewingQuiz(true);
+                setActiveDailyIndex(0);
+              }}
+            >
+              {t('learn.review_questions')}
+            </button>
+          </article>
+        ) : activeDailyChallenge ? (
           (() => {
             const challenge = activeDailyChallenge;
             const isDone = completedTodayIds.has(challenge.id);
-            const reviewResult = reviewResults[challenge.id];
+            const reviewResult = reviewResults[challenge.id] ?? reconstructedReviewResults[challenge.id];
             const challengeVisual = getChallengeVisual(challenge);
+            const showReviewDetails = isReviewingQuiz && Boolean(reviewResult);
 
             return (
               <article key={challenge.id} className={`learn-card learn-card-transition ${isDone ? 'completed' : ''} ${celebratingChallengeId === challenge.id ? 'celebrating' : ''}`}>
@@ -676,7 +836,7 @@ export default function LearnPage() {
                         <button
                           key={`${challenge.id}-option-${index}`}
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${showReviewDetails && reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${showReviewDetails && reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, index)}
                           disabled={isDone}
                         >
@@ -684,7 +844,7 @@ export default function LearnPage() {
                         </button>
                       ))}
                     </div>
-                    {reviewResult && (
+                    {showReviewDetails && reviewResult && (
                       <p className={`answer-review ${reviewResult.isCorrect ? 'correct' : 'wrong'}`}>
                         {reviewResult.isCorrect ? t('learn.review_correct') : t('learn.review_wrong')}
                       </p>
@@ -701,7 +861,7 @@ export default function LearnPage() {
                           <button
                             key={option.alt}
                             type="button"
-                            className={`image-choice-card ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
+                            className={`image-choice-card ${selectedOptions[challenge.id] === index ? 'selected' : ''} ${showReviewDetails && reviewResult?.correctIndex === index ? 'answer-correct' : ''} ${showReviewDetails && reviewResult?.selectedIndex === index && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                             onClick={() => handleSelectOption(challenge, index)}
                             disabled={isDone}
                           >
@@ -714,7 +874,7 @@ export default function LearnPage() {
                       <div className="quiz-options">
                         <button
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === 0 ? 'selected' : ''} ${reviewResult?.correctIndex === 0 ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === 0 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === 0 ? 'selected' : ''} ${showReviewDetails && reviewResult?.correctIndex === 0 ? 'answer-correct' : ''} ${showReviewDetails && reviewResult?.selectedIndex === 0 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, 0)}
                           disabled={isDone}
                         >
@@ -722,7 +882,7 @@ export default function LearnPage() {
                         </button>
                         <button
                           type="button"
-                          className={`quiz-option ${selectedOptions[challenge.id] === 1 ? 'selected' : ''} ${reviewResult?.correctIndex === 1 ? 'answer-correct' : ''} ${reviewResult?.selectedIndex === 1 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
+                          className={`quiz-option ${selectedOptions[challenge.id] === 1 ? 'selected' : ''} ${showReviewDetails && reviewResult?.correctIndex === 1 ? 'answer-correct' : ''} ${showReviewDetails && reviewResult?.selectedIndex === 1 && !reviewResult.isCorrect ? 'answer-wrong' : ''}`}
                           onClick={() => handleSelectOption(challenge, 1)}
                           disabled={isDone}
                         >
@@ -730,7 +890,7 @@ export default function LearnPage() {
                         </button>
                       </div>
                     )}
-                    {reviewResult && (
+                    {showReviewDetails && reviewResult && (
                       <p className={`answer-review ${reviewResult.isCorrect ? 'correct' : 'wrong'}`}>
                         {reviewResult.isCorrect ? t('learn.review_correct') : t('learn.review_wrong')}
                       </p>
@@ -739,12 +899,16 @@ export default function LearnPage() {
                 )}
 
                 <div className="challenge-footer">
-                  <span>+{challenge.points} {t('learn.points_unit')} / +{getChallengeXpReward(challenge)} XP</span>
+                  {showReviewDetails && reviewResult?.isCorrect && (
+                    <span>
+                      {t('learn.review_reward_earned', { points: reviewResult.pointsAwarded, xp: reviewResult.xpAwarded })}
+                    </span>
+                  )}
                   <div className="challenge-footer-actions">
                     <button type="button" className="nav-step-button" onClick={() => moveDailyIndex(-1)} disabled={!canGoPrevious}>
                       {t('learn.previous')}
                     </button>
-                    {isLastDailyChallenge && (
+                    {isLastDailyChallenge && !isReviewingQuiz && (
                       <button
                         type="button"
                         onClick={() => {
@@ -753,6 +917,11 @@ export default function LearnPage() {
                         disabled={allDailyChallengesCompleted || isSubmittingDailyQuiz}
                       >
                         {allDailyChallengesCompleted ? t('learn.completed') : isSubmittingDailyQuiz ? t('learn.submitting_quiz') : t('learn.submit_quiz')}
+                      </button>
+                    )}
+                    {isReviewingQuiz && isLastDailyChallenge && (
+                      <button type="button" onClick={() => setIsReviewingQuiz(false)}>
+                        {t('learn.back_to_summary')}
                       </button>
                     )}
                     {canGoNext && (
@@ -776,6 +945,13 @@ export default function LearnPage() {
         )}
       </section>
 
+      <button
+        type="button"
+        className="learn-reset-dev-button"
+        onClick={handleResetLearnProgress}
+      >
+        Reset questionarios (temporario)
+      </button>
       <nav className="bottom-navbar" aria-label={t('learn.bottom_nav_label')}>
         <button className="nav-btn" onClick={() => navigate('/homepage')}>
           <Home size={24} />
@@ -789,7 +965,7 @@ export default function LearnPage() {
           <History size={24} />
           <span>{t('nav.history')}</span>
         </button>
-        <button className="nav-btn active" aria-current="page">
+        <button className="nav-btn" onClick={() => navigate('/learn')}>
           <BookOpen size={24} />
           <span>{t('nav.learn')}</span>
         </button>

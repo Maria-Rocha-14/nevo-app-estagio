@@ -3,9 +3,38 @@ html[data-theme='dark'] body {
   color: #eef7f5;
 }
 
+.bottom-navbar,
+.history-bottom-navbar {
+  position: fixed !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  bottom: env(safe-area-inset-bottom, 0) !important;
+  left: 50% !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  width: 100% !important;
+  max-width: 450px !important;
+  z-index: 5000 !important;
+  padding-bottom: max(15px, env(safe-area-inset-bottom, 0)) !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media (min-width: 900px) {
+  .bottom-navbar,
+  .history-bottom-navbar {
+    max-width: 960px !important;
+  }
+}
+
 html[data-theme='dark'] .home-container,
 html[data-theme='dark'] .profile-container,
-html[data-theme='dark'] .avatar-page {
+html[data-theme='dark'] .avatar-page,
+html[data-theme='dark'] .learn-container,
+html[data-theme='dark'] .capture-container,
+html[data-theme='dark'] .history-container,
+html[data-theme='dark'] .assessment-container,
+html[data-theme='dark'] .login-container,
+html[data-theme='dark'] .privacy-container {
   --bg-app: #0f1718;
   --text-dark: #eef7f5;
   --card-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
@@ -26,10 +55,71 @@ html[data-theme='dark'] .avatar-icon-btn,
 html[data-theme='dark'] .profile-icon-btn,
 html[data-theme='dark'] .avatar-color-option,
 html[data-theme='dark'] .avatar-item-option,
-html[data-theme='dark'] .bottom-navbar {
+html[data-theme='dark'] .learn-score-card,
+html[data-theme='dark'] .learn-card,
+html[data-theme='dark'] .quiz-summary-stats div,
+html[data-theme='dark'] .history-card,
+html[data-theme='dark'] .history-empty-card,
+html[data-theme='dark'] .history-compare-card,
+html[data-theme='dark'] .history-scan-card,
+html[data-theme='dark'] .history-compare-image-card,
+html[data-theme='dark'] .history-compare-select-btn,
+html[data-theme='dark'] .history-header-action,
+html[data-theme='dark'] .scan-option-card,
+html[data-theme='dark'] .body-area-controls,
+html[data-theme='dark'] .assessment-card,
+html[data-theme='dark'] .assessment-history-mini,
+html[data-theme='dark'] .secondary-action,
+html[data-theme='dark'] .ghost-action,
+html[data-theme='dark'] .login-card,
+html[data-theme='dark'] .bottom-navbar,
+html[data-theme='dark'] .history-bottom-navbar {
   background: #172223;
   border-color: #294143;
   color: #eef7f5;
+}
+
+html[data-theme='dark'] .learn-card,
+html[data-theme='dark'] .learn-score-card,
+html[data-theme='dark'] .scan-option-card,
+html[data-theme='dark'] .assessment-card {
+  background: #172223;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme='dark'] .challenge-hero-teal,
+html[data-theme='dark'] .challenge-hero-blue,
+html[data-theme='dark'] .challenge-hero-orange,
+html[data-theme='dark'] .score-icon,
+html[data-theme='dark'] .history-empty-icon,
+html[data-theme='dark'] .scan-option-icon,
+html[data-theme='dark'] .submitted-image-placeholder,
+html[data-theme='dark'] .history-compare-image-wrap,
+html[data-theme='dark'] .history-thumbnail {
+  background: #101b1c;
+  border-color: #294143;
+  color: #a9bfbd;
+}
+
+html[data-theme='dark'] .scan-tips-card,
+html[data-theme='dark'] .medical-disclaimer {
+  background: #17263a;
+  border-color: #284664;
+}
+
+html[data-theme='dark'] .risk-low {
+  background: #153322;
+  border-color: #276747;
+}
+
+html[data-theme='dark'] .risk-moderate {
+  background: #382914;
+  border-color: #765422;
+}
+
+html[data-theme='dark'] .risk-high {
+  background: #3a1719;
+  border-color: #7f2d31;
 }
 
 html[data-theme='dark'] .avatar-stage,
@@ -74,7 +164,23 @@ html[data-theme='dark'] .avatar-item-option span,
 html[data-theme='dark'] .mascot-home-copy h2,
 html[data-theme='dark'] .profile-mascot-copy h2,
 html[data-theme='dark'] .achievement-info h4,
-html[data-theme='dark'] .achievement-count {
+html[data-theme='dark'] .achievement-count,
+html[data-theme='dark'] .learn-header h1,
+html[data-theme='dark'] .learn-card h3,
+html[data-theme='dark'] .quiz-block h4,
+html[data-theme='dark'] .capture-header h1,
+html[data-theme='dark'] .scan-option-card h3,
+html[data-theme='dark'] .history-header h1,
+html[data-theme='dark'] .history-empty-card h2,
+html[data-theme='dark'] .history-scan-content h2,
+html[data-theme='dark'] .history-scan-topline strong,
+html[data-theme='dark'] .assessment-header h1,
+html[data-theme='dark'] .analysis-summary h3,
+html[data-theme='dark'] .risk-heading h2,
+html[data-theme='dark'] .assessment-history-mini h4,
+html[data-theme='dark'] .login-title,
+html[data-theme='dark'] .login-brand-name,
+html[data-theme='dark'] .register-text {
   color: #eef7f5;
 }
 
@@ -84,17 +190,180 @@ html[data-theme='dark'] .avatar-item-option small,
 html[data-theme='dark'] .profile-summary-text span,
 html[data-theme='dark'] .profile-section-heading p,
 html[data-theme='dark'] .avatar-progress,
-html[data-theme='dark'] .achievement-info p {
+html[data-theme='dark'] .achievement-info p,
+html[data-theme='dark'] .learn-header p,
+html[data-theme='dark'] .learn-card p,
+html[data-theme='dark'] .learn-score-meta,
+html[data-theme='dark'] .challenge-source,
+html[data-theme='dark'] .scan-option-card p,
+html[data-theme='dark'] .scan-tips-list,
+html[data-theme='dark'] .body-area-controls p,
+html[data-theme='dark'] .history-empty-card p,
+html[data-theme='dark'] .history-scan-content p,
+html[data-theme='dark'] .history-compare-empty,
+html[data-theme='dark'] .history-compare-image-card figcaption span,
+html[data-theme='dark'] .risk-indicator p,
+html[data-theme='dark'] .assessment-history-mini li,
+html[data-theme='dark'] .login-subtitle,
+html[data-theme='dark'] .login-input-group label,
+html[data-theme='dark'] .legal-links {
   color: #a9bfbd;
 }
 
 html[data-theme='dark'] .profile-field input,
 html[data-theme='dark'] .profile-password-wrapper,
 html[data-theme='dark'] .avatar-name-field input,
-html[data-theme='dark'] .profile-segmented {
+html[data-theme='dark'] .profile-segmented,
+html[data-theme='dark'] .quiz-option,
+html[data-theme='dark'] .image-choice-card,
+html[data-theme='dark'] .history-filter-select,
+html[data-theme='dark'] .body-area-option,
+html[data-theme='dark'] .login-input.with-icon,
+html[data-theme='dark'] .cancel-btn {
   background: #101b1c;
   border-color: #294143;
   color: #eef7f5;
+}
+
+html[data-theme='dark'] .quiz-option.selected,
+html[data-theme='dark'] .image-choice-card.selected,
+html[data-theme='dark'] .body-area-option.active,
+html[data-theme='dark'] .history-scan-card-wrapper.selected .history-scan-card {
+  background: #12332f;
+  border-color: #5fa79a;
+  color: #eef7f5;
+}
+
+html[data-theme='dark'] .quiz-option.answer-correct,
+html[data-theme='dark'] .image-choice-card.answer-correct,
+html[data-theme='dark'] .answer-review.correct,
+html[data-theme='dark'] .history-risk-low {
+  background: #153322;
+  color: #b8f5d0;
+  border-color: #276747;
+}
+
+html[data-theme='dark'] .quiz-option.answer-wrong,
+html[data-theme='dark'] .image-choice-card.answer-wrong,
+html[data-theme='dark'] .answer-review.wrong,
+html[data-theme='dark'] .history-risk-high {
+  background: #3a1719;
+  color: #ffd0d0;
+  border-color: #7f2d31;
+}
+
+html[data-theme='dark'] .history-risk-moderate,
+html[data-theme='dark'] .simulated-tag {
+  background: #382914;
+  color: #ffdca8;
+  border-color: #765422;
+}
+
+html[data-theme='dark'] .challenge-footer,
+html[data-theme='dark'] .history-scan-card,
+html[data-theme='dark'] .assessment-history-mini,
+html[data-theme='dark'] .submitted-image,
+html[data-theme='dark'] .preview-image {
+  border-color: #294143;
+}
+
+html[data-theme='dark'] .challenge-source-link,
+html[data-theme='dark'] .history-kicker,
+html[data-theme='dark'] .history-header-action,
+html[data-theme='dark'] .history-compare-select-btn,
+html[data-theme='dark'] .legal-links button,
+html[data-theme='dark'] .login-link {
+  color: #8bd8cb;
+}
+
+html[data-theme='dark'] .learn-score-card {
+  background: #102728;
+  border-color: #4bb8aa;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+
+html[data-theme='dark'] .learn-score-today {
+  color: #ffffff;
+}
+
+html[data-theme='dark'] .learn-score-meta {
+  color: #c7e7e1;
+}
+
+html[data-theme='dark'] .quiz-summary-stats span {
+  color: #c7e7e1;
+}
+
+html[data-theme='dark'] .quiz-summary-stats strong {
+  color: #ffffff;
+}
+
+html[data-theme='dark'] .review-questions-button {
+  background: #eef7f5;
+  color: #0f1718;
+}
+
+html[data-theme='dark'] .learn-reset-dev-button {
+  background: #2f2418;
+  border-color: #f59e0b;
+  color: #ffdca8;
+}
+
+html[data-theme='dark'] .learn-reset-dev-button:hover {
+  background: #3a2b1a;
+}
+
+html[data-theme='dark'] .score-icon {
+  background: #1d4f4b;
+  color: #d9fff7;
+}
+
+html[data-theme='dark'] .challenge-source {
+  color: #c7d8d6;
+}
+
+html[data-theme='dark'] .challenge-source strong {
+  color: #ffffff;
+}
+
+html[data-theme='dark'] .challenge-source-link {
+  color: #9ff5e7;
+  border-bottom-color: rgba(159, 245, 231, 0.8);
+}
+
+html[data-theme='dark'] .challenge-footer {
+  border-top-color: #3b5b5d;
+}
+
+html[data-theme='dark'] .challenge-footer span {
+  color: #b7fff1;
+  background: #102f2d;
+  border: 1px solid #4bb8aa;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+html[data-theme='dark'] .challenge-footer button {
+  background: #eef7f5;
+  color: #0f1718;
+  border: 1px solid #eef7f5;
+}
+
+html[data-theme='dark'] .challenge-footer button.nav-step-button {
+  background: #102728;
+  color: #ffffff;
+  border-color: #6fbfb5;
+}
+
+html[data-theme='dark'] .challenge-footer button:hover:not(:disabled) {
+  filter: none;
+  box-shadow: 0 0 0 3px rgba(159, 245, 231, 0.14);
+}
+
+html[data-theme='dark'] .challenge-footer button:disabled {
+  background: #172223;
+  color: #78918f;
+  border-color: #294143;
 }
 
 html[data-theme='dark'] .profile-field input:disabled,

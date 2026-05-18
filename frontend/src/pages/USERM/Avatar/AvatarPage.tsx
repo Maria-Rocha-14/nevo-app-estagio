@@ -153,19 +153,35 @@ export default function AvatarPage() {
     }
   };
 
-  const getItemStatusLabel = (item: AvatarSelectableItem, isOwned: boolean, isSelected: boolean) => {
+  const getItemStatusLabel = (item: AvatarSelectableItem, isOwned: boolean, isSelected: boolean, canBuy: boolean) => {
     if (isSelected && !isOwned) return t('avatar.preview_locked');
     if (isSelected) return t('avatar.selected');
     if (isOwned) return t('avatar.unlocked');
     if (levelProgress.currentLevel < item.requiredLevel) {
       return t('avatar.requires_level', { level: item.requiredLevel });
     }
+    if (canBuy) return t('avatar.available');
     return t('avatar.buy_for', { points: item.cost });
+  };
+
+  const purchaseOrEquipAvatarItem = async (item: AvatarSelectableItem, avatarToSave: UserAvatar) => {
+    const isOwned = item.defaultUnlocked || unlockedItems.includes(item.unlockKey);
+    const nextUnlockedItems = isOwned ? unlockedItems : normalizeUnlockedAvatarItems([...unlockedItems, item.unlockKey]);
+    const nextPoints = isOwned ? availablePoints : availablePoints - item.cost;
+
+    setPreviewLockedItem(null);
+    setSelectedAvatar(avatarToSave);
+    setSavedAvatar(avatarToSave);
+    setAvailablePoints(nextPoints);
+    setUnlockedItems(nextUnlockedItems);
+    await persistAvatarState(avatarToSave, nextPoints, nextUnlockedItems);
+    setFeedback({ tone: 'success', message: isOwned ? t('avatar.equipped') : t('avatar.purchased') });
   };
 
   const handleAvatarItemClick = async (item: AvatarSelectableItem, avatarPatch: Partial<UserAvatar>) => {
     const isOwned = item.defaultUnlocked || unlockedItems.includes(item.unlockKey);
     const canBuy = !isOwned && levelProgress.currentLevel >= item.requiredLevel && availablePoints >= item.cost;
+    const canTry = !isOwned && levelProgress.currentLevel >= item.requiredLevel;
     const baseAvatar = previewLockedItem && (isOwned || canBuy) ? savedAvatar : selectedAvatar;
     const avatarToPreview: UserAvatar = {
       ...baseAvatar,
@@ -180,39 +196,86 @@ export default function AvatarPage() {
       return;
     }
 
-    if (!isOwned && availablePoints < item.cost) {
+    if (canTry) {
       setSelectedAvatar(avatarToPreview);
       setPreviewLockedItem(item);
-      setFeedback({ tone: 'warning', message: t('avatar.points_required_error', { points: item.cost }) });
+      setFeedback({ tone: 'info', message: t('avatar.trying_item') });
       return;
     }
 
-    const nextUnlockedItems = isOwned
-      ? unlockedItems
-      : normalizeUnlockedAvatarItems([...unlockedItems, item.unlockKey]);
-    const nextPoints = isOwned ? availablePoints : availablePoints - item.cost;
-    const avatarToSave: UserAvatar = {
-      ...avatarToPreview
-    };
-
     try {
       setIsUpdatingItem(true);
-      setPreviewLockedItem(null);
-      setSelectedAvatar(avatarToSave);
-      setSavedAvatar(avatarToSave);
-      setAvailablePoints(nextPoints);
-      setUnlockedItems(nextUnlockedItems);
-      await persistAvatarState(avatarToSave, nextPoints, nextUnlockedItems);
-      setFeedback({
-        tone: 'success',
-        message: isOwned ? t('avatar.equipped') : t('avatar.purchased')
-      });
+      await purchaseOrEquipAvatarItem(item, avatarToPreview);
     } catch (error) {
       console.error('Avatar item update error:', error);
       setFeedback({ tone: 'error', message: t('profile.error_update') });
     } finally {
       setIsUpdatingItem(false);
     }
+  };
+
+  const handleBuyPreviewItem = async (item: AvatarSelectableItem, event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    if (availablePoints < item.cost) {
+      setFeedback({ tone: 'warning', message: t('avatar.points_required_error', { points: item.cost }) });
+      return;
+    }
+
+    const avatarToSave: UserAvatar = {
+      ...selectedAvatar,
+      name: mascotName.trim()
+    };
+
+    try {
+      setIsUpdatingItem(true);
+      await purchaseOrEquipAvatarItem(item, avatarToSave);
+    } catch (error) {
+      console.error('Avatar item purchase error:', error);
+      setFeedback({ tone: 'error', message: t('profile.error_update') });
+    } finally {
+      setIsUpdatingItem(false);
+    }
+  };
+
+  const renderItemAction = (
+    item: AvatarSelectableItem,
+    isOwned: boolean,
+    levelLocked: boolean,
+    avatarPatch: Partial<UserAvatar>
+  ) => {
+    if (isOwned) return null;
+    if (levelLocked) return <Lock size={16} aria-hidden="true" />;
+
+    const isPreviewing = previewLockedItem?.unlockKey === item.unlockKey;
+
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        className={`avatar-item-action ${isPreviewing ? 'buy' : 'try'}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (!isPreviewing) {
+            setSelectedAvatar({
+              ...(previewLockedItem ? savedAvatar : selectedAvatar),
+              ...avatarPatch,
+              name: mascotName.trim()
+            });
+            setPreviewLockedItem(item);
+            setFeedback({ tone: 'info', message: t('avatar.trying_item') });
+            return;
+          }
+          void handleBuyPreviewItem(item, event);
+        }}
+        onKeyDown={(event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          event.currentTarget.click();
+        }}
+      >
+        {isPreviewing ? t('avatar.buy') : t('avatar.try_on')}
+      </span>
+    );
   };
 
   const handleSave = async () => {
@@ -231,7 +294,14 @@ export default function AvatarPage() {
       await persistAvatarState(avatarToSave);
       setSelectedAvatar(avatarToSave);
       setSavedAvatar(avatarToSave);
-      setFeedback({ tone: 'success', message: t('avatar.saved') });
+      navigate('/profile', {
+        state: {
+          feedback: {
+            tone: 'success',
+            message: t('avatar.saved')
+          }
+        }
+      });
     } catch (error) {
       console.error('Avatar save error:', error);
       setFeedback({ tone: 'error', message: t('profile.error_update') });
@@ -325,6 +395,7 @@ export default function AvatarPage() {
             const owned = outfit.defaultUnlocked || unlockedItems.includes(outfit.unlockKey);
             const levelLocked = levelProgress.currentLevel < outfit.requiredLevel;
             const selected = selectedAvatar.outfitId === outfit.id;
+            const canBuy = !owned && !levelLocked && availablePoints >= outfit.cost;
 
             return (
               <button
@@ -335,9 +406,9 @@ export default function AvatarPage() {
                 onClick={() => void handleAvatarItemClick(outfit, { outfitId: outfit.id, specialId: 'none' })}
               >
                 <span>{t(outfit.nameKey)}</span>
-                <small>{getItemStatusLabel(outfit, owned, selected)}</small>
+                <small>{getItemStatusLabel(outfit, owned, selected, canBuy)}</small>
                 <small>{t('avatar.item_requirements', { level: outfit.requiredLevel, points: outfit.cost })}</small>
-                {levelLocked && !owned && <Lock size={16} aria-hidden="true" />}
+                {renderItemAction(outfit, owned, levelLocked, { outfitId: outfit.id, specialId: 'none' })}
               </button>
             );
           })}
@@ -354,6 +425,7 @@ export default function AvatarPage() {
             const owned = accessory.defaultUnlocked || unlockedItems.includes(accessory.unlockKey);
             const levelLocked = levelProgress.currentLevel < accessory.requiredLevel;
             const selected = selectedAvatar.accessoryId === accessory.id;
+            const canBuy = !owned && !levelLocked && availablePoints >= accessory.cost;
 
             return (
               <button
@@ -364,9 +436,9 @@ export default function AvatarPage() {
                 onClick={() => void handleAvatarItemClick(accessory, { accessoryId: accessory.id, specialId: 'none' })}
               >
                 <span>{t(accessory.nameKey)}</span>
-                <small>{getItemStatusLabel(accessory, owned, selected)}</small>
+                <small>{getItemStatusLabel(accessory, owned, selected, canBuy)}</small>
                 <small>{t('avatar.item_requirements', { level: accessory.requiredLevel, points: accessory.cost })}</small>
-                {levelLocked && !owned && <Lock size={16} aria-hidden="true" />}
+                {renderItemAction(accessory, owned, levelLocked, { accessoryId: accessory.id, specialId: 'none' })}
               </button>
             );
           })}
@@ -383,6 +455,7 @@ export default function AvatarPage() {
             const owned = special.defaultUnlocked || unlockedItems.includes(special.unlockKey);
             const levelLocked = levelProgress.currentLevel < special.requiredLevel;
             const selected = selectedAvatar.specialId === special.id;
+            const canBuy = !owned && !levelLocked && availablePoints >= special.cost;
 
             return (
               <button
@@ -399,18 +472,22 @@ export default function AvatarPage() {
                 }
               >
                 <span>{t(special.nameKey)}</span>
-                <small>{getItemStatusLabel(special, owned, selected)}</small>
+                <small>{getItemStatusLabel(special, owned, selected, canBuy)}</small>
                 <small>{t('avatar.item_requirements', { level: special.requiredLevel, points: special.cost })}</small>
-                {levelLocked && !owned && <Lock size={16} aria-hidden="true" />}
+                {renderItemAction(special, owned, levelLocked, {
+                  specialId: special.id,
+                  outfitId: 'none',
+                  accessoryId: 'none'
+                })}
               </button>
             );
           })}
         </div>
       </section>
 
-      <button type="button" className="avatar-save-btn" onClick={handleSave} disabled={isSaving || Boolean(previewLockedItem)}>
+      <button type="button" className="avatar-save-btn" onClick={handleSave} disabled={isSaving}>
         <Save size={20} aria-hidden="true" />
-        {isSaving ? t('profile.saving') : previewLockedItem ? t('avatar.preview_locked_save') : t('avatar.save')}
+        {isSaving ? t('profile.saving') : t('avatar.save')}
       </button>
     </main>
   );

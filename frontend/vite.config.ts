@@ -11,9 +11,8 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000', 
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   },
@@ -37,7 +36,6 @@ export default defineConfig({
           if (id.includes('node_modules/jspdf')) {
             return 'vendor-pdf';
           }
-
           // Route chunks - one per major module
           if (id.includes('USERM/Login') || id.includes('USERM/Register')) {
             return 'page-auth';

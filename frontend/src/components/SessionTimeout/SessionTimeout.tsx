@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, LogOut } from 'lucide-react';
@@ -14,7 +14,7 @@ const getTimeoutConfig = () => {
   };
 };
 
-export default function SessionTimeout() {
+const SessionTimeout = memo(function SessionTimeout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,4 +122,6 @@ export default function SessionTimeout() {
       </div>
     </div>
   );
-}
+});
+
+export default SessionTimeout;
