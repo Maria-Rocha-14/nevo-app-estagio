@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   ArrowLeft, ArrowDownUp, Download, Eye, EyeOff, Languages, Lock, 
   Moon, Pencil, Save, ShieldCheck, Sun, UploadCloud, User as UserIcon, 
-  LogOut, Award, HelpCircle, Trophy, Medal, CheckCircle2 
+  LogOut, Award, HelpCircle, CheckCircle2 
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import ChameleonAvatar from '../../../components/ChameleonAvatar';
