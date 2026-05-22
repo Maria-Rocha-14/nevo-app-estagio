@@ -9,6 +9,7 @@ type ChameleonAvatarProps = {
   className?: string;
 };
 
+
 type AvatarImageModule = {
   default: string;
 };
