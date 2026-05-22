@@ -1,21 +1,21 @@
 [build]
-  # Comanda a Netlify a entrar na pasta frontend e a compilar o layout
+  # Comanda a Netlify a entrar na pasta frontend para compilar o layout
   base = "frontend"
   command = "npm run build"
   publish = "dist"
 
 [functions]
-  # Indica à Netlify que a tua pasta de backend/funções da API é a "api"
+  # Indica à Netlify onde está a pasta do teu backend Express
   directory = "../api"
 
 [[redirects]]
-  # Encaminha todos os pedidos de /api/* para o teu backend
+  # Encaminha as chamadas do teu React diretamente para as funções da Netlify
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/index/:splat"
   status = 200
 
 [[redirects]]
-  # Trata as rotas do React/Vite para evitar o erro 404
+  # Trata as rotas do React Router para evitar o erro 404
   from = "/*"
   to = "/index.html"
   status = 200
