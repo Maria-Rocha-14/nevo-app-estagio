@@ -1,0 +1,13 @@
+@startuml Geral-simplificado.puml
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as U
+actor "System Administrator" as A
+
+rectangle "Skin Lesion Gamification Web Platform" as App
+
+U --> App : Registers, scans lesions,\nlearns, earns rewards,\nand reviews history
+A --> App : Manages users, server-side\ncontent, badges, and scan rules
+@enduml

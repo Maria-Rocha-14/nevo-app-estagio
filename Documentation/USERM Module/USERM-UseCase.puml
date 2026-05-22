@@ -1,0 +1,31 @@
+@startuml USERM-UseCase.puml
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as U
+actor "System Administrator" as A
+
+rectangle "USERM Module" {
+  usecase "Register Account" as UC1
+  usecase "Accept Terms and\nPrivacy Policy" as UC2
+  usecase "Provide Birth Year and\nSkin History" as UC3
+  usecase "Login" as UC4
+  usecase "Admin Login" as UC5
+  usecase "Update Profile" as UC6
+  usecase "Customize Avatar" as UC7
+  usecase "Export / Import\nEncrypted Local Data" as UC8
+  usecase "Change Language and Theme" as UC9
+}
+
+U --> UC1
+U --> UC4
+U --> UC6
+U --> UC7
+U --> UC8
+U --> UC9
+A --> UC5
+
+UC1 .> UC2 : <<include>>
+UC1 .> UC3 : <<include>>
+@enduml

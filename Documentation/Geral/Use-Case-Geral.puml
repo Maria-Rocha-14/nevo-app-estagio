@@ -1,0 +1,23 @@
+@startuml Use-Case-Geral.puml
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as U
+actor "System Administrator" as A
+
+rectangle "Platform Overview" {
+  usecase "Register, Login and Profile\n(USERM)" as UC1
+  usecase "Capture / Upload Lesion Image\nand View Risk Assessment\n(ANLS)" as UC2
+  usecase "Learning, Points, XP,\nBadges and Avatar Rewards\n(GAMF)" as UC3
+  usecase "Scan History, Comparison\nand PDF Export\n(HIST)" as UC4
+  usecase "Admin Dashboard, Users,\nQuizzes, Badges and Scan Rules\n(ADMIN)" as UC5
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+
+A --> UC5
+@enduml

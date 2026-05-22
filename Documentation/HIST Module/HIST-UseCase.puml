@@ -1,0 +1,26 @@
+@startuml HIST-UseCase.puml
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as U
+
+rectangle "HIST Module" {
+  usecase "View Scan History Gallery" as UC1
+  usecase "Filter Scan History\nby Time Period" as UC2
+  usecase "Open Scan Details" as UC3
+  usecase "Side-by-Side Comparison" as UC4
+  usecase "View Risk Percentage\nin Comparison" as UC5
+  usecase "Export PDF Report" as UC6
+  usecase "Show Medical Disclaimer\nin PDF" as UC7
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC6
+
+UC4 .> UC5 : <<include>>
+UC6 .> UC7 : <<include>>
+@enduml
