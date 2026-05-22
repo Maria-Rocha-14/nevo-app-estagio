@@ -1,11 +1,34 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     react(),
-    basicSsl()
+    basicSsl(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.png'], // Certifica-te que tens este ficheiro na pasta 'public'
+      manifest: {
+        name: 'Nevo App',
+        short_name: 'Nevo',
+        description: 'App de gestão de lesões cutâneas',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: '/favicon.png', // Usa o teu ícone existente
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/favicon.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
   ],
   server: {
     allowedHosts: true,
