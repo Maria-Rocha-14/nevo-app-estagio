@@ -2,7 +2,7 @@
   "name": "nevo-app-estagio",
   "version": "1.0.0",
   "scripts": {
-    "build": "npm run build --workspace=frontend"
+    "build": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "cors": "^2.8.5",
