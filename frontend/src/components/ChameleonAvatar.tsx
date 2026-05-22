@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import type { UserAvatar } from '../db/db';
 import { DEFAULT_AVATAR } from '../services/avatar';
 import './ChameleonAvatar.css';
@@ -8,6 +8,13 @@ type ChameleonAvatarProps = {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
+
+type AvatarImageModule = {
+  default: string;
+};
+
+const avatarModules = import.meta.glob<AvatarImageModule>('../assets/avatar/**/*.png');
+const avatarSrcCache = new Map<string, string>();
 
 const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
   const prefix = avatar.colorId;
@@ -24,13 +31,26 @@ const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
 };
 
 const getAvatarAssetPath = (avatar: UserAvatar): string => {
-  // Se tiver um item especial selecionado
   if (avatar.specialId !== 'none') {
-    return `/avatar/${avatar.colorId}/${avatar.specialId}.png`;
+    return `../assets/avatar/${avatar.colorId}/${avatar.specialId}.png`;
   }
 
-  // Caminho da combinação normal (base + roupa + acessório)
-  return `/avatar/${avatar.colorId}/${buildAvatarCombinationFileName(avatar)}.png`;
+  const combinationPath = `../assets/avatar/${avatar.colorId}/${buildAvatarCombinationFileName(avatar)}.png`;
+  if (avatarModules[combinationPath]) {
+    return combinationPath;
+  }
+
+  return `../assets/avatar/${avatar.colorId}/nude.png`;
+};
+
+const loadAvatarSrc = async (path: string): Promise<string> => {
+  const cachedSrc = avatarSrcCache.get(path);
+  if (cachedSrc) return cachedSrc;
+
+  const loader = avatarModules[path] ?? avatarModules['../assets/avatar/green/nude.png'];
+  const module = await loader();
+  avatarSrcCache.set(path, module.default);
+  return module.default;
 };
 
 const ChameleonAvatar = memo(function ChameleonAvatar({
@@ -42,9 +62,29 @@ const ChameleonAvatar = memo(function ChameleonAvatar({
     ...DEFAULT_AVATAR,
     ...avatar
   }), [avatar]);
+  const assetPath = useMemo(() => getAvatarAssetPath(currentAvatar), [currentAvatar]);
+  const [imageSrc, setImageSrc] = useState(() => avatarSrcCache.get(assetPath) || '');
 
-  // O caminho agora é absoluto partindo da raiz da pasta public (ex: /avatar/green/nude.png)
-  const imageSrc = useMemo(() => getAvatarAssetPath(currentAvatar), [currentAvatar]);
+  useEffect(() => {
+    let cancelled = false;
+    const cachedSrc = avatarSrcCache.get(assetPath);
+
+    if (cachedSrc) {
+      setImageSrc(cachedSrc);
+      return;
+    }
+
+    setImageSrc('');
+    loadAvatarSrc(assetPath).then((src) => {
+      if (!cancelled) {
+        setImageSrc(src);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [assetPath]);
 
   return (
     <div
@@ -56,18 +96,10 @@ const ChameleonAvatar = memo(function ChameleonAvatar({
         <img
           className="chameleon-avatar-base"
           src={imageSrc}
-          alt="Mascote Camaleão personalizado"
+          alt=""
           aria-hidden="true"
           loading="lazy"
           decoding="async"
-          // Caso uma imagem falhe por não existir a combinação, carrega a versão "nude" da cor correspondente
-          onError={(e) => {
-            const target = e.currentTarget;
-            const fallback = `/avatar/${currentAvatar.colorId}/nude.png`;
-            if (target.src !== window.location.origin + fallback) {
-              target.src = fallback;
-            }
-          }}
         />
       )}
     </div>
