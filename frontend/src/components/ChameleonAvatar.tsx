@@ -21,9 +21,9 @@ const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
 
   const baseName =
     avatar.outfitId === 'coat' ? `${prefix}-lab-coat` :
-      avatar.outfitId === 'sweatshirt' ? `${prefix}-sweatshirt` :
-        avatar.outfitId === 'simpleTee' ? `${prefix}-t-shirt` :
-          `${prefix}-base`;
+    avatar.outfitId === 'sweatshirt' ? `${prefix}-sweatshirt` :
+    avatar.outfitId === 'simpleTee' ? `${prefix}-t-shirt` :
+    `${prefix}-base`;
 
   if (avatar.accessoryId === 'glasses') return `${baseName}-glasses`;
   if (avatar.accessoryId === 'stethoscope') return `${baseName}-stethoscope`;
