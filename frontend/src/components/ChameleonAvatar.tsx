@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo} from 'react';
 import type { UserAvatar } from '../db/db';
 import { DEFAULT_AVATAR } from '../services/avatar';
 import './ChameleonAvatar.css';
@@ -13,7 +13,8 @@ type AvatarImageModule = {
   default: string;
 };
 
-const avatarModules = import.meta.glob<AvatarImageModule>('../assets/avatar/**/*.png');
+// 1. Adicionamos { eager: true } para carregar todas as imagens no build
+const avatarModules = import.meta.glob<AvatarImageModule>('../assets/avatar/**/*.png', { eager: true });
 const avatarSrcCache = new Map<string, string>();
 
 const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
@@ -21,9 +22,9 @@ const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
 
   const baseName =
     avatar.outfitId === 'coat' ? `${prefix}-lab-coat` :
-    avatar.outfitId === 'sweatshirt' ? `${prefix}-sweatshirt` :
-    avatar.outfitId === 'simpleTee' ? `${prefix}-t-shirt` :
-    `${prefix}-base`;
+      avatar.outfitId === 'sweatshirt' ? `${prefix}-sweatshirt` :
+        avatar.outfitId === 'simpleTee' ? `${prefix}-t-shirt` :
+          `${prefix}-base`;
 
   if (avatar.accessoryId === 'glasses') return `${baseName}-glasses`;
   if (avatar.accessoryId === 'stethoscope') return `${baseName}-stethoscope`;
@@ -43,14 +44,19 @@ const getAvatarAssetPath = (avatar: UserAvatar): string => {
   return `../assets/avatar/${avatar.colorId}/nude.png`;
 };
 
-const loadAvatarSrc = async (path: string): Promise<string> => {
+// 2. Agora esta função é síncrona
+const getAvatarSrc = (path: string): string => {
   const cachedSrc = avatarSrcCache.get(path);
   if (cachedSrc) return cachedSrc;
 
-  const loader = avatarModules[path] ?? avatarModules['../assets/avatar/green/nude.png'];
-  const module = await loader();
-  avatarSrcCache.set(path, module.default);
-  return module.default;
+  const module = avatarModules[path] ?? avatarModules['../assets/avatar/green/nude.png'];
+
+  if (module && typeof module === 'object' && 'default' in module) {
+    const src = (module as AvatarImageModule).default;
+    avatarSrcCache.set(path, src);
+    return src;
+  }
+  return '';
 };
 
 const ChameleonAvatar = memo(function ChameleonAvatar({
@@ -62,29 +68,11 @@ const ChameleonAvatar = memo(function ChameleonAvatar({
     ...DEFAULT_AVATAR,
     ...avatar
   }), [avatar]);
+
   const assetPath = useMemo(() => getAvatarAssetPath(currentAvatar), [currentAvatar]);
-  const [imageSrc, setImageSrc] = useState(() => avatarSrcCache.get(assetPath) || '');
 
-  useEffect(() => {
-    let cancelled = false;
-    const cachedSrc = avatarSrcCache.get(assetPath);
-
-    if (cachedSrc) {
-      setImageSrc(cachedSrc);
-      return;
-    }
-
-    setImageSrc('');
-    loadAvatarSrc(assetPath).then((src) => {
-      if (!cancelled) {
-        setImageSrc(src);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [assetPath]);
+  // 3. Carregamento direto e síncrono
+  const imageSrc = useMemo(() => getAvatarSrc(assetPath), [assetPath]);
 
   return (
     <div
