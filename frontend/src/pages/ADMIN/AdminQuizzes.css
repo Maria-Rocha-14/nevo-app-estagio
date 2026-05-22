@@ -562,3 +562,369 @@
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
+
+@media (max-width: 820px) {
+    .admin-quizzes-wrapper,
+    .admin-page {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .header-titles h1 {
+        font-size: 23px;
+        line-height: 1.15;
+    }
+
+    .header-titles p {
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .btn-create-new,
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-danger-confirm {
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .btn-create-new {
+        width: 100%;
+        padding: 12px 16px;
+    }
+
+    .admin-panel {
+        min-height: 280px;
+    }
+
+    .admin-section-title {
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .admin-section-title h2 {
+        font-size: 18px;
+        line-height: 1.2;
+    }
+
+    .admin-empty-state-container {
+        min-height: 220px;
+        text-align: center;
+        padding: 18px;
+    }
+
+    .admin-table-wrap {
+        overflow: visible;
+        margin-top: 12px;
+    }
+
+    .admin-custom-table,
+    .admin-custom-table thead,
+    .admin-custom-table tbody,
+    .admin-custom-table tr,
+    .admin-custom-table th,
+    .admin-custom-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-custom-table thead {
+        display: none;
+    }
+
+    .admin-custom-table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .admin-custom-table tr {
+        background: white;
+        border: 1px solid #eaf2f1;
+        border-radius: 14px;
+        padding: 12px;
+        box-shadow: 0 8px 18px rgba(15, 35, 32, 0.05);
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .admin-custom-table td,
+    .admin-custom-table td.text-center,
+    .admin-users-table td.text-center {
+        display: grid;
+        grid-template-columns: minmax(92px, 34%) minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0 !important;
+        border: 0;
+        border-bottom: 1px solid #f1f5f9;
+        min-width: 0;
+        text-align: left !important;
+        font-size: 14px;
+    }
+
+    .admin-custom-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-quizzes-wrapper .admin-custom-table.admin-users-table td {
+        background: transparent !important;
+        border-top: 0 !important;
+    }
+
+    .admin-user-stats {
+        flex-wrap: wrap;
+    }
+
+    .admin-custom-table td::before {
+        color: #64748b;
+        content: "";
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .admin-quizzes-table td:nth-child(1)::before {
+        content: "Pergunta";
+    }
+
+    .admin-quizzes-table td:nth-child(2)::before {
+        content: "Tipo";
+    }
+
+    .admin-quizzes-table td:nth-child(3)::before {
+        content: "XP";
+    }
+
+    .admin-quizzes-table td:nth-child(4)::before {
+        content: "Fonte";
+    }
+
+    .admin-quizzes-table td:nth-child(5)::before {
+        content: "Acoes";
+    }
+
+    .admin-badges-table td:nth-child(1)::before {
+        content: "Badge";
+    }
+
+    .admin-badges-table td:nth-child(2)::before {
+        content: "Descricao";
+    }
+
+    .admin-badges-table td:nth-child(3)::before {
+        content: "Tipo";
+    }
+
+    .admin-badges-table td:nth-child(4)::before {
+        content: "Meta";
+    }
+
+    .admin-badges-table td:nth-child(5)::before {
+        content: "Premio XP";
+    }
+
+    .admin-badges-table td:nth-child(6)::before {
+        content: "Premio Pontos";
+    }
+
+    .admin-badges-table td:nth-child(7)::before {
+        content: "Acoes";
+    }
+
+    .admin-users-table td:nth-child(1)::before {
+        content: "Email";
+    }
+
+    .admin-users-table td:nth-child(2)::before {
+        content: "Idade";
+    }
+
+    .admin-users-table td:nth-child(3)::before {
+        content: "Historico";
+    }
+
+    .admin-users-table td:nth-child(4)::before {
+        content: "Estado";
+    }
+
+    .admin-users-table td:nth-child(5)::before {
+        content: "Acoes";
+    }
+
+    .admin-scan-settings-table td:nth-child(1)::before {
+        content: "Idade min.";
+    }
+
+    .admin-scan-settings-table td:nth-child(2)::before {
+        content: "Idade max.";
+    }
+
+    .admin-scan-settings-table td:nth-child(3)::before {
+        content: "Base";
+    }
+
+    .admin-scan-settings-table td:nth-child(4)::before {
+        content: "Alto risco";
+    }
+
+    .admin-scan-settings-table td:nth-child(5)::before {
+        content: "Acoes";
+    }
+
+    .td-main-text {
+        max-width: none;
+    }
+
+    .td-main-text strong {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .td-badge-name {
+        min-width: 0;
+    }
+
+    .td-desc,
+    .source-link,
+    .scan-count-badge {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-actions-cell {
+        justify-content: flex-start;
+        width: auto;
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .badge-type-tag {
+        width: fit-content;
+        max-width: 100%;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-custom-table .input-field.small {
+        width: min(120px, 100%);
+        min-height: 40px;
+    }
+
+    .admin-modal-overlay {
+        align-items: flex-end;
+        padding: 10px;
+    }
+
+    .admin-modal-content,
+    .confirm-dialog {
+        max-width: none !important;
+        width: 100%;
+        max-height: calc(100dvh - 20px);
+        border-radius: 20px;
+        padding: 20px !important;
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .modal-titles h2,
+    .modal-header h2 {
+        font-size: 19px;
+        line-height: 1.2;
+    }
+
+    .modal-close-x {
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+    }
+
+    .modal-form-body {
+        gap: 16px;
+    }
+
+    .options-section {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .option-input-group {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .option-input-group > input[type="radio"] {
+        margin-top: 14px;
+        flex: 0 0 auto;
+    }
+
+    .input-field {
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    .textarea {
+        min-height: 110px;
+    }
+
+    .modal-footer-fields {
+        gap: 14px;
+    }
+
+    .modal-footer-actions {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .modal-footer-actions button {
+        width: 100%;
+    }
+
+    .form-row-group {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .icon-selector-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .icon-option {
+        min-height: 46px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-custom-table td,
+    .admin-custom-table td.text-center,
+    .admin-users-table td.text-center {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .nav-item {
+        padding-inline: 11px;
+    }
+}

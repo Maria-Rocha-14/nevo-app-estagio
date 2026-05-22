@@ -167,10 +167,12 @@ export const completeChallengeOnce = async (challengeId: string, pointsToAdd: nu
     });
 
     status = 'awarded';
-
-    const atualizado = await db.users.get(userId);
-    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
   });
+
+  if ((status as string) === 'awarded') {
+    const updatedUser = await db.users.get(userId);
+    if (updatedUser) void achievementService.checkBadgeProgress(updatedUser, 'points', updatedUser.xp || 0);
+  }
 
   return status;
 };
@@ -237,36 +239,39 @@ export const completeDailyChallengesOnce = async (challenges: ChallengeCompletio
       xpAwarded,
       completedCount: uniquePendingChallenges.length
     };
-
-    const atualizado = await db.users.get(userId);
-    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
   });
+
+  if ((result.status as string) === 'awarded') {
+    const atualizado = await db.users.get(userId);
+    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', atualizado.xp || 0);
+  }
 
   return result;
 };
 
-// Atualização para a Missão Diária (IPMA)
 export const awardDailyMissionXp = async (xpToAdd: number, pointsToAdd = 0): Promise<void> => {
   const userId = getLoggedInUserId();
   if (!userId) return;
 
   const today = new Date().toISOString().split('T')[0];
+  let isAwarded = false;
 
   await db.transaction('rw', db.users, async () => {
     const current = await db.users.get(userId);
     if (!current || current.lastMissionDate === today) return;
 
-    const novoXp = (current.xp || 0) + xpToAdd;
-
     await db.users.update(userId, {
-      xp: novoXp,
+      xp: (current.xp || 0) + xpToAdd,
       points: (current.points || 0) + pointsToAdd,
       lastMissionDate: today
     });
-
-    const atualizado = await db.users.get(userId);
-    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', novoXp);
+    isAwarded = true;
   });
+
+  if (isAwarded) {
+    const atualizado = await db.users.get(userId);
+    if (atualizado) void achievementService.checkBadgeProgress(atualizado, 'points', atualizado.xp || 0);
+  }
 };
 
 export const appendAssessmentHistory = async (entry: AssessmentHistoryEntry): Promise<void> => {
@@ -277,23 +282,20 @@ export const appendAssessmentHistory = async (entry: AssessmentHistoryEntry): Pr
     const current = await db.users.get(userId);
     if (!current) return;
 
-    const novosScans = (current.scansCount || 0) + 1;
-    const novoXp = (current.xp || 0) + SCAN_XP_REWARD;
-
     await db.users.update(userId, {
-      scansCount: novosScans,
-      xp: novoXp,
+      scansCount: (current.scansCount || 0) + 1,
+      xp: (current.xp || 0) + SCAN_XP_REWARD,
       points: (current.points || 0) + SCAN_POINTS_REWARD,
       assessmentHistory: [...(current.assessmentHistory || []), entry]
     });
-
-    const atualizado = await db.users.get(userId);
-    if (atualizado) {
-      await achievementService.checkBadgeProgress(atualizado, 'scans', novosScans);
-      const utilizadorRecarregado = await db.users.get(userId);
-      if (utilizadorRecarregado) {
-        void achievementService.checkBadgeProgress(utilizadorRecarregado, 'points', novoXp);
-      }
-    }
   });
+
+  const atualizado = await db.users.get(userId);
+  if (atualizado) {
+    await achievementService.checkBadgeProgress(atualizado, 'scans', atualizado.scansCount || 0);
+    const utilizadorRecarregado = await db.users.get(userId);
+    if (utilizadorRecarregado) {
+      void achievementService.checkBadgeProgress(utilizadorRecarregado, 'points', utilizadorRecarregado.xp || 0);
+    }
+  }
 };

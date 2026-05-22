@@ -440,6 +440,10 @@
     margin-bottom: 14px;
   }
 
+  .avatar-page-with-feedback .avatar-preview-card {
+    top: calc(env(safe-area-inset-top, 0px) + 92px);
+  }
+
   .avatar-stage {
     height: 126px;
     border-radius: 14px;

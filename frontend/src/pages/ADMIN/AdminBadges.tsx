@@ -159,7 +159,7 @@ export default function AdminBadges() {
                         <div className="admin-empty-state-container"><Inbox size={48} color="#cbd5e1" /><p>Sem badges configurados.</p></div>
                     ) : (
                         <div className="admin-table-wrap">
-                            <table className="admin-custom-table">
+                            <table className="admin-custom-table admin-badges-table">
                                 <thead>
                                     <tr>
                                         <th>Badge</th>

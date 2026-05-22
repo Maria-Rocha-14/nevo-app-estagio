@@ -168,6 +168,7 @@
 }
 
 .primary-action,
+.phone-action,
 .secondary-action,
 .ghost-action {
   display: inline-flex;
@@ -178,12 +179,12 @@
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-}
-
-.primary-action {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.primary-action {
   border: none;
   background: linear-gradient(135deg, #12967e 0%, #0d7f6a 100%);
   color: #fff;
@@ -195,8 +196,20 @@
   overflow-wrap: anywhere;
 }
 
+.phone-action {
+  border: none;
+  background: linear-gradient(135deg, #e5484d 0%, #c43237 100%);
+  color: #fff;
+  padding: 12px 14px;
+  margin-top: 12px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  box-shadow: 0 4px 12px rgba(229, 72, 77, 0.2);
+}
+
 .secondary-action {
-  width: 100%;
   border: 1px solid #c5d4cf;
   background: #fff;
   color: #1f2d2a;
@@ -205,14 +218,16 @@
 }
 
 .ghost-action {
+  width: auto;
   border: 1px solid #c5d4cf;
   background: #fff;
   color: #1f2d2a;
   padding: 8px 12px;
 }
 
-.primary-action:hover {
-  filter: brightness(0.98);
+.primary-action:hover,
+.phone-action:hover {
+  filter: brightness(0.95);
 }
 
 .secondary-action:hover,
@@ -221,6 +236,7 @@
 }
 
 .primary-action:focus-visible,
+.phone-action:focus-visible,
 .secondary-action:focus-visible,
 .ghost-action:focus-visible {
   outline: 3px solid #0b5fff;
@@ -237,5 +253,44 @@
   .assessment-container {
     max-width: 960px;
     padding: 28px;
+  }
+}
+
+.doctor-verification-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.doctor-verification-btn:not(:disabled):hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.doctor-verification-btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.doctor-verification-btn.confirmed {
+  background-color: #ffffff !important;
+  color: #5fa79a !important;
+  cursor: default !important;
+  font-weight: 700;
+  box-shadow: none !important;
+  animation: popInCheck 0.3s ease-out;
+}
+
+.doctor-verification-btn:focus-visible {
+  outline: 3px solid #0b5fff;
+  outline-offset: 2px;
+}
+
+@keyframes popInCheck {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }

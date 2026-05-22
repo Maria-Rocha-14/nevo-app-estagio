@@ -311,7 +311,7 @@ export default function AvatarPage() {
   };
 
   return (
-    <main className="avatar-page" aria-labelledby="avatar-title">
+    <main className={`avatar-page ${feedback ? 'avatar-page-with-feedback' : ''}`} aria-labelledby="avatar-title">
       <header className="avatar-header">
         <button type="button" className="avatar-icon-btn" onClick={() => navigate('/profile')} aria-label={t('profile.back')}>
           <ArrowLeft size={22} aria-hidden="true" />

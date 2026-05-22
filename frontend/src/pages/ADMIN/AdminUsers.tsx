@@ -56,7 +56,7 @@ export default function AdminUsers() {
     const handleToggleStatus = async (user: any) => {
         const nextStatus = user.accountStatus === 'active' ? 'suspended' : 'active';
         try {
-            const response = await fetch(`http://127.0.0.1:5000/api/admin/users/${user._id}/status`, {
+            const response = await fetch(`/api/admin/users/${user._id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: nextStatus })
@@ -102,7 +102,7 @@ export default function AdminUsers() {
                     </div>
 
                     <div className="admin-table-wrap">
-                        <table className="admin-custom-table">
+                        <table className="admin-custom-table admin-users-table">
                             <thead>
                                 <tr>
                                     <th>Email</th>

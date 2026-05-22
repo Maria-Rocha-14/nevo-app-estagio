@@ -52,7 +52,8 @@
         "scan_confirm_pending": "Analysis confirmation is still under development.",
         "home_location_fallback": "Could not get your location. Showing an approximate UV index.",
         "home_mission_already_done": "You already completed today's daily mission.",
-        "home_mission_completed": "Mission completed successfully. +{{xp}} XP and +{{points}} points awarded."
+        "home_mission_completed": "Mission completed successfully. +{{xp}} XP and +{{points}} points awarded.",
+        "assessment_doctor_visit_reward": "Thank you for taking care of your health! You earned +50 Points!"
     },
     "nav": {
         "home": "Home",
@@ -153,7 +154,9 @@
         "back_to_history": "Back to history",
         "back_home": "Back to home",
         "missing_data_title": "No analysis data",
-        "missing_data_desc": "There is no submitted image yet to show results."
+        "missing_data_desc": "There is no submitted image yet to show results.",
+        "doctor_evaluated_status": "Evaluated by a Specialist",
+        "doctor_confirm_button": "I have been to a medical appointment (+50 Points)"
     },
     "learn": {
         "title": "Educational mini-challenges",
@@ -196,6 +199,10 @@
         "review_correct": "Correct answer. Points and XP awarded.",
         "review_wrong": "Wrong answer. No points or XP were awarded for this question.",
         "review_reward_earned": "+{{points}} points and +{{xp}} XP",
+        "start_title": "Today's challenge",
+        "start_desc": "Start when you are ready. Answers are only evaluated at the end.",
+        "start_quiz": "Start challenge",
+        "start_count": "{{count}} challenges",
         "summary_title": "Today's challenge summary",
         "summary_correct": "Correct",
         "summary_points": "Points",
@@ -302,7 +309,33 @@
         "challenge20_opt1": "When it changes, bleeds, forms persistent crust, or does not heal.",
         "challenge20_opt2": "Only if there is intense pain.",
         "challenge20_opt3": "Only after waiting several months.",
-        "challenge20_source": "NHS - melanoma warning signs"
+        "challenge20_source": "NHS - melanoma warning signs",
+        "challenge21_title": "Card: Choose the malignant lesion",
+        "challenge21_content": "Compare the two dermoscopy images and select the malignant lesion confirmed in ISIC metadata.",
+        "challenge21_source": "ISIC Archive - invasive melanoma and benign nevus",
+        "challenge22_title": "Card: Compare leg lesions",
+        "challenge22_content": "Look at both images and choose the malignant lesion. One is classified in ISIC as melanoma in situ.",
+        "challenge22_source": "ISIC Archive - melanoma in situ and benign nevus",
+        "challenge23_title": "Card: Malignant upper-limb lesion",
+        "challenge23_content": "Compare the two images and choose the malignant lesion confirmed by histopathology in ISIC Archive.",
+        "challenge23_source": "ISIC Archive - melanoma in situ and benign nevus",
+        "challenge24_title": "Quiz: Risk factors",
+        "challenge24_content": "Some personal and family history factors increase skin cancer risk.",
+        "challenge24_question": "Which factor can increase skin cancer risk?",
+        "challenge24_opt1": "Family history of skin cancer or a history of sunburns.",
+        "challenge24_opt2": "Wearing UV-protective clothing outdoors.",
+        "challenge24_opt3": "Applying sunscreen correctly.",
+        "challenge24_source": "CDC - skin cancer risk factors",
+        "challenge25_title": "Card: UV on cloudy days",
+        "challenge25_content": "On cloudy days and in winter, skin is no longer exposed to UV radiation.",
+        "challenge25_source": "AAD - sun protection on cloudy days",
+        "challenge26_title": "Quiz: Before going outdoors",
+        "challenge26_content": "Application timing also affects protection.",
+        "challenge26_question": "When should you apply sunscreen before going outdoors?",
+        "challenge26_opt1": "About 15 minutes before going outside.",
+        "challenge26_opt2": "Only after the skin starts turning red.",
+        "challenge26_opt3": "Only after returning home.",
+        "challenge26_source": "AAD - how to apply sunscreen"
     },
     "session_timeout": {
         "title": "Are you still there?",
@@ -349,7 +382,15 @@
         "pdf_exam_date": "Exam date: ",
         "pdf_prob": "Probability: ",
         "pdf_no_image": "No image available",
-        "pdf_err_image": "Error processing the image"
+        "pdf_err_image": "Error processing the image",
+        "doctor_visited_tooltip": "Medical appointment completed",
+        "loading_session": "Loading session...",
+        "filters_button": "Filters",
+        "filter_time_label": "Time Period",
+        "filter_body_all": "All body areas",
+        "filter_body_label": "Body Area",
+        "clear_filters_btn": "Clear",
+        "close_filters": "Apply"
     },
     "privacy": {
         "title": "Privacy Policy",

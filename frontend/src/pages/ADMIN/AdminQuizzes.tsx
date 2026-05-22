@@ -182,7 +182,7 @@ export default function AdminQuizzes() {
                         </div>
                     ) : (
                         <div className="admin-table-wrap">
-                            <table className="admin-custom-table">
+                            <table className="admin-custom-table admin-quizzes-table">
                                 <thead>
                                     <tr>
                                         <th>Pergunta</th>

@@ -226,3 +226,132 @@
     margin-left: auto;
     color: #ccc;
 }
+
+@media (max-width: 820px) {
+    .admin-layout {
+        display: block;
+        min-height: 100dvh;
+        background: #f8fdfc;
+    }
+
+    .admin-sidebar,
+    .collapsed .admin-sidebar {
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+        border-right: 0;
+        border-bottom: 1px solid #eaf2f1;
+        box-shadow: 0 8px 22px rgba(15, 35, 32, 0.08);
+        overflow: visible;
+    }
+
+    .sidebar-header {
+        margin-bottom: 10px;
+        justify-content: space-between;
+    }
+
+    .admin-brand h1 {
+        font-size: 18px;
+    }
+
+    .menu-toggle-btn {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .nav-item {
+        flex: 0 0 auto;
+        width: auto;
+        min-height: 44px;
+        padding: 10px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .nav-item svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .admin-main {
+        padding: 18px 14px calc(24px + env(safe-area-inset-bottom, 0px));
+        min-width: 0;
+    }
+
+    .main-header {
+        margin-bottom: 20px;
+    }
+
+    .main-header h1 {
+        font-size: 24px;
+        line-height: 1.15;
+    }
+
+    .main-header p {
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .stats-highlight-card {
+        align-items: flex-start;
+        padding: 18px;
+        border-radius: 14px;
+        margin-bottom: 22px;
+    }
+
+    .stats-icon-box,
+    .action-icon-circle {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+    }
+
+    .admin-separator {
+        margin: 18px 0;
+    }
+
+    .action-card-row {
+        padding: 16px;
+        border-radius: 14px;
+        align-items: flex-start;
+    }
+
+    .action-card-row:hover {
+        transform: none;
+    }
+
+    .action-content {
+        min-width: 0;
+    }
+
+    .action-content h3 {
+        font-size: 15px;
+    }
+
+    .action-content p {
+        font-size: 13px;
+        line-height: 1.35;
+    }
+}

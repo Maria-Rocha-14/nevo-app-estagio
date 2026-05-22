@@ -17,7 +17,20 @@ export async function exportHistoryToPDF(
 
   doc.setFontSize(16);
   doc.text(t('history_page.pdf_title'), pageWidth / 2, yPos, { align: 'center' });
-  yPos += 15;
+  yPos += 10;
+
+  const disclaimerText = `${t('home.warning')}: ${t('home.medical_warning_text')}`;
+  const disclaimerLines = doc.splitTextToSize(disclaimerText, pageWidth - 48);
+  const disclaimerHeight = Math.max(16, disclaimerLines.length * 5 + 8);
+
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(251, 146, 60);
+  doc.roundedRect(20, yPos, pageWidth - 40, disclaimerHeight, 3, 3, 'FD');
+  doc.setFontSize(9);
+  doc.setTextColor(124, 45, 18);
+  doc.text(disclaimerLines, 24, yPos + 7);
+  doc.setTextColor(0, 0, 0);
+  yPos += disclaimerHeight + 10;
 
   doc.setFontSize(11);
   doc.text(`${t('history_page.pdf_patient')}${user?.name || '---'}`, 20, yPos);

@@ -21,7 +21,7 @@ const createDemoUser = (): User => ({
   points: 9999,
   weeksStreak: 52,
   scansCount: 12,
-  earnedBadges:[],
+  earnedBadges: [],
   lastMissionDate: new Date().toISOString().split('T')[0],
   avatar: {
     name: 'Nemi',

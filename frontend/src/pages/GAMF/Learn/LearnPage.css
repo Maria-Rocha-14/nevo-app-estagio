@@ -447,6 +447,16 @@
   gap: 14px;
 }
 
+.quiz-start-card {
+  min-height: 0;
+  gap: 14px;
+}
+
+.quiz-start-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .quiz-summary-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

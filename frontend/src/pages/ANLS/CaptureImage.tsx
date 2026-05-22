@@ -97,7 +97,7 @@ export default function CaptureImage() {
 
     const startCamera = async (facingMode: CameraFacingMode = cameraFacingMode) => {
         if (!navigator.mediaDevices?.getUserMedia) {
-            setFeedback({ tone: 'warning', message: t('feedback.scan_camera_unavailable') });
+            setFeedback({ tone: 'warning', message: t('feedback.scan_camera_unavailable', 'Câmara não disponível neste dispositivo.') });
             return;
         }
 
@@ -118,7 +118,7 @@ export default function CaptureImage() {
                 }
             }, 100);
         } catch {
-            setFeedback({ tone: 'error', message: t('feedback.scan_camera_permission_denied') });
+            setFeedback({ tone: 'error', message: t('feedback.scan_camera_permission_denied', 'Permissão de acesso à câmara rejeitada.') });
         }
     };
 
@@ -148,7 +148,7 @@ export default function CaptureImage() {
                         setSelectedFileName(`camera_${Date.now()}.jpg`);
                         setSelectedFileSize(blob.size);
                         setSelectedBodyArea('');
-                        setFeedback({ tone: 'success', message: t('feedback.scan_image_loaded') || 'Fotografia capturada com sucesso.' });
+                        setFeedback({ tone: 'success', message: t('feedback.scan_image_captured', 'Fotografia capturada com sucesso.') });
                         stopCamera();
                     }
                 }, 'image/jpeg', 0.9);
@@ -182,7 +182,7 @@ export default function CaptureImage() {
 
         // 🔹 Validação básica → só imagens
         if (!file.type.startsWith('image/')) {
-            setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image') });
+            setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image', 'O ficheiro selecionado não é uma imagem válida.') });
             return;
         }
 
@@ -193,7 +193,7 @@ export default function CaptureImage() {
         setSelectedFileName(file.name);
         setSelectedFileSize(file.size);
         setSelectedBodyArea('');
-        setFeedback({ tone: 'success', message: t('feedback.scan_image_loaded') });
+        setFeedback({ tone: 'success', message: t('feedback.scan_image_loaded', 'Imagem carregada com sucesso.') });
     };
 
     // 🔹 Cancelar preview → volta ao estado inicial
@@ -203,7 +203,7 @@ export default function CaptureImage() {
         setSelectedFileName('');
         setSelectedFileSize(0);
         setSelectedBodyArea('');
-        setFeedback({ tone: 'info', message: t('feedback.scan_selection_canceled') });
+        setFeedback({ tone: 'info', message: t('feedback.scan_selection_canceled', 'Seleção cancelada.') });
     };
 
     const fileToBase64 = (fileOrBlob: Blob): Promise<string> => {
@@ -217,23 +217,24 @@ export default function CaptureImage() {
 
     const handleConfirm = async () => {
         if (!selectedImage || !selectedFileBlob) {
-            setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image') });
+            setFeedback({ tone: 'error', message: t('feedback.scan_invalid_image', 'O ficheiro selecionado não é uma imagem válida.') });
             return;
         }
 
         if (!selectedBodyArea) {
-            setFeedback({ tone: 'warning', message: t('feedback.scan_body_area_required') });
+            setFeedback({ tone: 'warning', message: t('feedback.scan_body_area_required', 'Por favor, selecione a zona do corpo.') });
             return;
         }
 
         const bodyAreaLabel = t(`scan.body_area_${selectedBodyArea}`);
         const mockAssessment = getMockAssessment(selectedFileSize);
+        const isoDate = new Date().toISOString();
 
         try {
             const base64Image = await fileToBase64(selectedFileBlob);
 
             await appendAssessmentHistory({
-                createdAt: new Date().toISOString(),
+                createdAt: isoDate,
                 fileName: selectedFileName,
                 imageUrl: base64Image,
                 bodyAreaId: selectedBodyArea,
@@ -251,13 +252,17 @@ export default function CaptureImage() {
                     probability: mockAssessment.probability,
                     riskLevel: mockAssessment.riskLevel,
                     isSimulated: true,
+                    createdAt: isoDate,
                     returnTo: '/scan'
                 }
             });
         } catch (error: unknown) {
-            console.error("ERRO COMPLETO:", error);
+            console.error("ERRO COMPLETO CAPTURADO:", error);
             const message = error instanceof Error ? error.message : String(error);
-            setFeedback({ tone: 'error', message: `Erro ao processar: ${message}` });
+            setFeedback({
+                tone: 'error',
+                message: t('feedback.scan_process_error', { error: message, defaultValue: 'Erro ao processar: {{error}}' })
+            });
         }
     };
 
@@ -266,7 +271,7 @@ export default function CaptureImage() {
 
             {/* 🔹 HEADER */}
             <header className="capture-header">
-                <h1>{t('scan.title')}</h1>
+                <h1>{t('scan.title', 'Análise de Pele')}</h1>
             </header>
 
             {feedback && (
@@ -293,26 +298,28 @@ export default function CaptureImage() {
 
                         {/* Tirar Foto */}
                         <button
+                            type="button"
                             className="scan-option-card"
                             onClick={() => void startCamera()}
                         >
                             <div className="scan-option-icon camera-icon">
                                 <Camera size={30} color="#5fa79a" strokeWidth={2.3} />
                             </div>
-                            <h3>{t('scan.take_photo')}</h3>
-                            <p>{t('scan.take_photo_desc')}</p>
+                            <h3>{t('scan.take_photo', 'Tirar Fotografia')}</h3>
+                            <p>{t('scan.take_photo_desc', 'Use a câmara do seu dispositivo para capturar uma lesão cutânea.')}</p>
                         </button>
 
                         {/* 🔹 Upload da galeria (funcional) */}
                         <button
+                            type="button"
                             className="scan-option-card"
                             onClick={handleOpenGallery}
                         >
                             <div className="scan-option-icon upload-icon">
                                 <Upload size={30} color="#4a90e2" strokeWidth={2.3} />
                             </div>
-                            <h3>{t('scan.upload_gallery')}</h3>
-                            <p>{t('scan.upload_gallery_desc')}</p>
+                            <h3>{t('scan.upload_gallery', 'Carregar da Galeria')}</h3>
+                            <p>{t('scan.upload_gallery_desc', 'Escolha uma imagem guardada previamente no seu rolo de câmara.')}</p>
                         </button>
                     </section>
 
@@ -320,15 +327,15 @@ export default function CaptureImage() {
                     <section className="scan-tips-card">
                         <div className="scan-tips-title">
                             <Lightbulb size={18} color="#f4b400" />
-                            <h3>{t('scan.tips_title')}</h3>
+                            <h3>{t('scan.tips_title', 'Dicas para uma boa captura')}</h3>
                         </div>
 
                         <ul className="scan-tips-list">
-                            <li>{t('scan.tip_1')}</li>
-                            <li>{t('scan.tip_2')}</li>
-                            <li>{t('scan.tip_3')}</li>
-                            <li>{t('scan.tip_4')}</li>
-                            <li>{t('scan.tip_5')}</li>
+                            <li>{t('scan.tip_1', 'Garanta uma iluminação clara e natural sobre a zona.')}</li>
+                            <li>{t('scan.tip_2', 'Aproxime e foque a lente diretamente sobre o sinal/lesão.')}</li>
+                            <li>{t('scan.tip_3', 'Evite tremer o dispositivo e remova acessórios ou roupa.')}</li>
+                            <li>{t('scan.tip_4', 'Limpe o vidro da lente da câmara antes de disparar.')}</li>
+                            <li>{t('scan.tip_5', 'Certifique-se de que a imagem não fica desfocada ou escura.')}</li>
                         </ul>
                     </section>
                 </>
@@ -341,20 +348,20 @@ export default function CaptureImage() {
                         <video ref={videoRef} className={`camera-video ${cameraFacingMode === 'user' ? 'front-camera' : ''}`} playsInline />
                         <div className="camera-overlay">
                             <div className="reticle"></div>
-                            <p className="camera-hint">{t('scan.camera_hint') || 'Centre a lesão no círculo'}</p>
+                            <p className="camera-hint">{t('scan.camera_hint', 'Centre a lesão no círculo')}</p>
                         </div>
                     </div>
                     <canvas ref={canvasRef} style={{ display: 'none' }} />
                     <div className="camera-actions">
-                        <button className="capture-btn" onClick={takePhoto}>
+                        <button type="button" className="capture-btn" onClick={takePhoto} aria-label={t('scan.capture_aria', 'Capturar fotografia')}>
                             <Camera size={32} />
                         </button>
-                        <button className="switch-camera-btn" onClick={switchCamera}>
+                        <button type="button" className="switch-camera-btn" onClick={switchCamera}>
                             <SwitchCamera size={20} />
-                            {cameraFacingMode === 'environment' ? 'Frontal' : 'Traseira'}
+                            {cameraFacingMode === 'environment' ? t('scan.facing_front', 'Frontal') : t('scan.facing_back', 'Traseira')}
                         </button>
-                        <button className="cancel-camera-btn" onClick={stopCamera}>
-                            Cancelar
+                        <button type="button" className="cancel-camera-btn" onClick={stopCamera}>
+                            {t('scan.cancel', 'Cancelar')}
                         </button>
                     </div>
                 </div>
@@ -372,8 +379,8 @@ export default function CaptureImage() {
                     />
 
                     {/* Botões de ação */}
-                    <div className="body-area-controls" aria-label={t('scan.body_area_label')}>
-                        <p>{t('scan.body_area_title')}</p>
+                    <div className="body-area-controls" aria-label={t('scan.body_area_label', 'Seleção da zona corporal')}>
+                        <p>{t('scan.body_area_title', 'Onde se localiza a lesão?')}</p>
                         <div className="body-area-options">
                             {BODY_AREA_IDS.map((areaId) => (
                                 <button
@@ -382,7 +389,7 @@ export default function CaptureImage() {
                                     className={`body-area-option ${selectedBodyArea === areaId ? 'active' : ''}`}
                                     onClick={() => setSelectedBodyArea(areaId)}
                                 >
-                                    {t(`scan.body_area_${areaId}`)}
+                                    {t(`scan.body_area_${areaId}`, areaId)}
                                 </button>
                             ))}
                         </div>
@@ -390,42 +397,44 @@ export default function CaptureImage() {
 
                     <div className="preview-actions">
                         <button
+                            type="button"
                             className="confirm-btn"
                             onClick={handleConfirm}
                         >
-                            Confirmar
+                            {t('scan.confirm', 'Confirmar')}
                         </button>
 
                         <button
+                            type="button"
                             className="cancel-btn"
                             onClick={handleCancel}
                         >
-                            Cancelar
+                            {t('scan.cancel', 'Cancelar')}
                         </button>
                     </div>
                 </div>
             )}
 
             {/* 🔹 NAVBAR */}
-            <nav className="bottom-navbar">
-                <button className="nav-btn" onClick={() => navigate('/homepage')}>
+            <nav className="bottom-navbar" aria-label={t('scan.nav_aria', 'Menu principal de navegação')}>
+                <button type="button" className="nav-btn" onClick={() => navigate('/homepage')}>
                     <Home size={24} />
-                    <span>{t('nav.home')}</span>
+                    <span>{t('nav.home', 'Início')}</span>
                 </button>
 
-                <button className="nav-btn active">
+                <button type="button" className="nav-btn active">
                     <Camera size={24} />
-                    <span>{t('nav.scan')}</span>
+                    <span>{t('nav.scan', 'Scanner')}</span>
                 </button>
 
-                <button className="nav-btn" onClick={() => navigate('/history')}>
+                <button type="button" className="nav-btn" onClick={() => navigate('/history')}>
                     <History size={24} />
-                    <span>{t('nav.history')}</span>
+                    <span>{t('nav.history', 'Histórico')}</span>
                 </button>
 
-                <button className="nav-btn" onClick={() => navigate('/learn')}>
+                <button type="button" className="nav-btn" onClick={() => navigate('/learn')}>
                     <BookOpen size={24} />
-                    <span>{t('nav.learn')}</span>
+                    <span>{t('nav.learn', 'Aprender')}</span>
                 </button>
             </nav>
         </div>

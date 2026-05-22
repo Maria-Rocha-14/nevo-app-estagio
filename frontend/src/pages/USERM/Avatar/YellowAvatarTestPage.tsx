@@ -22,15 +22,12 @@ import yellowProgrammerAvatar from '../../../assets/avatar/yellow/programmer.png
 import yellowTennisAvatar from '../../../assets/avatar/yellow/tennis.png';
 import yellowLabCoatAvatar from '../../../assets/avatar/yellow/yellow-lab-coat.png';
 import yellowLabCoatGlassesAvatar from '../../../assets/avatar/yellow/yellow-lab-coat-glasses.png';
-import yellowLabCoatGlassesStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-lab-coat-glasses-stethoscope.png';
 import yellowLabCoatStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-lab-coat-stethoscope.png';
 import yellowSweatshirtAvatar from '../../../assets/avatar/yellow/yellow-sweatshirt.png';
 import yellowSweatshirtGlassesAvatar from '../../../assets/avatar/yellow/yellow-sweatshirt-glasses.png';
-import yellowSweatshirtGlassesStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-sweatshirt-glasses-stethoscope.png';
 import yellowSweatshirtStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-sweatshirt-stethoscope.png';
 import yellowTShirtAvatar from '../../../assets/avatar/yellow/yellow-t-shirt.png';
 import yellowTShirtGlassesAvatar from '../../../assets/avatar/yellow/yellow-t-shirt-glasses.png';
-import yellowTShirtGlassesStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-t-shirt-glasses-stethoscope.png';
 import yellowTShirtStethoscopeAvatar from '../../../assets/avatar/yellow/yellow-t-shirt-stethoscope.png';
 import './YellowAvatarTestPage.css';
 
@@ -39,15 +36,12 @@ const yellowAvatars = [
   ['Lab coat', yellowLabCoatAvatar],
   ['Lab coat + glasses', yellowLabCoatGlassesAvatar],
   ['Lab coat + stethoscope', yellowLabCoatStethoscopeAvatar],
-  ['Lab coat + glasses + stethoscope', yellowLabCoatGlassesStethoscopeAvatar],
   ['Sweatshirt', yellowSweatshirtAvatar],
   ['Sweatshirt + glasses', yellowSweatshirtGlassesAvatar],
   ['Sweatshirt + stethoscope', yellowSweatshirtStethoscopeAvatar],
-  ['Sweatshirt + glasses + stethoscope', yellowSweatshirtGlassesStethoscopeAvatar],
   ['T-shirt', yellowTShirtAvatar],
   ['T-shirt + glasses', yellowTShirtGlassesAvatar],
-  ['T-shirt + stethoscope', yellowTShirtStethoscopeAvatar],
-  ['T-shirt + glasses + stethoscope', yellowTShirtGlassesStethoscopeAvatar]
+  ['T-shirt + stethoscope', yellowTShirtStethoscopeAvatar]
 ] as const;
 
 const specialAvatars = [

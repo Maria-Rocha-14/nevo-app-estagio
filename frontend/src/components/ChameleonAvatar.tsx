@@ -16,14 +16,14 @@ type AvatarImageModule = {
 const avatarModules = import.meta.glob<AvatarImageModule>('../assets/avatar/**/*.png');
 const avatarSrcCache = new Map<string, string>();
 
-const getYellowAvatarFileName = (avatar: UserAvatar): string => {
-  if (avatar.specialId !== 'none') return avatar.specialId;
+const buildAvatarCombinationFileName = (avatar: UserAvatar): string => {
+  const prefix = avatar.colorId;
 
   const baseName =
-    avatar.outfitId === 'coat' ? 'yellow-lab-coat' :
-    avatar.outfitId === 'sweatshirt' ? 'yellow-sweatshirt' :
-    avatar.outfitId === 'simpleTee' ? 'yellow-t-shirt' :
-    'yellow-base';
+    avatar.outfitId === 'coat' ? `${prefix}-lab-coat` :
+    avatar.outfitId === 'sweatshirt' ? `${prefix}-sweatshirt` :
+    avatar.outfitId === 'simpleTee' ? `${prefix}-t-shirt` :
+    `${prefix}-base`;
 
   if (avatar.accessoryId === 'glasses') return `${baseName}-glasses`;
   if (avatar.accessoryId === 'stethoscope') return `${baseName}-stethoscope`;
@@ -31,12 +31,13 @@ const getYellowAvatarFileName = (avatar: UserAvatar): string => {
 };
 
 const getAvatarAssetPath = (avatar: UserAvatar): string => {
-  if (avatar.colorId === 'yellow') {
-    return `../assets/avatar/yellow/${getYellowAvatarFileName(avatar)}.png`;
-  }
-
   if (avatar.specialId !== 'none') {
     return `../assets/avatar/${avatar.colorId}/${avatar.specialId}.png`;
+  }
+
+  const combinationPath = `../assets/avatar/${avatar.colorId}/${buildAvatarCombinationFileName(avatar)}.png`;
+  if (avatarModules[combinationPath]) {
+    return combinationPath;
   }
 
   return `../assets/avatar/${avatar.colorId}/nude.png`;

@@ -1,42 +1,33 @@
-# Avatar Assets
+# Avatar assets
 
-Avatar images are final combined PNGs. Keep every file on the same transparent
-canvas and with the character aligned in the same position so switching options
-feels smooth.
+Each color folder contains the same 16 PNG avatars. Files use English names and
+are loaded dynamically by `ChameleonAvatar`.
 
-Current canvas: `1080x1350`.
+Required folders:
 
-## Color Folders
+- `blue`
+- `green`
+- `red`
+- `yellow`
 
-Use one folder per chameleon color:
+Required files per color:
 
-- `blue/`
-- `green/`
-- `red/`
-- `yellow/`
-
-Each color folder should contain:
-
-- `nude.png`
-- `football.png`
-- `programmer.png`
 - `doctor.png`
+- `football.png`
+- `nude.png`
+- `programmer.png`
 - `tennis.png`
+- `<color>-base-glasses.png`
+- `<color>-base-stethoscope.png`
+- `<color>-lab-coat.png`
+- `<color>-lab-coat-glasses.png`
+- `<color>-lab-coat-stethoscope.png`
+- `<color>-sweatshirt.png`
+- `<color>-sweatshirt-glasses.png`
+- `<color>-sweatshirt-stethoscope.png`
+- `<color>-t-shirt.png`
+- `<color>-t-shirt-glasses.png`
+- `<color>-t-shirt-stethoscope.png`
 
-The `nude.png` image is used for the no-outfit state. The other files are used
-by the rarer `specials` category.
-
-The yellow folder also keeps the older yellow outfit combinations:
-
-- `yellow-t-shirt.png`
-- `yellow-t-shirt-glasses.png`
-- `yellow-t-shirt-stethoscope.png`
-- `yellow-t-shirt-glasses-stethoscope.png`
-- `yellow-sweatshirt.png`
-- `yellow-sweatshirt-glasses.png`
-- `yellow-sweatshirt-stethoscope.png`
-- `yellow-sweatshirt-glasses-stethoscope.png`
-- `yellow-lab-coat.png`
-- `yellow-lab-coat-glasses.png`
-- `yellow-lab-coat-stethoscope.png`
-- `yellow-lab-coat-glasses-stethoscope.png`
+All final PNGs should stay on a transparent `1080x1350` canvas so changing
+clothes, accessories, colors, or specials feels smooth in the app.

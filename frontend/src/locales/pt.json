@@ -31,7 +31,7 @@
         "no": "Não",
         "pnr": "Prefiro não responder",
         "password_policy_error": "A palavra-passe deve ter pelo menos 8 caracteres, incluir maiúsculas, minúsculas, números e um caráter especial.",
-        "birth_year_error": "Introduza um ano de nascimento valido entre 1900 e {{currentYear}}."
+        "birth_year_error": "Introduza um ano de nascimento válido entre 1900 e {{currentYear}}."
     },
     "errors": {
         "user_not_found": "Esta conta não existe.",
@@ -52,7 +52,8 @@
         "scan_confirm_pending": "Confirmacao de analise ainda em desenvolvimento.",
         "home_location_fallback": "Nao foi possivel obter a localizacao. A mostrar indice UV aproximado.",
         "home_mission_already_done": "Ja completaste a missao diaria de hoje.",
-        "home_mission_completed": "Missao concluida com sucesso. +{{xp}} XP e +{{points}} pontos atribuidos."
+        "home_mission_completed": "Missao concluida com sucesso. +{{xp}} XP e +{{points}} pontos atribuidos.",
+        "assessment_doctor_visit_reward": "Obrigado por cuidares da tua saúde! Ganhaste +50 Pontos!"
     },
     "nav": {
         "home": "Início",
@@ -128,7 +129,10 @@
         "body_area_left_leg": "Perna esquerda",
         "body_area_right_leg": "Perna direita",
         "body_area_left_foot": "Pe esquerdo",
-        "body_area_right_foot": "Pe direito"
+        "body_area_right_foot": "Pe direito",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+
     },
     "assessment": {
         "title": "Resultado da Análise",
@@ -153,7 +157,9 @@
         "back_to_history": "Voltar ao histórico",
         "back_home": "Voltar ao início",
         "missing_data_title": "Sem dados de análise",
-        "missing_data_desc": "Ainda não existe uma imagem submetida para apresentar resultados."
+        "missing_data_desc": "Ainda não existe uma imagem submetida para apresentar resultados.",
+        "doctor_evaluated_status": "Avaliado por um Especialista",
+        "doctor_confirm_button": "Já fui a uma consulta médica (+50 Pontos)"
     },
     "learn": {
         "title": "Mini-desafios de aprendizagem",
@@ -196,6 +202,10 @@
         "review_correct": "Resposta correta. Pontos e XP atribuídos.",
         "review_wrong": "Resposta errada. Não recebeu pontos nem XP nesta pergunta.",
         "review_reward_earned": "+{{points}} points and +{{xp}} XP",
+        "start_title": "Challenge de hoje",
+        "start_desc": "Começa quando estiveres pronto. As respostas só são avaliadas no fim.",
+        "start_quiz": "Iniciar challenge",
+        "start_count": "{{count}} desafios",
         "summary_title": "Resumo dos desafios de hoje",
         "summary_correct": "Certas",
         "summary_points": "Pontos",
@@ -302,7 +312,33 @@
         "challenge20_opt1": "Quando muda, sangra, faz crosta persistente ou não cicatriza.",
         "challenge20_opt2": "Apenas se houver dor intensa.",
         "challenge20_opt3": "Somente após vários meses de espera.",
-        "challenge20_source": "NHS - sinais de alerta de melanoma"
+        "challenge20_source": "NHS - sinais de alerta de melanoma",
+        "challenge21_title": "Card: Escolher a lesao maligna",
+        "challenge21_content": "Compare as duas imagens de dermatoscopia e selecione a lesao maligna confirmada nos metadados ISIC.",
+        "challenge21_source": "ISIC Archive - melanoma invasivo e nevo benigno",
+        "challenge22_title": "Card: Comparar lesoes da perna",
+        "challenge22_content": "Observe as duas imagens e escolha a lesao maligna. Uma delas esta classificada no ISIC como melanoma in situ.",
+        "challenge22_source": "ISIC Archive - melanoma in situ e nevo benigno",
+        "challenge23_title": "Card: Lesao maligna no membro superior",
+        "challenge23_content": "Compare as duas imagens e escolha a lesao maligna confirmada por histopatologia no ISIC Archive.",
+        "challenge23_source": "ISIC Archive - melanoma in situ e nevo benigno",
+        "challenge24_title": "Quiz: Fatores de risco",
+        "challenge24_content": "Alguns historicos pessoais e familiares aumentam o risco de cancro da pele.",
+        "challenge24_question": "Qual destes fatores pode aumentar o risco de cancro da pele?",
+        "challenge24_opt1": "Historico familiar de cancro da pele ou historico de queimaduras solares.",
+        "challenge24_opt2": "Usar roupa de protecao UV ao ar livre.",
+        "challenge24_opt3": "Aplicar protetor solar corretamente.",
+        "challenge24_source": "CDC - fatores de risco do cancro da pele",
+        "challenge25_title": "Card: UV em dias nublados",
+        "challenge25_content": "Em dias nublados e no inverno, a pele deixa de estar exposta a radiacao UV.",
+        "challenge25_source": "AAD - protecao solar em dias nublados",
+        "challenge26_title": "Quiz: Antes de sair ao sol",
+        "challenge26_content": "O momento de aplicacao tambem influencia a protecao.",
+        "challenge26_question": "Quando deve aplicar protetor solar antes de sair?",
+        "challenge26_opt1": "Cerca de 15 minutos antes de ir para o exterior.",
+        "challenge26_opt2": "Apenas depois da pele comecar a ficar vermelha.",
+        "challenge26_opt3": "So depois de voltar para casa.",
+        "challenge26_source": "AAD - como aplicar protetor solar"
     },
     "session_timeout": {
         "title": "Ainda estás aí?",
@@ -349,7 +385,16 @@
         "pdf_exam_date": "Data do exame: ",
         "pdf_prob": "Probabilidade: ",
         "pdf_no_image": "Sem imagem disponível",
-        "pdf_err_image": "Erro ao processar a imagem"
+        "pdf_err_image": "Erro ao processar a imagem",
+        "date_unavailable": "Data indisponível",
+        "doctor_visited_tooltip": "Consulta médica realizada",
+        "loading_session": "A carregar sessão...",
+        "filters_button": "Filtros",
+        "filter_time_label": "Período de Tempo",
+        "filter_body_all": "Todas as zonas",
+        "filter_body_label": "Zona do Corpo",
+        "clear_filters_btn": "Limpar",
+        "close_filters": "Aplicar"
     },
     "privacy": {
         "title": "Política de Privacidade",

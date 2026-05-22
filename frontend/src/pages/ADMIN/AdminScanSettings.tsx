@@ -122,7 +122,7 @@ export default function AdminScanSettings() {
                         </div>
                     ) : (
                         <div className="admin-table-wrap">
-                            <table className="admin-custom-table">
+                            <table className="admin-custom-table admin-scan-settings-table">
                                 <thead>
                                     <tr>
                                         <th>Idade Mín.</th>

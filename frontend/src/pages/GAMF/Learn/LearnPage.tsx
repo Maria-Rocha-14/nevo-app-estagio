@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { BookOpen, Brain, Camera, History, Home, ShieldCheck, Sparkles, SunMedium } from 'lucide-react';
 import { completeDailyChallengesOnce, useSessionUser } from '../../../services/session';
 import { db } from '../../../db/db';
-import type { AdminQuiz } from '../../../db/db';
 import FeedbackMessage from '../../../components/FeedbackMessage';
-import { api } from '../../../services/api'; // 🔥 Importação do teu ficheiro de rotas
 import './LearnPage.css';
 
 type ChallengeType = 'card' | 'quiz';
@@ -56,6 +53,8 @@ type QuizSummary = {
   xpAwarded: number;
 };
 
+type ChallengeKind = 'image' | 'trueFalse' | 'multipleChoice';
+
 const getChallengeXpReward = (challenge: Challenge): number => (
   challenge.xp ?? Math.max(challenge.points + 1, challenge.points * 2)
 );
@@ -76,6 +75,12 @@ const hashText = (value: string): number => {
   return Math.abs(hash);
 };
 
+const getChallengeKind = (challenge: Challenge): ChallengeKind => {
+  if (challenge.imageOptions) return 'image';
+  if (challenge.type === 'quiz') return 'multipleChoice';
+  return 'trueFalse';
+};
+
 const getDailyChallenges = (allChallenges: Challenge[], dateKey: string): Challenge[] => {
   const ranked = [...allChallenges].sort((a, b) => {
     const rankA = hashText(`${dateKey}-${a.id}`);
@@ -83,74 +88,27 @@ const getDailyChallenges = (allChallenges: Challenge[], dateKey: string): Challe
     return rankA - rankB;
   });
 
-  const featured = allChallenges.filter((challenge) => challenge.featuredDaily);
-  const nonFeatured = ranked.filter((challenge) => !challenge.featuredDaily);
-  const dailySet = [...featured, ...nonFeatured].slice(0, Math.min(DAILY_CHALLENGES_COUNT, allChallenges.length));
+  const selected: Challenge[] = [];
+  const selectedIds = new Set<string>();
+  const requiredKinds: ChallengeKind[] = ['image', 'trueFalse', 'multipleChoice'];
 
-  return dailySet;
-};
+  requiredKinds.forEach((kind) => {
+    const match = ranked.find((challenge) => getChallengeKind(challenge) === kind && !selectedIds.has(challenge.id));
+    if (match) {
+      selected.push(match);
+      selectedIds.add(match.id);
+    }
+  });
 
-const getAdminQuizTypeTitle = (quiz: AdminQuiz): string => {
-  if (quiz.questionType === 'true_false') return 'Admin: Verdadeiro/Falso';
-  if (quiz.questionType === 'image_choice') return 'Admin: Escolha por imagem';
-  return 'Admin: Escolha múltipla';
-};
+  ranked.forEach((challenge) => {
+    if (selected.length >= DAILY_CHALLENGES_COUNT) return;
+    if (!selectedIds.has(challenge.id)) {
+      selected.push(challenge);
+      selectedIds.add(challenge.id);
+    }
+  });
 
-const mapAdminQuizToChallenge = (quiz: any): Challenge | null => {
-  const quizId = quiz._id || quiz.id;
-  if (!quizId) return null;
-
-  const correctIndex = quiz.options.findIndex((option: any) => option.id === quiz.correctOptionId);
-  if (correctIndex < 0) return null;
-
-  if (quiz.questionType === 'image_choice') {
-    return {
-      id: `admin-quiz-${quizId}`,
-      type: 'card',
-      visualTheme: 'teal',
-      points: quiz.xpValue,
-      titleText: getAdminQuizTypeTitle(quiz),
-      contentText: quiz.questionText,
-      sourceLabel: 'Fundamento médico indicado pelo administrador',
-      sourceUrl: quiz.medicalSourceUrl,
-      imageOptions: quiz.options.map((option: any) => ({
-        src: option.imageUrl || '',
-        alt: option.text
-      })),
-      correctIndex,
-      featuredDaily: true
-    };
-  }
-
-  if (quiz.questionType === 'true_false') {
-    return {
-      id: `admin-quiz-${quizId}`,
-      type: 'card',
-      visualTheme: 'orange',
-      points: quiz.xpValue,
-      titleText: getAdminQuizTypeTitle(quiz),
-      contentText: quiz.questionText,
-      sourceLabel: 'Fundamento médico indicado pelo administrador',
-      sourceUrl: quiz.medicalSourceUrl,
-      correctAnswer: quiz.correctOptionId === 'true',
-      featuredDaily: true
-    };
-  }
-
-  return {
-    id: `admin-quiz-${quizId}`,
-    type: 'quiz',
-    visualTheme: 'blue',
-    points: quiz.xpValue,
-    titleText: getAdminQuizTypeTitle(quiz),
-    contentText: 'Pergunta criada pelo administrador.',
-    sourceLabel: 'Fundamento médico indicado pelo administrador',
-    sourceUrl: quiz.medicalSourceUrl,
-    questionText: quiz.questionText,
-    optionsText: quiz.options.map((option: any) => option.text),
-    correctIndex,
-    featuredDaily: true
-  };
+  return selected.slice(0, Math.min(DAILY_CHALLENGES_COUNT, allChallenges.length));
 };
 
 const CHALLENGES: Challenge[] = [
@@ -402,6 +360,106 @@ const CHALLENGES: Challenge[] = [
     questionKey: 'learn.challenge20_question',
     optionsKeys: ['learn.challenge20_opt1', 'learn.challenge20_opt2', 'learn.challenge20_opt3'],
     correctIndex: 0
+  },
+  {
+    id: 'card-image-melanoma-invasive',
+    type: 'card',
+    visualTheme: 'blue',
+    points: 12,
+    titleKey: 'learn.challenge21_title',
+    contentKey: 'learn.challenge21_content',
+    sourceLabelKey: 'learn.challenge21_source',
+    sourceUrl: 'https://api.isic-archive.com/images/ISIC_0000013/',
+    imageOptions: [
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0000010.jpg',
+        alt: 'ISIC_0000010'
+      },
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0000013.jpg',
+        alt: 'ISIC_0000013'
+      }
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 'card-image-melanoma-in-situ-leg',
+    type: 'card',
+    visualTheme: 'teal',
+    points: 12,
+    titleKey: 'learn.challenge22_title',
+    contentKey: 'learn.challenge22_content',
+    sourceLabelKey: 'learn.challenge22_source',
+    sourceUrl: 'https://api.isic-archive.com/images/ISIC_0000022/',
+    imageOptions: [
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0000022.jpg',
+        alt: 'ISIC_0000022'
+      },
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0000012.jpg',
+        alt: 'ISIC_0000012'
+      }
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 'card-image-melanoma-arm',
+    type: 'card',
+    visualTheme: 'blue',
+    points: 12,
+    titleKey: 'learn.challenge23_title',
+    contentKey: 'learn.challenge23_content',
+    sourceLabelKey: 'learn.challenge23_source',
+    sourceUrl: 'https://api.isic-archive.com/images/ISIC_0010023/',
+    imageOptions: [
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0000001.jpg',
+        alt: 'ISIC_0000001'
+      },
+      {
+        src: 'https://isic-archive.s3.amazonaws.com/images/ISIC_0010023.jpg',
+        alt: 'ISIC_0010023'
+      }
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 'quiz-risk-factor-history',
+    type: 'quiz',
+    visualTheme: 'teal',
+    points: 16,
+    titleKey: 'learn.challenge24_title',
+    contentKey: 'learn.challenge24_content',
+    sourceLabelKey: 'learn.challenge24_source',
+    sourceUrl: 'https://www.cdc.gov/skin-cancer/risk-factors/index.html',
+    questionKey: 'learn.challenge24_question',
+    optionsKeys: ['learn.challenge24_opt1', 'learn.challenge24_opt2', 'learn.challenge24_opt3'],
+    correctIndex: 0
+  },
+  {
+    id: 'card-cloudy-days-uv',
+    type: 'card',
+    visualTheme: 'orange',
+    points: 10,
+    titleKey: 'learn.challenge25_title',
+    contentKey: 'learn.challenge25_content',
+    sourceLabelKey: 'learn.challenge25_source',
+    sourceUrl: 'https://www.aad.org/public/everyday-care/sun-protection/shade-clothing-sunscreen/how-to-apply-sunscreen',
+    correctAnswer: false
+  },
+  {
+    id: 'quiz-sunscreen-before-outdoors',
+    type: 'quiz',
+    visualTheme: 'orange',
+    points: 16,
+    titleKey: 'learn.challenge26_title',
+    contentKey: 'learn.challenge26_content',
+    sourceLabelKey: 'learn.challenge26_source',
+    sourceUrl: 'https://www.aad.org/public/everyday-care/sun-protection/shade-clothing-sunscreen/how-to-apply-sunscreen',
+    questionKey: 'learn.challenge26_question',
+    optionsKeys: ['learn.challenge26_opt1', 'learn.challenge26_opt2', 'learn.challenge26_opt3'],
+    correctIndex: 0
   }
 ];
 
@@ -414,45 +472,20 @@ export default function LearnPage() {
   const [reviewResults, setReviewResults] = useState<Record<string, ChallengeReviewResult>>({});
   const [quizSummary, setQuizSummary] = useState<QuizSummary | null>(null);
   const [isReviewingQuiz, setIsReviewingQuiz] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
   const [activeDailyIndex, setActiveDailyIndex] = useState(0);
   const [isSubmittingDailyQuiz, setIsSubmittingDailyQuiz] = useState(false);
 
-  const [remoteQuizzes, setRemoteQuizzes] = useState<any[]>([]);
-  const adminQuizzes = useLiveQuery(() => db.adminQuizzes.orderBy('createdAt').reverse().toArray(), []);
-
   const todayKey = getLocalDateKey(new Date());
-
-  useEffect(() => {
-    const fetchQuizzesDoBackend = async () => {
-      try {
-        const data = await api.getQuizzes();
-        setRemoteQuizzes(data);
-      } catch (err) {
-        console.warn("Falha ao ligar ao Mongo, a usar dados locais do Dexie...", err);
-      }
-    };
-    fetchQuizzesDoBackend();
-  }, []);
-
-  const allChallenges = useMemo(() => {
-    // Escolhe os dados remotos se existirem, caso contrário faz o fallback para o Dexie
-    const fonteDeDados = remoteQuizzes.length > 0 ? remoteQuizzes : (adminQuizzes || []);
-
-    const adminChallenges = fonteDeDados
-      .map(mapAdminQuizToChallenge)
-      .filter((challenge): challenge is Challenge => challenge !== null);
-
-    return [...adminChallenges, ...CHALLENGES];
-  }, [adminQuizzes, remoteQuizzes]);
 
   const dailyChallenges = useMemo(() => {
     try {
-      return getDailyChallenges(allChallenges, todayKey);
+      return getDailyChallenges(CHALLENGES, todayKey);
     } catch (err) {
       console.error('Error computing dailyChallenges', err);
       return [] as Challenge[];
     }
-  }, [allChallenges, todayKey]);
+  }, [todayKey]);
 
   const activeDailyChallenge = dailyChallenges[activeDailyIndex] || null;
   const activeDailyChallengeId = activeDailyChallenge?.id;
@@ -474,6 +507,7 @@ export default function LearnPage() {
       setReviewResults({});
       setQuizSummary(null);
       setIsReviewingQuiz(false);
+      setQuizStarted(false);
       setActiveDailyIndex(0);
       setChallengeNotice({ tone: 'success', message: 'Questionarios reiniciados para este utilizador.' });
 
@@ -517,6 +551,7 @@ export default function LearnPage() {
       setReviewResults({});
       setQuizSummary(null);
       setIsReviewingQuiz(false);
+      setQuizStarted(false);
       setActiveDailyIndex(0);
       setChallengeNotice({ tone: 'success', message: 'Questionários reiniciados para este utilizador.' });
       window.history.replaceState(null, '', window.location.pathname);
@@ -612,6 +647,7 @@ export default function LearnPage() {
   }, {});
 
   const handleSelectOption = (challenge: Challenge, selected: number) => {
+    setQuizStarted(true);
     setSelectedOptions((prev) => ({ ...prev, [challenge.id]: selected }));
     setChallengeNotice((current) => (current?.challengeId === challenge.id ? null : current));
   };
@@ -704,6 +740,7 @@ export default function LearnPage() {
         xpAwarded: result.xpAwarded
       });
       setIsReviewingQuiz(false);
+      setQuizStarted(false);
       setChallengeNotice(null);
       setActiveDailyIndex(firstWrong ? dailyChallenges.findIndex((challenge) => challenge.id === firstWrong.challenge.id) : 0);
 
@@ -788,11 +825,32 @@ export default function LearnPage() {
               className="review-questions-button"
               onClick={() => {
                 setIsReviewingQuiz(true);
+                setQuizStarted(true);
                 setActiveDailyIndex(0);
               }}
             >
               {t('learn.review_questions')}
             </button>
+          </article>
+        ) : !quizStarted && activeDailyChallenge && !allDailyChallengesCompleted ? (
+          <article className="learn-card quiz-start-card">
+            <div className="learn-card-header">
+              <h3>{t('learn.start_title')}</h3>
+              <span className="completed-badge">{t('learn.start_count', { count: DAILY_CHALLENGES_COUNT })}</span>
+            </div>
+            <p>{t('learn.start_desc')}</p>
+            <div className="quiz-start-actions">
+              <button
+                type="button"
+                className="review-questions-button"
+                onClick={() => {
+                  setQuizStarted(true);
+                  setActiveDailyIndex(0);
+                }}
+              >
+                {t('learn.start_quiz')}
+              </button>
+            </div>
           </article>
         ) : activeDailyChallenge ? (
           (() => {
