@@ -100,6 +100,9 @@ app.post('/api/register', async (req, res) => {
             name, email, dob: new Date(dob), skinHistory,
             createdAt: new Date(), lastScanDate: new Date()
         });
+        const existingUser = await User.findOne({ email: normalizedEmail });
+        if (existingUser) {
+            return res.status(409).json({ error: "Este email já está registado." });
         await newUser.save();
 
         const age = new Date().getFullYear() - new Date(dob).getFullYear();
